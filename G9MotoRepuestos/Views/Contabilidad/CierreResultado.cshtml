@@ -1,0 +1,245 @@
+﻿@{
+    ViewData["Title"] = "Resultado del Cierre Contable";
+}
+
+
+<div class="container">
+    <h2 class="titulo">Resultado del Cierre Contable</h2>
+
+    <!-- Información del cierre -->
+    <div class="card">
+        <h3 class="subtitulo">Resumen del periodo</h3>
+
+        <div class="info">
+            <p><strong>Tipo de Cierre:</strong> Cierre Diario</p>
+            <p><strong>Fecha / Periodo:</strong> 2025-11-30</p>
+            <p><strong>Estado:</strong> <span class="estado-exito">Cierre realizado exitosamente</span></p>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="totales">
+            <div class="total-card ingreso">
+                <p class="label">Total Ingresos</p>
+                <p class="monto">₡125,000</p>
+            </div>
+
+            <div class="total-card egreso">
+                <p class="label">Total Egresos</p>
+                <p class="monto">₡32,000</p>
+            </div>
+
+            <div class="total-card balance">
+                <p class="label">Balance Final</p>
+                <p class="monto">₡93,000</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla con lista de movimientos -->
+    <div class="card">
+        <h3 class="subtitulo">Movimientos incluidos en el cierre</h3>
+
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                    <th>Categoría</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2025-11-30</td>
+                    <td>Ingreso</td>
+                    <td class="monto-ingreso">+ ₡75,000</td>
+                    <td>Ventas</td>
+                </tr>
+                <tr>
+                    <td>2025-11-30</td>
+                    <td>Ingreso</td>
+                    <td class="monto-ingreso">+ ₡50,000</td>
+                    <td>Servicios</td>
+                </tr>
+                <tr>
+                    <td>2025-11-30</td>
+                    <td>Egreso</td>
+                    <td class="monto-egreso">- ₡20,000</td>
+                    <td>Insumos</td>
+                </tr>
+                <tr>
+                    <td>2025-11-30</td>
+                    <td>Egreso</td>
+                    <td class="monto-egreso">- ₡12,000</td>
+                    <td>Transporte</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botones -->
+    <div class="botones">
+        <a href="/Contabilidad" class="btn">Volver al menú</a>
+        <a href="/Contabilidad/Cierres" class="btn">Realizar otro cierre</a>
+        <a href="/Contabilidad/Historial" class="btn">Ir al historial</a>
+    </div>
+</div>
+
+
+
+<!-- ESTILOS -->
+<style>
+
+    /* Fondo general */
+    body {
+        background: #f4f4f4;
+    }
+
+    .container {
+        max-width: 850px;
+        margin: 30px auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.10);
+    }
+
+    /* Títulos con el color del proyecto */
+    .titulo {
+        text-align: center;
+        font-size: 26px;
+        margin-bottom: 25px;
+        color: #c62828; /* rojo elegante */
+        font-weight: bold;
+    }
+
+    .subtitulo {
+        font-size: 20px;
+        margin-bottom: 15px;
+        color: #c62828;
+        font-weight: bold;
+    }
+
+    /* Cards */
+    .card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .info p {
+        margin: 4px 0;
+        font-size: 15px;
+        color: #333333;
+    }
+
+    .estado-exito {
+        color: #2e7d32;
+        font-weight: bold;
+    }
+
+    .divider {
+        margin: 15px 0;
+        border: none;
+        border-top: 1px solid #d0d0d0;
+    }
+
+    /* Totales */
+    .totales {
+        display: flex;
+        gap: 15px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .total-card {
+        flex: 1;
+        min-width: 180px;
+        background: #fafafa;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+    }
+
+        .total-card .label {
+            color: #333333;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .total-card .monto {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+    .ingreso .monto {
+        color: #2e7d32;
+    }
+
+    .egreso .monto {
+        color: #c62828;
+    }
+
+    .balance .monto {
+        color: #1565c0;
+    }
+
+    /* TABLA estilo del proyecto */
+    .tabla {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .tabla th {
+            background: #000000;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .tabla td {
+            padding: 10px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333333;
+        }
+
+    .monto-ingreso {
+        color: #2e7d32;
+        font-weight: bold;
+    }
+
+    .monto-egreso {
+        color: #c62828;
+        font-weight: bold;
+    }
+
+    /* Botones estilo rojo */
+    .botones {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        text-decoration: none;
+        background: #c62828;
+        color: white;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+        .btn:hover {
+            background: #b71c1c;
+        }
+
+</style>
