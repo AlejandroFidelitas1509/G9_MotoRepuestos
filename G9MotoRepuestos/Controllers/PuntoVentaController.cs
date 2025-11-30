@@ -8,5 +8,10 @@ namespace G9MotoRepuestos.Controllers
         {
             return View();
         }
+
+        public IActionResult Cobrar()
+        {
+            return View();
+        }
     }
 }
