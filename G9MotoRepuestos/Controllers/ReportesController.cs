@@ -8,5 +8,27 @@ namespace G9MotoRepuestos.Controllers
         {
             return View();
         }
+
+        public IActionResult RepInventario()
+        {
+            return View();
+        }
+
+        public IActionResult RepUsuarios()
+        {
+            return View();
+        }
+        public IActionResult RepVentas()
+        {
+            return View();
+        }
+        public IActionResult RepServicios()
+        {
+            return View();
+        }
+        public IActionResult RepCitas()
+        {
+            return View();
+        }
     }
 }

@@ -1,0 +1,185 @@
+﻿
+@{
+    ViewData["Title"] = "Reporte de Inventario - Moto Repuestos Rojas";
+}
+
+<div class="reporte-container">
+    <h1 class="titulo">Reporte de Inventario</h1>
+    <p class="subtitulo-desc">Detalle del stock actual de repuestos y productos.</p>
+
+
+    <div class="acciones-reporte">
+
+
+        <a asp-action="Index" class="btn-volver">Volver</a>
+
+        <input type="text" id="buscar-item" placeholder="" class="input-busqueda">
+        <button class="btn-buscar">Buscar</button>
+        <button class="btn-exportar-excel">Exportar a Excel</button>
+        <button class="btn-exportar-pdf">Exportar a PDF</button>
+    </div>
+
+    <div class="tabla-scroll">
+        <table class="tabla-inventario">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Stock Actual</th>
+                    <th>Precio Venta</th>
+                    <th>Último Ingreso</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>REP-001</td>
+                    <td>Batería de Gel 12V</td>
+                    <td>15</td> 
+                    <td>₡25,000.00</td>
+                    <td>2025-11-20</td>
+                </tr>
+                <tr>
+                    <td>REP-005</td>
+                    <td>Kit de Frenos Traseros</td>
+                    <td>3</td> 
+                    <td>₡18,500.00</td>
+                    <td>2025-10-01</td>
+                </tr>
+                <tr>
+                    <td>REP-010</td>
+                    <td>Aceite Sintético (L)</td>
+                    <td>8</td> 
+                    <td>₡3,200.00</td>
+                    <td>2025-11-25</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .reporte-container {
+        margin: 30px auto;
+        max-width: 1000px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo {
+        color: #d32f2f;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 2em;
+        font-weight: bold;
+    }
+
+    .subtitulo-desc {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #666;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #ccc;
+    }
+
+    .acciones-reporte {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        align-items: center;
+    }
+
+    .input-busqueda {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .btn-buscar, .btn-exportar-pdf, .btn-exportar-excel, .btn-volver {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        text-decoration: none; 
+        text-align: center;
+        display: inline-block; 
+        color: #fff; 
+    }
+
+    .btn-volver {
+        background-color: #333; 
+    }
+
+        .btn-volver:hover {
+            background-color: #222;
+        }
+
+    .btn-buscar {
+        background-color: #6c757d; 
+    }
+
+        .btn-buscar:hover {
+            background-color: #5a6268;
+        }
+
+    .btn-exportar-pdf {
+        background-color: #d32f2f;
+    }
+
+        .btn-exportar-pdf:hover {
+            background-color: #b71c1c;
+        }
+
+    .btn-exportar-excel {
+        background-color: #008000; 
+    }
+
+        .btn-exportar-excel:hover {
+            background-color: #006400;
+        }
+
+
+
+    .tabla-scroll {
+        overflow-x: auto; 
+    }
+
+    .tabla-inventario {
+        width: 100%;
+        min-width: 600px; 
+        border-collapse: collapse;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+        .tabla-inventario thead th {
+            background-color: #333;
+            color: #fff;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .tabla-inventario tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+
+        .tabla-inventario tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+  
+</style>

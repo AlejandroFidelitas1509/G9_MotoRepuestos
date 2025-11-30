@@ -1,0 +1,296 @@
+﻿<div class="punto-venta-container">
+    <h2 class="titulo">Finalizar Venta</h2>
+
+    <div class="layout-cobro">
+
+        <div class="columna-formas-pago">
+            <h3 class="subtitulo">Forma de Pago</h3>
+
+            <div class="selector-pago">
+
+                <label class="opcion-pago seleccionado">
+                    <input type="radio" name="formaPago" checked>
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Efectivo</span>
+                </label>
+
+                <label class="opcion-pago">
+                    <input type="radio" name="formaPago">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Tarjeta</span>
+                </label>
+
+                <label class="opcion-pago">
+                    <input type="radio" name="formaPago">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Sinpe / Transf.</span>
+                </label>
+
+            </div>
+
+            <div class="notas-venta">
+                <label class="subtitulo-sm">Notas de la venta (Opcional):</label>
+                <textarea rows="3" class="input-notas" placeholder="Ej: Cliente retira mañana..."></textarea>
+            </div>
+        </div>
+
+
+        <div class="columna-calculos">
+
+            <div class="caja-total-final">
+                <span class="etiqueta-total">TOTAL A PAGAR:</span>
+                <span class="monto-total">₡23730</span>
+            </div>
+
+            <div class="caja-interaccion-pago">
+                <div class="fila-calculo">
+                    <label>PAGÓ CON:</label>
+                    <input type="number" class="input-gigante" placeholder="₡0.00" autofocus>
+                </div>
+
+                <div class="fila-calculo cambio-zona">
+                    <label>CAMBIO:</label>
+                    <span class="valor-cambio">₡0.00</span>
+                </div>
+            </div>
+
+            <div class="acciones-finales">
+                <button class="btn-cobrar-final">
+                    <i class="fas fa-check-circle"></i> Cobrar e Imprimir
+                </button>
+
+                <a asp-action="Index" class="btn-regresar">
+                    Cancelar
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .selector-pago {
+        display: grid;      
+        grid-template-columns: 1fr;
+        gap: 15px; 
+        margin-bottom: 20px;
+    }
+
+    .opcion-pago {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #555;
+    }
+
+    .punto-venta-container {
+        margin: 30px auto;
+        max-width: 900px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .titulo {
+        color: #d32f2f;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 2em;
+        font-weight: bold;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+    }
+
+    .subtitulo {
+        font-weight: bold;
+        color: #333;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .layout-cobro {
+        display: flex;
+        gap: 30px;
+    }
+
+    .columna-formas-pago {
+        flex: 1;
+        padding-right: 20px;
+        border-right: 1px dashed #ccc;
+    }
+
+    .columna-calculos {
+        flex: 1.2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .opcion-pago:hover {
+        background-color: #f9f9f9;
+        border-color: #bbb;
+    }
+
+    .opcion-pago input[type="radio"] {
+        display: none;
+    }
+
+    .opcion-pago:has(input:checked) {
+        border-color: #d32f2f;
+        background-color: #fff0f0;
+        color: #d32f2f;
+        font-weight: bold;
+    }
+
+    .opcion-pago i {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .notas-venta {
+        margin-top: 20px;
+    }
+
+    .subtitulo-sm {
+        font-size: 0.9em;
+        font-weight: bold;
+        color: #666;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .input-notas {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: none;
+    }
+
+    .caja-total-final {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .etiqueta-total {
+        display: block;
+        font-size: 1.2em;
+        opacity: 0.8;
+    }
+
+    .monto-total {
+        display: block;
+        font-size: 3.5em;
+        font-weight: bold;
+        color: #fff;
+        line-height: 1;
+    }
+
+    .caja-interaccion-pago {
+        background-color: #f2f2f2;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .fila-calculo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+        .fila-calculo label {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+    .input-gigante {
+        width: 60%;
+        font-size: 2em;
+        padding: 5px 10px;
+        text-align: right;
+        border: 2px solid #d32f2f;
+        border-radius: 5px;
+        color: #333;
+        outline: none;
+    }
+
+        .input-gigante:focus {
+            box-shadow: 0 0 8px rgba(211, 47, 47, 0.3);
+        }
+
+    .cambio-zona {
+        border-top: 1px solid #ccc;
+        padding-top: 15px;
+        margin-bottom: 0;
+    }
+
+    .valor-cambio {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #008000;
+    }
+
+    .acciones-finales {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-cobrar-final {
+        background-color: #d32f2f;
+        color: #fff;
+        padding: 15px;
+        font-size: 1.5em;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+        .btn-cobrar-final:hover {
+            background-color: #b71c1c;
+        }
+
+    .btn-regresar {
+        display: block;
+        text-align: center;
+        background-color: #6c757d;
+        color: #fff;
+        padding: 12px;
+        font-size: 1em;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+        .btn-regresar:hover {
+            background-color: #5a6268;
+        }
+
+    .columna-formas-pago {
+        border-right: none;
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 20px;
+        padding-right: 0;
+    }
+
+    
+</style>
