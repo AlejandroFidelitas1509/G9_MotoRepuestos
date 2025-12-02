@@ -1,0 +1,293 @@
+﻿@model IEnumerable<G9MotoRepuestos.Models.PuntoVenta>
+
+@{
+    ViewData["Title"] = "Punto de Venta - Moto Repuestos Rojas";
+}
+
+<div class="punto-venta-container">
+    <h2 class="titulo">Punto de Venta</h2>
+
+    <div class="cuerpo-venta">
+
+        <div class="panel-detalle">
+     
+            <div class="buscador-productos">           
+                <input type="text" id="buscar-producto" placeholder="" class="input-busqueda">
+                <button class="btn-buscar">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+          
+            <div class="tabla-scroll">
+                <table class="tabla-items">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cant.</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>231234</td>
+                            <td>Batería 12V</td>
+                            <td>
+                                <input type="number" value="2" min="1" class="input-cantidad">
+                            </td>
+                            <td>₡18000</td>
+                            <td>
+                                <button class="btn-eliminar-item">Eliminar</button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>12441</td>
+                            <td>Filtro de Aceite</td>
+                            <td>
+                                <input type="number" value="1" min="1" class="input-cantidad">
+                            </td>
+                            <td>₡3000</td>
+                            <td>
+                                <button class="btn-eliminar-item">Eliminar</button>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-resumen">
+            <h3 class="subtitulo">Resumen de Venta</h3>
+
+            <div class="resumen-detalle">
+                <div class="linea-resumen">
+                    <span>Subtotal:</span>
+                    <span id="subtotal-valor">₡21000</span>
+                </div>
+                <div class="linea-resumen">
+                    <span>IVA:</span>
+                    <span id="impuestos-valor">₡2730</span>
+                </div>
+                <div class="linea-resumen total-linea">
+                    <span>TOTAL A PAGAR:</span>
+                    <span id="total-valor">₡23730</span>
+                </div>
+            </div>
+
+            <div class="acciones-venta">
+               
+                <a asp-action="Cobrar" class="btn-facturar">Cobrar</a>
+                <button type="reset" class="btn-danger">Reiniciar</button>
+
+            </div>
+
+        </div>
+      
+    </div>
+
+</div>
+
+<style>
+    
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .punto-venta-container {
+        margin: 30px auto;
+        max-width: 1200px; 
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo {
+        color: #d32f2f;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 2em;
+        font-weight: bold;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+    }
+
+    .subtitulo {
+        font-weight: bold;
+        color: #333;
+        font-size: 1.1em;
+    }
+
+    .cuerpo-venta {
+        display: flex;
+        gap: 25px;
+    }
+
+    .panel-detalle {
+        flex: 3;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-resumen {
+        flex: 1; 
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        border: 1px solid #ccc;
+        min-width: 250px;
+    }
+
+    .buscador-productos {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: flex-end;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed #ccc;
+    }
+
+        .buscador-productos label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+    .input-busqueda {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .btn-buscar {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+        .btn-buscar:hover {
+            background-color: #555;
+        }
+
+    .tabla-scroll {
+        overflow-y: auto;
+        max-height: 400px; 
+    }
+
+    .tabla-items {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .tabla-items th {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+            position: sticky; 
+            top: 0;
+        }
+
+        .tabla-items td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .tabla-items tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+    .input-cantidad {
+        width: 60px;
+        text-align: center;
+        padding: 3px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    .btn-eliminar-item {
+        background-color: #b71c1c;
+        color: #fff;
+        padding: 5px 8px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+    .resumen-detalle {
+        margin: 20px 0;
+        padding: 15px 0;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .linea-resumen {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+
+    .total-linea {
+        font-weight: bold;
+        color: #d32f2f; 
+        font-size: 1.3em;
+        padding-top: 10px;
+        border-top: 2px solid #d32f2f;
+    }
+
+    .acciones-venta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-facturar {
+        background-color: #d32f2f;
+        color: #fff;
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 1.1em;
+        text-decoration: none;
+        text-align: center;
+    }
+
+        .btn-facturar {
+            background-color: #b71c1c;
+        }
+
+    .btn-danger {
+        background-color: #6c757d;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-danger{
+            background-color: #5a6268;
+        }
+
+</style>
