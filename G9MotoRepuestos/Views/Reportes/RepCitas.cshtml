@@ -1,0 +1,192 @@
+﻿
+@{
+    ViewData["Title"] = "Reporte de Citas - Moto Repuestos Rojas";
+}
+
+<div class="reporte-container">
+    <h1 class="titulo">Reporte de Citas</h1>
+    <p class="subtitulo-desc">Registro y estado de las citas y turnos agendados en el taller.</p>
+
+
+    <div class="acciones-reporte">
+
+        <a asp-action="Index" class="btn-volver">Volver</a>
+
+        <input type="text" id="buscar-item" placeholder="" class="input-busqueda">
+        <button class="btn-buscar">Buscar</button>
+        <button class="btn-exportar-excel">Exportar a Excel</button>
+        <button class="btn-exportar-pdf">Exportar a PDF</button>
+    </div>
+
+
+    <div class="tabla-scroll">
+        <table class="tabla-inventario">
+            <thead>
+                <tr>
+                    <th>Cita No.</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Servicio Solicitado</th>
+                    <th>Mecánico asignado</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>CITA-001</td>
+                    <td>2025-12-05</td>
+                    <td>09:00 AM</td>
+                    <td>Ana Gómez</td>
+                    <td>Mantenimiento Menor</td>
+                    <td>Carlos Soto</td>
+                    <td>Confirmada</td>
+                </tr>
+                <tr>
+                    <td>CITA-002</td>
+                    <td>2025-12-05</td>
+                    <td>11:30 AM</td>
+                    <td>Juan Pérez</td>
+                    <td>Diagnóstico de Fallas</td>
+                    <td>Pedro Ríos</td>
+                    <td>Pendiente</td>
+                </tr>
+                <tr>
+                    <td>CITA-003</td>
+                    <td>2025-12-06</td>
+                    <td>02:00 PM</td>
+                    <td>Público General</td>
+                    <td>Revisión de Frenos</td>
+                    <td>Sebastian</td>
+                    <td>Cancelada</td>
+                </tr>
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .reporte-container {
+        margin: 30px auto;
+        max-width: 1000px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo {
+        color: #d32f2f;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 2em;
+        font-weight: bold;
+    }
+
+    .subtitulo-desc {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #666;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #ccc;
+    }
+
+    .acciones-reporte {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        align-items: center;
+    }
+
+    .input-busqueda {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .btn-buscar, .btn-exportar-pdf, .btn-exportar-excel, .btn-volver {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        text-decoration: none; 
+        text-align: center;
+        display: inline-block; 
+        color: #fff;
+    }
+
+    .btn-volver {
+        background-color: #333; 
+    }
+
+        .btn-volver:hover {
+            background-color: #222;
+        }
+
+    .btn-buscar {
+        background-color: #6c757d; 
+    }
+
+        .btn-buscar:hover {
+            background-color: #5a6268;
+        }
+
+    .btn-exportar-pdf {
+        background-color: #d32f2f; 
+    }
+
+        .btn-exportar-pdf:hover {
+            background-color: #b71c1c;
+        }
+
+    .btn-exportar-excel {
+        background-color: #008000; 
+    }
+
+        .btn-exportar-excel:hover {
+            background-color: #006400;
+        }
+
+    .tabla-scroll {
+        overflow-x: auto; 
+    }
+
+    .tabla-inventario {
+        width: 100%;
+        min-width: 850px; 
+        border-collapse: collapse;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+        .tabla-inventario thead th {
+            background-color: #333;
+            color: #fff;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .tabla-inventario tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+
+        .tabla-inventario tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+</style>
