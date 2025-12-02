@@ -1,0 +1,153 @@
+﻿
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<div class="usuarios-container">
+    <h1 class="titulo">Gestión de Usuarios MotoRepuestos</h1>
+
+    <div class="acciones">
+        <a asp-controller="Usuarios" asp-action="Create" class="btn-crear">+ Crear Usuario</a>
+    </div>
+
+    <table class="tabla-usuarios">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Correo</th>
+                <th>Telefono</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Juan </td>
+                <td>Perez</td>
+                <td>juan@example.com</td>
+                <td>12345678</td>
+                <td>Admin</td>
+                <td>
+                    <a asp-controller="Usuarios" asp-action="Edit" class="btn-accion">Editar</a>
+                    <button class="btn-accion" data-bs-toggle="modal" data-bs-target="#modalEliminar"
+                            data-nombre="Juan" data-apellido="Pérez" data-correo="juan@example.com"
+                            data-telefono="8888-9999" data-rol="Administrador">
+                        Eliminar
+                    </button>
+
+                </td>
+            </tr>
+            <tr>
+                <td>Ana </td>
+                <td>Gomez</td>
+                <td>ana@example.com</td>
+                <td>12345678</td>
+                <td>Usuario</td>
+                <td>
+                    <a asp-controller="Usuarios" asp-action="Edit" class="btn-accion">Editar</a>
+                    <button class="btn-accion" data-bs-toggle="modal" data-bs-target="#modalEliminar"
+                            data-nombre="Ana" data-apellido="Gomez" data-correo="ana@example.com"
+                            data-telefono="12345678" data-rol="Usuario">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Eliminar Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Seguro que deseas eliminar este usuario?</p>
+                <ul>
+                    <li><strong>Nombre:</strong> <span id="nombre"></span></li>
+                    <li><strong>Apellido:</strong> <span id="apellido"></span></li>
+                    <li><strong>Correo:</strong> <span id="correo"></span></li>
+                    <li><strong>Teléfono:</strong> <span id="telefono"></span></li>
+                    <li><strong>Rol:</strong> <span id="rol"></span></li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-guardar">Eliminar</button>
+                <button type="button" class="btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .usuarios-container {
+        margin: 30px auto;
+        max-width: 900px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo {
+        color: #d32f2f; 
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .acciones {
+        text-align: right;
+        margin-bottom: 15px;
+    }
+
+    .btn-crear {
+        background-color: #d32f2f;
+        color: #fff;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .btn-crear:hover {
+        background-color: #b71c1c;
+    }
+
+    .tabla-usuarios {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .tabla-usuarios th {
+        background-color: #333;
+        color: #fff;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .tabla-usuarios td {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .btn-accion {
+        margin-right: 10px;
+        color: #d32f2f;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn-accion:hover {
+        color: #000;
+    }
+</style>

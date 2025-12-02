@@ -1,0 +1,287 @@
+﻿@{
+    ViewData["Title"] = "Gestión de Servicios";
+}
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+<style>
+   
+    .panel-modulo {
+        width: 90%;
+        margin: 40px auto;
+        background: #ffffff;
+        padding: 25px 35px;
+        border-radius: 14px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.10);
+    }
+
+/
+    .titulo-modulo {
+        font-size: 28px;
+        color: #b70000;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+ 
+    .nav-tabs .nav-link.active {
+        background-color: #b70000 !important;
+        color: white !important;
+        font-weight: 600;
+        border-radius: 6px 6px 0 0;
+    }
+
+    .nav-tabs .nav-link {
+        color: #333;
+        font-weight: 500;
+    }
+
+
+    .btn-rojo {
+        background-color: #d92727;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .btn-rojo:hover {
+            background-color: #b21e1e;
+        }
+
+ 
+    .tabla-estilo {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .tabla-estilo th {
+            background: #1a1a1a;
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+        }
+
+        .tabla-estilo td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+ 
+    .accion-link {
+        color: #c31a1a;
+        font-weight: 500;
+        text-decoration: none;
+        margin-right: 12px;
+    }
+
+        .accion-link:hover {
+            text-decoration: underline;
+        }
+
+
+    #modalEditar {
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+</style>
+
+
+<div class="panel-modulo">
+
+    <h2 class="titulo-modulo">Gestión de Servicios MotoRepuestos</h2>
+
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-info">@ViewBag.Mensaje</div>
+    }
+
+
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#agregar">Agregar Servicio</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#lista">Servicios Registrados</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#diagnostico">Diagnóstico</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#seguimiento">Seguimiento</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#bitacora">Bitácora</button></li>
+    </ul>
+
+
+
+    <div class="tab-content">
+
+  
+        <div class="tab-pane fade show active" id="agregar">
+
+            <form method="post" asp-action="CrearServicio">
+                <div class="mb-3">
+                    <label>Nombre del Servicio</label>
+                    <input class="form-control" name="Nombre" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Descripción</label>
+                    <textarea class="form-control" name="Descripcion"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>Precio Referencial</label>
+                    <input class="form-control" type="number" name="Precio" />
+                </div>
+
+                <button class="btn-rojo w-100">Guardar Servicio</button>
+            </form>
+        </div>
+
+
+
+
+        <div class="tab-pane fade" id="lista">
+
+            <h4 class="mb-3">Servicios Disponibles</h4>
+
+            <table class="tabla-estilo">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Servicio</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Cambio de aceite</td>
+                        <td>Mantenimiento básico</td>
+                        <td>$20</td>
+                        <td>
+                            <a href="#" class="accion-link" onclick="mostrarEditar(1, 'Cambio de aceite', 'Mantenimiento básico', 20)">Editar</a>
+                            <a href="#" class="accion-link">Eliminar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div id="modalEditar" class="bg-light mt-3" style="display:none;">
+                <h5 class="mb-2">Editar Servicio</h5>
+
+                <form method="post" asp-action="EditarServicio">
+                    <input type="hidden" id="editId" name="Id" />
+
+                    <div class="mb-2">
+                        <label>Nombre</label>
+                        <input id="editNombre" name="Nombre" class="form-control" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Descripción</label>
+                        <input id="editDescripcion" name="Descripcion" class="form-control" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Precio</label>
+                        <input id="editPrecio" name="Precio" class="form-control" />
+                    </div>
+
+                    <button class="btn btn-success">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarEditar()">Cancelar</button>
+                </form>
+            </div>
+
+        </div>
+
+
+
+        <div class="tab-pane fade" id="diagnostico">
+            <h4>Registrar diagnóstico</h4>
+
+            <form method="post" asp-action="RegistrarDiagnostico">
+                <div class="mb-3">
+                    <label>ID del Servicio</label>
+                    <input class="form-control" name="IdServicio" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Diagnóstico</label>
+                    <textarea class="form-control" name="Diagnostico"></textarea>
+                </div>
+
+                <button class="btn-rojo w-100">Guardar diagnóstico</button>
+            </form>
+        </div>
+
+
+
+
+        <div class="tab-pane fade" id="seguimiento">
+            <h4>Seguimiento del Servicio</h4>
+
+            <form method="post" asp-action="ConsultarEstado">
+                <label>Ingrese ID del servicio</label>
+                <input class="form-control mb-2" name="IdServicio" />
+
+                <button class="btn-rojo w-100">Consultar</button>
+            </form>
+
+            <div class="mt-3 p-3 border bg-light">
+                <p><strong>Estado actual:</strong> En Proceso</p>
+                <p><strong>Diagnóstico:</strong> Revisando sistema eléctrico</p>
+                <p><strong>Mecánico asignado:</strong> Juan Pérez</p>
+            </div>
+        </div>
+
+
+
+        <div class="tab-pane fade" id="bitacora">
+            <h4>Bitácora de movimientos</h4>
+
+            <table class="tabla-estilo">
+                <thead>
+                    <tr>
+                        <th>Acción</th>
+                        <th>ID Servicio</th>
+                        <th>Fecha y Hora</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>Creación</td>
+                        <td>1</td>
+                        <td>2025-02-01 10:32 AM</td>
+                    </tr>
+
+                    <tr>
+                        <td>Edición</td>
+                        <td>1</td>
+                        <td>2025-02-02 14:10 PM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    function mostrarEditar(id, nombre, descripcion, precio) {
+        document.getElementById("modalEditar").style.display = "block";
+        document.getElementById("editId").value = id;
+        document.getElementById("editNombre").value = nombre;
+        document.getElementById("editDescripcion").value = descripcion;
+        document.getElementById("editPrecio").value = precio;
+    }
+
+    function cerrarEditar() {
+        document.getElementById("modalEditar").style.display = "none";
+    }
+</script>

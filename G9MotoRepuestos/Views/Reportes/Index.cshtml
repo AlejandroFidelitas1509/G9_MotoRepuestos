@@ -1,0 +1,150 @@
+﻿@model IEnumerable<G9MotoRepuestos.Models.Reportes>
+
+@{
+    ViewData["Title"] = " Reportes -  Moto Repuestos Rojas";
+}
+
+<div class="reportes-container">
+
+    <header class="mb-10 pb-4" style="border-bottom: 1px solid #ccc;">
+        <h1 class="titulo">Panel de Reportes</h1>      
+    </header>
+
+    <div class="mb-3" display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+
+        <div data-reporte="inventario" class="report-card mb-3">
+            <h2>Reporte de Inventario</h2>
+            <p>Gestión y control de las existencias de productos y repuestos.</p>
+            <a asp-action="RepInventario" class="btn-reporte">Generar Reporte</a>
+        </div>
+
+        <div data-reporte="usuarios" class="report-card mb-3">
+            <h2>Reporte de Usuarios</h2>
+            <p>Listado de usuarios registrados y sus datos principales.</p>
+            <a asp-action="RepUsuarios" class="btn-reporte">Generar Reporte</a>
+        </div>
+
+        <div data-reporte="ventas" class="report-card mb-3">
+            <h2>Reporte de Ventas</h2>
+            <p>Análisis de transacciones y rendimiento comercial en un período.</p>
+            <a asp-action="RepVentas" class="btn-reporte">Generar Reporte</a>
+        </div>
+
+        <div data-reporte="servicios" class="report-card mb-3">
+            <h2>Reporte de Servicios</h2>
+            <p>Detalles de servicios prestados, estado y costos asociados.</p>
+            <a asp-action="RepServicios" class="btn-reporte">Generar Reporte</a>
+        </div>
+
+        <div data-reporte="citas" class="report-card mb-3">
+            <h2>Reporte de Citas</h2>
+            <p>Registro y estado de las citas y turnos agendados.</p>
+            <a asp-action="RepCitas" class="btn-reporte">Generar Reporte</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .reportes-container {
+        margin: 30px auto;
+        max-width: 900px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo {
+        color: #d32f2f; 
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 2em;
+        font-weight: bold;
+    }
+
+    .subtitulo {
+        font-weight: bold;
+        color: #333;
+        font-size: 1.1em;
+    }
+
+    .btn-reporte {
+        background-color: #d32f2f;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+        .btn-reporte:hover {
+            background-color: #b71c1c;
+        }
+
+    .filtro-container {
+        background-color: #eee;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .report-card {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+        background-color: #fff;
+    }
+
+        .report-card h2 {
+            color: #333;
+            font-size: 1.25em;
+            margin-bottom: 10px;
+        }
+
+        .report-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+    .input-fecha {
+        border: 1px solid #ccc;
+        padding: 8px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    #mensaje-global {
+        border: 1px solid transparent;
+    }
+
+    .success-style {
+        background-color: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+
+    .error-style {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+
+    .warning-style {
+        background-color: #fff3cd;
+        color: #856404;
+        border-color: #ffeeba;
+    }
+</style>

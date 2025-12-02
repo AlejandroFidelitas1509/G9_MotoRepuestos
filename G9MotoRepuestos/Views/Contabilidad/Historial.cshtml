@@ -1,0 +1,164 @@
+﻿@{
+    ViewData["Title"] = "Historial de Cierres Contables";
+}
+
+<div class="panel">
+    <h2 class="titulo">Historial de Cierres Contables</h2>
+
+
+    <div class="acciones-barra">
+        <a asp-controller="Contabilidad" asp-action="Index" class="btn-volver">⮐ Volver al Menú</a>
+
+        <a asp-controller="Contabilidad" asp-action="Cierres" class="btn-crear">+ Nuevo Cierre</a>
+    </div>
+
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Ingresos</th>
+                <th>Egresos</th>
+                <th>Balance</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>2025-11-30</td>
+                <td>Diario</td>
+                <td>₡125,000</td>
+                <td>₡32,000</td>
+                <td>₡93,000</td>
+                <td>Completado</td>
+                <td>
+                    <a class="accion-editar" href="#">Ver</a>
+                    <a class="accion-eliminar" href="#">Eliminar</a>
+                </td>
+            </tr>
+
+            <tr>
+                <td>2025-11-29</td>
+                <td>Diario</td>
+                <td>₡110,500</td>
+                <td>₡25,000</td>
+                <td>₡85,500</td>
+                <td>Completado</td>
+                <td>
+                    <a class="accion-editar" href="#">Ver</a>
+                    <a class="accion-eliminar" href="#">Eliminar</a>
+                </td>
+            </tr>
+
+            <tr>
+                <td>2025-11-28</td>
+                <td>Semanal</td>
+                <td>₡780,000</td>
+                <td>₡220,000</td>
+                <td>₡560,000</td>
+                <td>Completado</td>
+                <td>
+                    <a class="accion-editar" href="#">Ver</a>
+                    <a class="accion-eliminar" href="#">Eliminar</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<style>
+
+    body {
+        background: #eef2f6;
+    }
+
+    .panel {
+        max-width: 900px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .titulo {
+        text-align: center;
+        font-size: 28px;
+        color: #d9534f;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    /* Barra que contiene ambos botones */
+    .acciones-barra {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    /* Botón volver */
+    .btn-volver {
+        background: #a6a6a6;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+        .btn-volver:hover {
+            background: #8e8e8e;
+        }
+
+    /* Botón nuevo cierre */
+    .btn-crear {
+        background: #d9534f;
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+        .btn-crear:hover {
+            background: #c64541;
+        }
+
+    /* TABLA */
+    .tabla {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+        .tabla thead th {
+            background: #000;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+        }
+
+        .tabla tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+            color: #333;
+        }
+
+    .accion-editar {
+        color: #d9534f;
+        font-weight: bold;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    .accion-eliminar {
+        color: #d9534f;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+</style>

@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Módulo de Contabilidad";
+}
+
+<style>
+    /* Fondo general */
+    body {
+        background-color: #f4f4f4 !important;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Contenedor general */
+    .main-container {
+        width: 80%;
+        max-width: 900px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Título */
+    .main-title {
+        text-align: center;
+        font-size: 28px;
+        color: #c62828;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    /* Buscador */
+    .search-box {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        font-size: 15px;
+    }
+
+    /* Estilo para montos */
+    .monto-ingreso {
+        color: #2e7d32; /* Verde */
+        font-weight: bold;
+    }
+
+    .monto-egreso {
+        color: #c62828; /* Rojo */
+        font-weight: bold;
+    }
+
+
+
+    /* Tabla personalizada */
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .table-custom th {
+            background: #212121;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .table-custom td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+    /* Botón rojo */
+    .btn-red {
+        background-color: #c62828;
+        color: white !important;
+        padding: 10px 18px;
+        border-radius: 6px;
+        border: none;
+        text-decoration: none;
+        font-size: 15px;
+    }
+
+        .btn-red:hover {
+            background-color: #a51f1f;
+            color: white !important;
+        }
+
+    /* Botón gris */
+    .btn-gray {
+        background-color: #616161;
+        color: white !important;
+        padding: 10px 18px;
+        border-radius: 6px;
+        border: none;
+        text-decoration: none;
+        font-size: 15px;
+    }
+
+        .btn-gray:hover {
+            background-color: #4e4e4e;
+            color: white !important;
+        }
+
+    /* Acciones */
+    .action-edit,
+    .action-delete {
+        color: #c62828 !important;
+        font-weight: bold;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+        .action-edit:hover,
+        .action-delete:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="main-container">
+
+    <h2 class="main-title">Módulo de Contabilidad</h2>
+
+    <!-- Buscador -->
+    <input type="text" class="search-box" placeholder="Buscar movimientos... Ej: 'ventas diarias'">
+
+    <!-- Tabla historial -->
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2025-01-12</td>
+                <td>Ingreso</td>
+                <td>Venta</td>
+                <td>Venta #001</td>
+                <td class="monto-ingreso">₡5,000</td>
+            </tr>
+
+            <tr>
+                <td>2025-01-12</td>
+                <td>Egreso</td>
+                <td>Caja</td>
+                <td>Compra de insumos</td>
+                <td class="monto-egreso">-₡1,200</td>
+            </tr>
+
+            <tr>
+                <td>2025-01-13</td>
+                <td>Ingreso</td>
+                <td>Venta</td>
+                <td>Venta #002</td>
+                <td class="monto-ingreso">₡3,500</td>
+            </tr>
+        </tbody>
+
+
+    </table>
+
+    <!-- Botones del módulo -->
+    <div class="d-flex justify-content-center mt-4" style="gap: 20px;">
+
+        <a asp-controller="Contabilidad" asp-action="Cierres" class="btn-red">
+            Cierres Contables
+        </a>
+
+        <a asp-controller="Contabilidad" asp-action="Historial" class="btn-gray">
+            Historial de Cierres
+        </a>
+
+    </div>
+
+</div>
