@@ -24,7 +24,7 @@
 
         <input type="hidden" name="tipo" value="diario" />
 
-        <button class="btn">Realizar cierre diario</button>
+        <button class="btn-rojo">Realizar cierre diario</button>
     </form>
 
     <!-- FORMULARIO SEMANAL -->
@@ -39,7 +39,7 @@
 
         <input type="hidden" name="tipo" value="semanal" />
 
-        <button class="btn">Realizar cierre semanal</button>
+        <button class="btn-rojo">Realizar cierre semanal</button>
     </form>
 
     <!-- FORMULARIO MENSUAL -->
@@ -51,11 +51,17 @@
 
         <input type="hidden" name="tipo" value="mensual" />
 
-        <button class="btn">Realizar cierre mensual</button>
+        <button class="btn-rojo">Realizar cierre mensual</button>
     </form>
+
+    <!-- BOTONES DE NAVEGACIÓN ABAJO -->
+    <div class="botones">
+        <a asp-controller="Contabilidad" asp-action="Index" class="btn-gray">Volver al menú</a>
+        <a asp-controller="Contabilidad" asp-action="Historial" class="btn-gray">Historial de cierres</a>
+    </div>
 </div>
 
-<!-- SCRIPT PARA MOSTRAR/OCULTAR -->
+<!-- SCRIPT -->
 <script>
     function cambiarFormulario() {
         var tipo = document.getElementById("tipoCierre").value;
@@ -66,7 +72,7 @@
     }
 </script>
 
-<!-- ESTILOS INTERNOS (sin archivo CSS) -->
+<!-- ESTILOS -->
 <style>
     .container {
         max-width: 700px;
@@ -74,35 +80,35 @@
         background: #ffffff;
         padding: 25px;
         border-radius: 15px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.10);
+        box-shadow: 0 0 10px rgba(0,0,0,.10);
     }
 
     .titulo {
         text-align: center;
         font-size: 28px;
         margin-bottom: 25px;
-        color: #2c3e50;
+        color: #262626;
         font-weight: bold;
     }
 
     .subtitulo {
         font-size: 20px;
         margin-bottom: 15px;
-        color: #3b4b5a;
+        color: #404040;
         font-weight: 600;
     }
 
     .card {
-        background: #f7f9fc;
+        background: #f3f4f6;
         padding: 20px;
         border-radius: 12px;
         margin-bottom: 25px;
-        border: 1px solid #d5dce3;
+        border: 1px solid #d4d4d8;
     }
 
     .label {
         font-weight: 600;
-        color: #3b4b5a;
+        color: #333;
         display: block;
         margin-bottom: 5px;
     }
@@ -111,15 +117,15 @@
         width: 100%;
         padding: 10px;
         border-radius: 8px;
-        border: 1px solid #bfc7d1;
+        border: 1px solid #cfcfcf;
         background: #ffffff;
         margin-bottom: 15px;
         font-size: 15px;
     }
 
-    .btn {
+    .btn-rojo {
         width: 100%;
-        background: #5c9ded;
+        background: #dc2626;
         color: white;
         padding: 12px;
         border: none;
@@ -127,10 +133,30 @@
         cursor: pointer;
         transition: .2s;
         font-size: 16px;
-        font-weight: 600;
+        font-weight: bold;
     }
 
-        .btn:hover {
-            background: #4a89d8;
+        .btn-rojo:hover {
+            background: #b91c1c;
+        }
+
+    .botones {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-gray {
+        background: #6b7280;
+        color: white;
+        padding: 12px 18px;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: bold;
+        transition: .2s;
+    }
+
+        .btn-gray:hover {
+            background: #4b5563;
         }
 </style>
