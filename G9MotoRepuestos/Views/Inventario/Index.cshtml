@@ -1,0 +1,188 @@
+﻿@{
+    ViewData["Title"] = "Inventario de Repuestos";
+}
+
+<h1 class="text-danger">@ViewData["Title"]</h1>
+<hr />
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-danger">Crear Producto</a>
+</div>
+
+<a asp-action="BitacoraEventos" class="btn btn-danger">Ver Bitácora</a>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Id Producto</th>
+                <th>Nombre</th>
+                <th>Stock</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Filtro de aire Yamaha</td>
+                <td>25</td>
+                <td>₡8,500</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="1" class="btn btn-sm btn-danger">Editar</a>
+                    <a href="#"
+                       class="btn btn-sm btn-dark"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalEliminarProducto">
+                        Eliminar
+                    </a>
+
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Batería Honda 12V</td>
+                <td>10</td>
+                <td>₡32,000</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="2" class="btn btn-sm btn-danger">Editar</a>
+                    <a href="#"
+                       class="btn btn-sm btn-dark"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalEliminarProducto">
+                        Eliminar
+                    </a>
+
+                </td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Pastillas de freno Suzuki</td>
+                <td>40</td>
+                <td>₡12,500</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="3" class="btn btn-sm btn-danger">Editar</a>
+                    <a href="#"
+                       class="btn btn-sm btn-dark"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalEliminarProducto">
+                        Eliminar
+                    </a>
+
+                </td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Cadena reforzada Kawasaki</td>
+                <td>15</td>
+                <td>₡18,000</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="4" class="btn btn-sm btn-danger">Editar</a>
+                    <a href="#"
+                       class="btn btn-sm btn-dark"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalEliminarProducto">
+                        Eliminar
+                    </a>
+
+                </td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Llanta trasera Michelin</td>
+                <td>8</td>
+                <td>₡45,000</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="5" class="btn btn-sm btn-danger">Editar</a>
+                    <a href="#"
+                       class="btn btn-sm btn-dark"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalEliminarProducto">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalEliminarProducto" tabindex="-1" aria-labelledby="modalEliminarProductoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="modalEliminarProductoLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            
+            <div class="modal-body">
+                <p class="text-danger fw-bold">¿Está seguro que desea eliminar este producto?</p>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Id:</strong> 1</li>
+                    <li class="list-group-item"><strong>NombreProducto:</strong> Filtro de aire Yamaha</li>
+                    <li class="list-group-item"><strong>Stock:</strong> 25</li>
+                    <li class="list-group-item"><strong>Precio:</strong> ₡8,500</li>
+                </ul>
+            </div>
+
+          
+            <div class="modal-footer">
+                <a href="/Inventario" class="btn btn-danger">Eliminar</a>
+                <a href="/Inventario" class="btn btn-dark">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    h1 {
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    table {
+        border: 1px solid #333;
+    }
+
+    thead {
+        background-color: #333;
+        color: #fff;
+    }
+
+    tbody tr:hover {
+        background-color: #f2f2f2;
+    }
+
+    td, th {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Hover rojo en las celdas */
+    tbody td:hover {
+        color: #d32f2f;
+    }
+
+    .btn-danger {
+        background-color: #d32f2f !important;
+        border: none;
+        font-weight: bold;
+    }
+
+        .btn-danger:hover {
+            background-color: #b71c1c !important;
+        }
+
+    .btn-dark {
+        background-color: #333 !important;
+        color: #fff !important;
+    }
+
+        .btn-dark:hover {
+            background-color: #555 !important;
+        }
+</style>
