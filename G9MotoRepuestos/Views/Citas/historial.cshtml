@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Historial Citas";
+}
+
+<div class="usuarios-container">
+    <h2 class="titulo-rojo">Historial de Citas</h2>
+
+    <div>
+
+        <a href="/Citas/Index" class="btn-cancelar mb-3">Cancelar</a>
+
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>101</td>
+                    <td>Ana García</td>
+                    <td>15/09/2025 09:30 AM</td>
+                    <td>Finalizada</td>
+                </tr>
+                <tr>
+                    <td>102</td>
+                    <td>Roberto Funes</td>
+                    <td>01/10/2025 15:00 PM</td>
+                    <td>Cancelada</td>
+                </tr>
+                <tr>
+                    <td>103</td>
+                    <td>Sofía Castro</td>
+                    <td>10/11/2025 11:00 AM</td>
+                    <td>Finalizada</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .usuarios-container {
+        margin: 30px auto;
+        max-width: 900px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo-rojo {
+        color: #d32f2f;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-cancelar {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        display: inline-block;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    thead th {
+        background-color: #eee;
+    }
+</style>
