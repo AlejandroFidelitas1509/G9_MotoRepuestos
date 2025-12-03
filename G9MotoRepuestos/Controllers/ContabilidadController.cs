@@ -14,7 +14,12 @@ namespace G9MotoRepuestos.Controllers
             return View();
         }
 
-       
+        public IActionResult Historial()
+        {
+            return View();
+        }
+
+
         [HttpGet]
         public IActionResult CierreResultado(string tipo, DateTime? fecha, DateTime? fechaInicio, DateTime? fechaFin)
         {
