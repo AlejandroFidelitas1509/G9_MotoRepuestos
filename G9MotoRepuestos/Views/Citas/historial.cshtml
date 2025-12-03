@@ -1,0 +1,110 @@
+@model IEnumerable<G9MotoRepuestos.Models.Cita>
+@{
+    ViewData["Title"] = "Historial de Citas";
+}
+<div class="usuarios-container">
+    <h2 class="titulo-rojo">Historial de Citas</h2>
+
+    @if (!Model.Any())
+    {
+        <div>No hay citas registradas.</div>
+    }
+    else
+    {
+        <table style="width:100%; border-collapse:collapse;">
+        <thead><tr><th>Id</th><th>Cliente</th><th>Fecha</th><th>Estado</th></tr></thead>
+        <tbody>
+        @foreach(var c in Model) {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.NombreCliente</td>
+                <td>@c.Fecha.ToString("g")</td>
+                <td>@c.Estado</td>
+            </tr>
+        }
+        </tbody>
+        </table>
+    }
+</div>
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f2f2f2;
+        color: #222;
+    }
+
+    .usuarios-container {
+        margin: 30px auto;
+        max-width: 900px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .titulo-rojo {
+        color: #d32f2f; /* rojo fuerte */
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-usuario {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .form-row {
+        flex: 1 1 45%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-text {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: border-color 0.3s;
+    }
+
+        /* Hover en los campos */
+        .input-text:hover {
+            border-color: #d32f2f;
+        }
+
+    .acciones-form {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn-guardar {
+        background-color: #d32f2f;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-guardar:hover {
+            background-color: #b71c1c; /* rojo más oscuro */
+            text-decoration: none;
+        }
+
+    .btn-cancelar {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-left: 10px;
+    }
+
+        .btn-cancelar:hover {
+            background-color: #555;
+            text-decoration: none;
+        }
+</style>
