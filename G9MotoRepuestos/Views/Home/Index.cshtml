@@ -1,8 +1,145 @@
 ﻿@{
-    ViewData["Title"] = "Inicio - Moto Repuestos Rojas";
+    ViewData["Title"] = "Panel Principal";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid fade-in">
+    <div class="row mb-4">
+        <div class="col-12 text-center text-md-start">
+            <h2 class="fw-bold text-dark">Panel de Control <span class="text-danger">Rojas</span></h2>
+            <p class="text-muted">Gestión de inventario y servicios en tiempo real.</p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-5">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 card-hover">
+                <div class="card-body text-center">
+                    <div class="icon-box bg-light-danger mb-3">
+                        <i class="fas fa-boxes fa-2x text-danger"></i>
+                    </div>
+                    <h6 class="fw-bold">Inventario</h6>
+                    <small class="text-muted d-block mb-3">Ver stock de repuestos</small>
+                    <a asp-controller="Inventario" asp-action="Index" class="btn btn-sm btn-danger w-100">Administrar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 card-hover">
+                <div class="card-body text-center">
+                    <div class="icon-box bg-light-success mb-3">
+                        <i class="fas fa-cash-register fa-2x text-success"></i>
+                    </div>
+                    <h6 class="fw-bold">Nueva Venta</h6>
+                    <small class="text-muted d-block mb-3">Facturación rápida</small>
+                    <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-sm btn-success w-100">Abrir Caja</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 card-hover">
+                <div class="card-body text-center">
+                    <div class="icon-box bg-light-info mb-3">
+                        <i class="fas fa-motorcycle fa-2x text-info"></i>
+                    </div>
+                    <h6 class="fw-bold">Taller</h6>
+                    <small class="text-muted d-block mb-3">Citas por placa</small>
+                    <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-info text-white w-100">Ver Agenda</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100 card-hover">
+                <div class="card-body text-center">
+                    <div class="icon-box bg-light-warning mb-3">
+                        <i class="fas fa-file-invoice-dollar fa-2x text-warning"></i>
+                    </div>
+                    <h6 class="fw-bold">Finanzas</h6>
+                    <small class="text-muted d-block mb-3">Cierres y balance</small>
+                    <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-sm btn-warning text-white w-100">Reportes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <h4 class="fw-bold mb-4 border-bottom pb-2">Novedades</h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
+                    <p class="text-danger fw-bold">₡ 25,500</p>
+                    <p class="small text-muted mb-3">Cod: 74410293</p>
+                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 border-bottom pb-2">Ofertas</h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
+                    <p class="text-danger fw-bold">₡ 25,500</p>
+                    <p class="small text-muted mb-3">Cod: 74410293</p>
+                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 border-bottom pb-2">Repuestos</h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
+                    <p class="text-danger fw-bold">₡ 25,500</p>
+                    <p class="small text-muted mb-3">Cod: 74410293</p>
+                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 border-bottom pb-2">Accesorios</h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
+                    <p class="text-danger fw-bold">₡ 25,500</p>
+                    <p class="small text-muted mb-3">Cod: 74410293</p>
+                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 border-bottom pb-2">Servicios</h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
+                    <p class="text-danger fw-bold">₡ 25,500</p>
+                    <p class="small text-muted mb-3">Cod: 74410293</p>
+                    <button class="btn btn-outline-danger btn-sm w-100">Agendar Cita</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
