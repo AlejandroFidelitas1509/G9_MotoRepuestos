@@ -20,3 +20,159 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Colores de fondo suaves para los iconos */
+.bg-light-danger {
+    background-color: #fceaea;
+    border-radius: 12px;
+    padding: 15px;
+    display: inline-block;
+}
+
+.bg-light-success {
+    background-color: #eafcf0;
+    border-radius: 12px;
+    padding: 15px;
+    display: inline-block;
+}
+
+.bg-light-info {
+    background-color: #eaf7fc;
+    border-radius: 12px;
+    padding: 15px;
+    display: inline-block;
+}
+
+.bg-light-warning {
+    background-color: #fcf9ea;
+    border-radius: 12px;
+    padding: 15px;
+    display: inline-block;
+}
+
+/* Animación al entrar */
+.fade-in {
+    animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto hover en cards */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+/* Estilo de productos */
+.product-card {
+    transition: all 0.3s;
+    border-radius: 10px;
+}
+
+    .product-card:hover {
+        border: 1px solid #B01E1E;
+    }
+
+
+/* Estilizacion de la Barra de Busqueda Navbar */
+.search-form {
+    min-width: 320px;
+}
+
+.search-input {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    border-radius: 25px 0 0 25px !important;
+    padding-left: 18px;
+    transition: all 0.3s ease;
+}
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+    }
+
+    .search-input:focus {
+        background-color: white !important;
+        color: #333 !important;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+        outline: none;
+    }
+
+.btn-search {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 0 25px 25px 0 !important;
+    padding: 0 15px;
+    transition: all 0.3s ease;
+}
+
+    .btn-search:hover {
+        background-color: white;
+        color: #B01E1E; /* Color Rojo Rojas */
+        border: 1px solid white;
+    }
+
+/* Efectos para el Menu Lateral */
+.sidebar-link {
+    padding: 15px 20px;
+    transition: 0.2s;
+    border-color: #333 !important;
+}
+
+    .sidebar-link:hover {
+        padding-left: 30px; /* Efecto de desplazamiento */
+    }
+
+/* --- Estilos del Menú Lateral --- */
+.sidebar-link {
+    padding: 18px 25px;
+    border-bottom: 1px solid #333 !important;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+    .sidebar-link i {
+        color: var(--rojo-rojas);
+        width: 25px;
+    }
+
+    .sidebar-link:hover {
+        padding-left: 35px; /* Efecto de desplazamiento lateral */
+        color: white !important;
+    }
+
+/* --- Ajuste de la Barra de Búsqueda --- */
+.search-form {
+    min-width: 350px;
+}
+
+.search-input {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    border-radius: 25px 0 0 25px !important;
+}
+
+.btn-search {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: white;
+    border-radius: 0 25px 25px 0 !important;
+    padding: 0 15px;
+}
