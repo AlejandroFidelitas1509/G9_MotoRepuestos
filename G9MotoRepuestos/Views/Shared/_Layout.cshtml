@@ -14,6 +14,22 @@
             --rojo-rojas: #B01E1E;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
         .bg-rojas {
             background-color: var(--rojo-rojas) !important;
         }
@@ -27,6 +43,45 @@
             background-color: var(--rojo-rojas) !important;
             color: white !important;
         }
+
+        .logo-navbar {
+            object-fit: contain;
+            border-radius: 50%;
+            background-color: white;
+            padding: 2px;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid #444;
+            margin-top: 15px;
+            padding-top: 10px;
+        }
+
+        .footer-link:hover {
+            color: #ffc107 !important;
+            padding-left: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon-sm {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+            .social-icon-sm:hover {
+                transform: translateY(-3px);
+                background-color: var(--rojo-rojas);
+                border-color: var(--rojo-rojas);
+                color: white;
+            }
     </style>
 </head>
 <body>
@@ -37,7 +92,10 @@
                     <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
                 </button>
 
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">MOTO REPUESTOS ROJAS</a>
+                <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/LogoLocal.jpeg" alt="Logo" width="40" height="40" class="d-inline-block align-top me-2 logo-navbar">
+                    <span class="d-none d-sm-inline">MOTO REPUESTOS ROJAS</span>
+                </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
@@ -54,7 +112,7 @@
 
                     <form class="d-flex mx-lg-4 my-2 my-lg-0 search-form" asp-controller="Inventario" asp-action="Index" method="get">
                         <div class="input-group">
-                            <input name="buscar" class="form-control search-input" type="search" placeholder="Buscar repuestos..." aria-label="Search">
+                            <input name="buscar" class="form-control search-input" type="search" placeholder="¿Qué repuesto buscas?" aria-label="Search">
                             <button class="btn btn-search" type="submit"><i class="fas fa-search"></i></button>
                         </div>
                     </form>
@@ -90,6 +148,12 @@
                 <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link">
                     <i class="fas fa-tire me-2"></i> Llantas
                 </a>
+
+                <div class="sidebar-footer">
+                    <a asp-controller="Home" asp-action="Nosotros" class="list-group-item list-group-item-action bg-dark text-white sidebar-link">
+                        <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -99,6 +163,48 @@
             @RenderBody()
         </main>
     </div>
+
+    <footer class="bg-dark text-white pt-4 pb-2 border-top border-danger border-4 mt-auto mb-0">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                    <h6 class="text-uppercase fw-bold text-danger mb-1 small">Moto Repuestos Rojas</h6>
+                    <p class="small text-secondary mb-0" style="font-size: 0.75rem;">Calidad y asesoría honesta en Mercedes Norte desde 2024.</p>
+                </div>
+
+                <div class="col-md-5 text-center mb-3 mb-md-0">
+                    <div class="d-inline-block text-start">
+                        <p class="small mb-0" style="font-size: 0.8rem;">
+                            <i class="fas fa-map-marker-alt text-danger me-2"></i>Mercedes Norte, Heredia
+                        </p>
+                        <p class="small mb-0" style="font-size: 0.8rem;">
+                            <i class="fab fa-whatsapp text-success me-2"></i>+506 7243-2805
+                            <span class="ms-2 text-secondary">|</span>
+                            <i class="far fa-clock text-warning ms-2 me-1"></i>L-V: 8am - 6pm
+                            <i class="far fa-clock text-warning ms-2 me-1"></i>S: Cerrado
+                            <i class="far fa-clock text-warning ms-2 me-1"></i>D: 9am - 6pm
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-3 text-center text-md-end">
+                    <a href="https://wa.me/50672432805" target="_blank" class="social-icon-sm me-2"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.facebook.com/share/1831P2NdY6/" target="_blank" class="social-icon-sm me-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/motorepuestosrojas?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="social-icon-sm"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <hr class="my-3 border-secondary opacity-25">
+
+            <div class="row pb-2">
+                <div class="col-12 text-center">
+                    <p class="mb-0 text-secondary" style="font-size: 0.7rem;">
+                        © 2026 <strong>Moto Repuestos Rojas</strong>. Pasión por las motos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

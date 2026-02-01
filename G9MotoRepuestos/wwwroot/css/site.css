@@ -21,7 +21,6 @@ body {
   margin-bottom: 60px;
 }
 
-/* Colores de fondo suaves para los iconos */
 .bg-light-danger {
     background-color: #fceaea;
     border-radius: 12px;
@@ -50,7 +49,7 @@ body {
     display: inline-block;
 }
 
-/* Animación al entrar */
+
 .fade-in {
     animation: fadeIn 0.8s ease-in;
 }
@@ -67,7 +66,7 @@ body {
     }
 }
 
-/* Efecto hover en cards */
+
 .card-hover {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -77,7 +76,7 @@ body {
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
     }
 
-/* Estilo de productos */
+
 .product-card {
     transition: all 0.3s;
     border-radius: 10px;
@@ -87,8 +86,6 @@ body {
         border: 1px solid #B01E1E;
     }
 
-
-/* Estilizacion de la Barra de Busqueda Navbar */
 .search-form {
     min-width: 320px;
 }
@@ -125,11 +122,11 @@ body {
 
     .btn-search:hover {
         background-color: white;
-        color: #B01E1E; /* Color Rojo Rojas */
+        color: #B01E1E; 
         border: 1px solid white;
     }
 
-/* Efectos para el Menu Lateral */
+
 .sidebar-link {
     padding: 15px 20px;
     transition: 0.2s;
@@ -137,10 +134,10 @@ body {
 }
 
     .sidebar-link:hover {
-        padding-left: 30px; /* Efecto de desplazamiento */
+        padding-left: 30px; 
     }
 
-/* --- Estilos del Menú Lateral --- */
+
 .sidebar-link {
     padding: 18px 25px;
     border-bottom: 1px solid #333 !important;
@@ -154,11 +151,11 @@ body {
     }
 
     .sidebar-link:hover {
-        padding-left: 35px; /* Efecto de desplazamiento lateral */
+        padding-left: 35px; 
         color: white !important;
     }
 
-/* --- Ajuste de la Barra de Búsqueda --- */
+
 .search-form {
     min-width: 350px;
 }
@@ -175,4 +172,156 @@ body {
     color: white;
     border-radius: 0 25px 25px 0 !important;
     padding: 0 15px;
+}
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #212529; 
+
+footer {
+    margin-bottom: 0 !important;
+}
+
+    footer .container {
+        padding-bottom: 0;
+    }
+
+.social-icon-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+    .social-icon-sm:hover {
+        background-color: var(--rojo-rojas);
+        border-color: var(--rojo-rojas);
+        transform: translateY(-3px);
+        color: white;
+    }
+
+.img-carrusel {
+    height: 500px; 
+    object-fit: cover; 
+    filter: brightness(0.8);
+}
+
+.overlay-carrusel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+    z-index: 1;
+}
+
+.carousel-caption {
+    z-index: 2;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+}
+
+@media (max-width: 768px) {
+    .img-carrusel {
+        height: 300px; 
+    }
+}
+
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25d366;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+    .whatsapp-float:hover {
+        transform: scale(1.1);
+        color: white;
+    }
+
+
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+
+.product-card-hover {
+    transition: transform 0.2s ease-in-out;
+}
+
+    .product-card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+    }
+
+
+.rounded-circle {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-inner {
+    overflow: visible;
+}
+
+.product-card-hover img {
+    height: 160px;
+    object-fit: contain; 
+    background-color: #f8f9fa;
+}
+
+
+.chatbox-wrapper {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 280px;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+    z-index: 1000;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+    .chatbox-wrapper:hover {
+        transform: translateY(-5px);
+    }
+
+.chat-msg p {
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }

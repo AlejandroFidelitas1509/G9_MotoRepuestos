@@ -2,144 +2,234 @@
     ViewData["Title"] = "Panel Principal";
 }
 
-<div class="container-fluid fade-in">
+<div class="container-fluid fade-in pb-5">
     <div class="row mb-4">
         <div class="col-12 text-center text-md-start">
             <h2 class="fw-bold text-dark">Panel de Control <span class="text-danger">Rojas</span></h2>
-            <p class="text-muted">Gestión de inventario y servicios en tiempo real.</p>
+            <p class="text-muted">Gestión de inventario y servicios en tiempo real para Moto Repuestos Rojas.</p>
         </div>
     </div>
 
     <div class="row g-3 mb-5">
         <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover">
+            <div class="card shadow-sm border-0 h-100 card-hover border-start border-danger border-4">
                 <div class="card-body text-center">
-                    <div class="icon-box bg-light-danger mb-3">
-                        <i class="fas fa-boxes fa-2x text-danger"></i>
-                    </div>
+                    <div class="icon-box bg-light-danger mb-3 py-3 rounded"><i class="fas fa-boxes fa-2x text-danger"></i></div>
                     <h6 class="fw-bold">Inventario</h6>
-                    <small class="text-muted d-block mb-3">Ver stock de repuestos</small>
-                    <a asp-controller="Inventario" asp-action="Index" class="btn btn-sm btn-danger w-100">Administrar</a>
+                    <a asp-controller="Inventario" asp-action="Index" class="btn btn-sm btn-danger w-100 shadow-sm">Administrar</a>
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover">
+            <div class="card shadow-sm border-0 h-100 card-hover border-start border-success border-4">
                 <div class="card-body text-center">
-                    <div class="icon-box bg-light-success mb-3">
-                        <i class="fas fa-cash-register fa-2x text-success"></i>
-                    </div>
+                    <div class="icon-box bg-light-success mb-3 py-3 rounded"><i class="fas fa-cash-register fa-2x text-success"></i></div>
                     <h6 class="fw-bold">Nueva Venta</h6>
-                    <small class="text-muted d-block mb-3">Facturación rápida</small>
-                    <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-sm btn-success w-100">Abrir Caja</a>
+                    <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-sm btn-success w-100 shadow-sm">Abrir Caja</a>
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover">
+            <div class="card shadow-sm border-0 h-100 card-hover border-start border-info border-4">
                 <div class="card-body text-center">
-                    <div class="icon-box bg-light-info mb-3">
-                        <i class="fas fa-motorcycle fa-2x text-info"></i>
-                    </div>
+                    <div class="icon-box bg-light-info mb-3 py-3 rounded"><i class="fas fa-motorcycle fa-2x text-info"></i></div>
                     <h6 class="fw-bold">Taller</h6>
-                    <small class="text-muted d-block mb-3">Citas por placa</small>
-                    <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-info text-white w-100">Ver Agenda</a>
+                    <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-info text-white w-100 shadow-sm">Ver Agenda</a>
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover">
+            <div class="card shadow-sm border-0 h-100 card-hover border-start border-warning border-4">
                 <div class="card-body text-center">
-                    <div class="icon-box bg-light-warning mb-3">
-                        <i class="fas fa-file-invoice-dollar fa-2x text-warning"></i>
-                    </div>
+                    <div class="icon-box bg-light-warning mb-3 py-3 rounded"><i class="fas fa-file-invoice-dollar fa-2x text-warning"></i></div>
                     <h6 class="fw-bold">Finanzas</h6>
-                    <small class="text-muted d-block mb-3">Cierres y balance</small>
-                    <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-sm btn-warning text-white w-100">Reportes</a>
+                    <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-sm btn-warning text-white w-100 shadow-sm">Reportes</a>
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="carouselMoto" class="carousel slide carousel-fade shadow rounded overflow-hidden mb-5 border border-light" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselMoto" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#carouselMoto" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#carouselMoto" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="4000">
+                <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.4);">
+                <div class="carousel-caption d-none d-md-block text-start mb-4">
+                    <h1 class="fw-bold">Potencia y Rendimiento</h1>
+                    <p class="fs-5">Repuestos de alta gama para que su motor nunca se detenga.</p>
+                </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="4000">
+                <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.4);">
+                <div class="carousel-caption d-none d-md-block mb-4">
+                    <h1 class="fw-bold text-warning">Kits de Arrastre Racing</h1>
+                    <p class="fs-5 text-white">Seguridad y durabilidad certificada para su motocicleta.</p>
+                </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="4000">
+                <img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.4);">
+                <div class="carousel-caption d-none d-md-block text-end mb-4">
+                    <h1 class="fw-bold text-white">Mantenimiento Profesional</h1>
+                    <p class="fs-5 text-white">Visítenos en Mercedes Norte, Heredia.</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselMoto" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselMoto" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+    </div>
 
-
-
-    <h4 class="fw-bold mb-4 border-bottom pb-2">Novedades</h4>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm product-card">
-                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
-                    <p class="text-danger fw-bold">₡ 25,500</p>
-                    <p class="small text-muted mb-3">Cod: 74410293</p>
-                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
+        <h4 class="fw-bold mb-0 text-danger"><i class="fas fa-star me-2"></i>Novedades</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderNov" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderNov" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div id="sliderNov" class="carousel slide mb-5" data-bs-ride="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="row g-3">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="col-md-3">
+                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center">
+                                <i class="fas fa-box fa-3x text-light mb-3"></i>
+                                <h6 class="fw-bold mb-1 small">Repuesto #@i</h6>
+                                <p class="text-danger fw-bold mb-1">₡ 25,500</p>
+                                <button class="btn btn-sm btn-outline-danger w-100 mt-2">Detalles</button>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <h4 class="fw-bold mb-4 border-bottom pb-2">Ofertas</h4>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm product-card">
-                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
-                    <p class="text-danger fw-bold">₡ 25,500</p>
-                    <p class="small text-muted mb-3">Cod: 74410293</p>
-                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
+        <h4 class="fw-bold mb-0 text-primary"><i class="fas fa-percentage me-2"></i>Ofertas</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderOf" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderOf" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div id="sliderOf" class="carousel slide mb-5" data-bs-ride="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="row g-3">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="col-md-3">
+                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center">
+                                <i class="fas fa-tag fa-3x text-light mb-3"></i>
+                                <h6 class="fw-bold mb-1 small">Oferta Aceite</h6>
+                                <p class="text-primary fw-bold mb-1">₡ 8,500</p>
+                                <button class="btn btn-sm btn-outline-primary w-100 mt-2">Ver Oferta</button>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <h4 class="fw-bold mb-4 border-bottom pb-2">Repuestos</h4>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm product-card">
-                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
-                    <p class="text-danger fw-bold">₡ 25,500</p>
-                    <p class="small text-muted mb-3">Cod: 74410293</p>
-                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
+        <h4 class="fw-bold mb-0 text-dark"><i class="fas fa-cog me-2"></i>Repuestos</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderRep" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderRep" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div id="sliderRep" class="carousel slide mb-5" data-bs-ride="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="row g-3">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="col-md-3">
+                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center">
+                                <i class="fas fa-tools fa-3x text-light mb-3"></i>
+                                <h6 class="fw-bold mb-1 small">Pastillas de Freno</h6>
+                                <p class="text-dark fw-bold mb-1">₡ 12,000</p>
+                                <button class="btn btn-sm btn-outline-dark w-100 mt-2">Detalles</button>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <h4 class="fw-bold mb-4 border-bottom pb-2">Accesorios</h4>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm product-card">
-                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
-                    <p class="text-danger fw-bold">₡ 25,500</p>
-                    <p class="small text-muted mb-3">Cod: 74410293</p>
-                    <button class="btn btn-outline-danger btn-sm w-100">Detalles</button>
+    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
+        <h4 class="fw-bold mb-0 text-success"><i class="fas fa-calendar-check me-2"></i>Servicios de Taller</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderSer" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderSer" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div id="sliderSer" class="carousel slide mb-5" data-bs-ride="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="row g-3">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="col-md-3">
+                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center border-bottom border-success border-3">
+                                <i class="fas fa-screwdriver-wrench fa-3x text-light mb-3"></i>
+                                <h6 class="fw-bold mb-1 small">Mantenimiento</h6>
+                                <p class="text-success fw-bold mb-1 text-uppercase small">Placa: ABC-123</p>
+                                <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-success w-100 mt-2">Agendar</a>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <h4 class="fw-bold mb-4 border-bottom pb-2">Servicios</h4>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm product-card">
-                <img src="https://via.placeholder.com/200x150?text=Kit+Arrastre" class="card-img-top" alt="Repuesto">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold">Kit de Arrastre Racing</h6>
-                    <p class="text-danger fw-bold">₡ 25,500</p>
-                    <p class="small text-muted mb-3">Cod: 74410293</p>
-                    <button class="btn btn-outline-danger btn-sm w-100">Agendar Cita</button>
+    <div class="bg-light py-5 mb-5 rounded shadow-sm">
+        <div class="container text-center">
+            <h6 class="text-muted text-uppercase small mb-4 fw-bold">Marcas que manejamos</h6>
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-5 opacity-75">
+                <h4 class="fw-bold text-secondary">HONDA</h4>
+                <h4 class="fw-bold text-secondary">YAMAHA</h4>
+                <h4 class="fw-bold text-secondary">VIPER</h4>
+                <h4 class="fw-bold text-secondary">REPSOL</h4>
+                <h4 class="fw-bold text-secondary">BELRAY</h4>
+                <h4 class="fw-bold text-secondary">VINI</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="chatbox-wrapper shadow-lg d-none d-md-block" id="chatboxRojas">
+        <div class="chatbox-header bg-dark text-white p-2 d-flex justify-content-between align-items-center" onclick="toggleChat()" style="cursor: pointer;">
+            <small class="fw-bold text-danger"><i class="fas fa-robot me-2"></i>Asistente Rojas</small>
+            <i class="fas fa-minus small" id="chatIcon"></i>
+        </div>
+        <div id="chatContent">
+            <div class="chatbox-body bg-light p-3" style="height: 200px; overflow-y: auto;">
+                <div class="chat-msg mb-2">
+                    <span class="badge bg-danger">Bot</span>
+                    <p class="small bg-white p-2 rounded shadow-sm mb-0 mt-1">¡Hola Sebas! ¿Cómo va el trabajo hoy en Heredia?</p>
+                </div>
+            </div>
+            <div class="chatbox-footer p-2 bg-white border-top">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" placeholder="Escribe un mensaje...">
+                    <button class="btn btn-danger"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
+    <a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 </div>
+
+@section Scripts {
+    <script src="~/js/chatbox.js" asp-append-version="true"></script>
+}
