@@ -19,16 +19,18 @@ namespace G9MotoRepuestos.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductoDto model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             await _ln.CrearAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // por ahora puede estar quemado, no llames ListarAsync aún
-            return View();
+            var data = await _ln.ListarAsync(soloActivos: true);
+            return View(data);
         }
+
     }
 }

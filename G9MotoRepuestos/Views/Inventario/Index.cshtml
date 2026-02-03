@@ -1,4 +1,7 @@
-﻿@{
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model IEnumerable<ProductoDto>
+
+@{
     ViewData["Title"] = "Inventario de Repuestos";
 }
 
@@ -9,7 +12,7 @@
     <a asp-action="Create" class="btn btn-danger">Crear Producto</a>
 </div>
 
-<a asp-action="BitacoraEventos" class="btn btn-danger">Ver Bitácora</a>
+<a asp-action="BitacoraEventos" class="btn btn-danger mb-3">Ver Bitácora</a>
 
 <div class="table-responsive">
     <table class="table table-bordered table-striped">
@@ -23,120 +26,96 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Filtro de aire Yamaha</td>
-                <td>25</td>
-                <td>₡8,500</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="1" class="btn btn-sm btn-danger">Editar</a>
-                    <a href="#"
-                       class="btn btn-sm btn-dark"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modalEliminarProducto">
-                        Eliminar
-                    </a>
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No hay productos registrados.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    var modalId = $"modalEliminarProducto_{item.IdProducto}";
+                    <tr>
+                        <td>@item.IdProducto</td>
+                        <td>@item.Nombre</td>
+                        <td>@(item.StockActual ?? 0)</td>
+                        <td>₡@(item.PrecioVenta?.ToString("N0") ?? "0")</td>
+                        <td>
+                            <a asp-action="Edit"
+                               asp-route-id="@item.IdProducto"
+                               class="btn btn-sm btn-danger">
+                                Editar
+                            </a>
 
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Batería Honda 12V</td>
-                <td>10</td>
-                <td>₡32,000</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="2" class="btn btn-sm btn-danger">Editar</a>
-                    <a href="#"
-                       class="btn btn-sm btn-dark"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modalEliminarProducto">
-                        Eliminar
-                    </a>
-
-                </td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Pastillas de freno Suzuki</td>
-                <td>40</td>
-                <td>₡12,500</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="3" class="btn btn-sm btn-danger">Editar</a>
-                    <a href="#"
-                       class="btn btn-sm btn-dark"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modalEliminarProducto">
-                        Eliminar
-                    </a>
-
-                </td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Cadena reforzada Kawasaki</td>
-                <td>15</td>
-                <td>₡18,000</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="4" class="btn btn-sm btn-danger">Editar</a>
-                    <a href="#"
-                       class="btn btn-sm btn-dark"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modalEliminarProducto">
-                        Eliminar
-                    </a>
-
-                </td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>Llanta trasera Michelin</td>
-                <td>8</td>
-                <td>₡45,000</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="5" class="btn btn-sm btn-danger">Editar</a>
-                    <a href="#"
-                       class="btn btn-sm btn-dark"
-                       data-bs-toggle="modal"
-                       data-bs-target="#modalEliminarProducto">
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
+                            <a href="#"
+                               class="btn btn-sm btn-dark"
+                               data-bs-toggle="modal"
+                               data-bs-target="#@modalId">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
+
     </table>
-</div>
 
+    @foreach (var item in Model ?? Enumerable.Empty<ProductoDto>())
+    {
+        var modalId = $"modalEliminarProducto_{item.IdProducto}";
+        <div class="modal fade"
+             id="@modalId"
+             tabindex="-1"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
 
-<!-- Modal -->
-<div class="modal fade" id="modalEliminarProducto" tabindex="-1" aria-labelledby="modalEliminarProductoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="modalEliminarProductoLabel">Confirmar Eliminación</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title">Confirmar Eliminación</h5>
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"></button>
+                    </div>
 
-            
-            <div class="modal-body">
-                <p class="text-danger fw-bold">¿Está seguro que desea eliminar este producto?</p>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Id:</strong> 1</li>
-                    <li class="list-group-item"><strong>NombreProducto:</strong> Filtro de aire Yamaha</li>
-                    <li class="list-group-item"><strong>Stock:</strong> 25</li>
-                    <li class="list-group-item"><strong>Precio:</strong> ₡8,500</li>
-                </ul>
-            </div>
+                    <div class="modal-body">
+                        <p class="text-danger fw-bold">
+                            ¿Está seguro que desea eliminar este producto?
+                        </p>
+                        <ul class="list-group">
+                            <li class="list-group-item"><strong>Id:</strong> @item.IdProducto</li>
+                            <li class="list-group-item"><strong>Nombre:</strong> @item.Nombre</li>
+                            <li class="list-group-item"><strong>Stock:</strong> @(item.StockActual ?? 0)</li>
+                            <li class="list-group-item">
+                                <strong>Precio:</strong> ₡@(item.PrecioVenta?.ToString("N0") ?? "0")
+                            </li>
+                        </ul>
+                    </div>
 
-          
-            <div class="modal-footer">
-                <a href="/Inventario" class="btn btn-danger">Eliminar</a>
-                <a href="/Inventario" class="btn btn-dark">Cancelar</a>
+                    <div class="modal-footer">
+                        <a asp-action="Delete"
+                           asp-route-id="@item.IdProducto"
+                           class="btn btn-danger">
+                            Eliminar
+                        </a>
+                        <button type="button"
+                                class="btn btn-dark"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    }
 
+
+</div>
 
 <style>
     h1 {
@@ -162,7 +141,6 @@
         vertical-align: middle;
     }
 
-    /* Hover rojo en las celdas */
     tbody td:hover {
         color: #d32f2f;
     }
