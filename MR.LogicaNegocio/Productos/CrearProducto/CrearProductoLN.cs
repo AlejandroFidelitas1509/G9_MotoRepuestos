@@ -25,6 +25,10 @@ namespace MR.LogicaNegocio.Productos.CrearProducto
             if (p.PrecioVenta.HasValue && p.PrecioVenta.Value < 0)
                 throw new ArgumentException("PrecioVenta no puede ser negativo.");
 
+            if (p.StockActual.HasValue && p.StockActual.Value < 0)
+                throw new ArgumentException("El stock no puede ser negativo.");
+
+
             // Por defecto activo si viene null
             p.Estado ??= true;
 

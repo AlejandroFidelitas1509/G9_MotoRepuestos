@@ -24,10 +24,10 @@ namespace MR.LogicaNegocio.Productos
         public Task<int> CrearAsync(ProductoDto producto)
             => new CrearProductoLN(_ad).EjecutarAsync(producto);
 
-        //  Pendientes por ahora
         public Task<IEnumerable<ProductoDto>> ListarAsync(bool soloActivos = true)
-            => throw new NotImplementedException("ListarAsync aún no implementado.");
+            => _ad.ListarAsync(soloActivos);
 
+        //  Pendientes por ahora
         public Task<ProductoDto?> ObtenerPorIdAsync(int id)
             => throw new NotImplementedException("ObtenerPorIdAsync aún no implementado.");
 
