@@ -1,0 +1,50 @@
+.auth-wrapper {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/FachadaLocal.jpeg') no-repeat center center;
+    background-size: cover;
+    border-radius: 15px;
+    margin-top: 20px;
+    position: relative;
+    padding: 20px 0;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.form-control-custom {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: none;
+    transition: 0.3s;
+}
+
+    .form-control-custom:focus {
+        box-shadow: 0 0 10px rgba(176, 30, 30, 0.5);
+        transform: scale(1.02);
+    }
+
+.btn-rojas-auth {
+    background-color: #B01E1E;
+    border: none;
+    transition: 0.3s;
+    color: white;
+    font-weight: bold;
+}
+
+    .btn-rojas-auth:hover {
+        background-color: #8c1818;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        color: white;
+    }
+
+.text-light-muted {
+    color: rgba(255, 255, 255, 0.7);
+}
