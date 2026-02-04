@@ -97,11 +97,11 @@
                     </div>
 
                     <div class="modal-footer">
-                        <a asp-action="Delete"
-                           asp-route-id="@item.IdProducto"
-                           class="btn btn-danger">
-                            Eliminar
-                        </a>
+                        <form asp-action="Delete" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.IdProducto" />
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
                         <button type="button"
                                 class="btn btn-dark"
                                 data-bs-dismiss="modal">
