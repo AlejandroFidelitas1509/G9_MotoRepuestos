@@ -1,13 +1,23 @@
-﻿namespace G9MotoRepuestos.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MotoRepuestosRojas.Models
 {
-    public class Usuarios
+    [Table("Usuarios", Schema = "dbo")]
+    public class Usuario
     {
-        public int IdUsuario { get; set; }  
-        public string NombreCompleto { get; set; }
-        public string Telefono { get; set; }
-        public string Correo { get; set; }
-        public string PasswordHash { get; set; }
-        public bool Estado { get; set; }
-        public string ImagenURL { get; set; }
+        [Key]
+        public int IdUsuario { get; set; }
+        public string? NombreCompleto { get; set; }
+        public string? Telefono { get; set; }
+        public string? Correo { get; set; }
+        public string? PasswordHash { get; set; }
+        public bool? Estado { get; set; }
+        public string? ImagenURL { get; set; }
+        public int? IdRol { get; set; }
+
+        // Esto es para que C# sepa que IdRol apunta a la tabla Roles
+        [ForeignKey("IdRol")]
+        public virtual Rol? Rol { get; set; }
     }
 }
