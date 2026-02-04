@@ -1,6 +1,6 @@
 ﻿using G9MotoRepuestos.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using MR.AccesoDatos.Bitacora;
 using MR.LogicaNegocio.Bitacora;
 using MR.AccesoDatos.Productos;
@@ -12,7 +12,7 @@ using MR.Abstracciones.LogicaDeNegocio.Bitacora;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// --- CONFIGURACIÓN DE BASE DE DATOS ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -21,23 +21,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// --- SISTEMA DE AUTENTICACIÓN (Login Personalizado) ---
+// Quitamos Identity y dejamos solo Cookies para que tu Login funcione al 100%
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Usuarios/Login";
+        options.AccessDeniedPath = "/Home/Privacy";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true; // Renueva el tiempo si el usuario está activo
+        options.Cookie.Name = "MotoRepuestosRojas.Session"; // Nombre personalizado para la cookie
+    });
 
 builder.Services.AddControllersWithViews();
 
-// Bitácora Productos
+// --- INYECCIÓN DE DEPENDENCIAS (Capas de tus compañeros) ---
 builder.Services.AddScoped<IBitacoraProductosAD>(_ => new BitacoraProductosAD(connectionString));
 builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
-
-
-// ✅ AGREGA ESTO (inyección de dependencias para tu CRUD Productos con Dapper)
 builder.Services.AddScoped<IProductosAD>(_ => new ProductosAD(connectionString));
 builder.Services.AddScoped<IProductosLN, ProductosLN>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- PIPELINE DE LA APLICACIÓN ---
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -53,7 +59,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ✅ Recomendado con Identity (normalmente va antes de Authorization)
+// ✅ El orden es fundamental para que sepa quién eres antes de darte permiso
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -61,6 +67,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages();
+// MapRazorPages se queda quitado para no cargar el registro viejo de Identity
 
 app.Run();

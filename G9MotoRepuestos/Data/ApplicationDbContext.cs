@@ -9,5 +9,11 @@ namespace G9MotoRepuestos.Data
             : base(options)
         {
         }
+
+        // Cambiamos a 'Usuario' (singular) que es como se llama tu clase en Models
+        public DbSet<G9MotoRepuestos.Models.Usuario> Usuarios { get; set; }
+
+        // Usamos 'new' para evitar el choque con Identity y 'Rol' en singular
+        public new DbSet<G9MotoRepuestos.Models.Rol> Roles { get; set; }
     }
 }

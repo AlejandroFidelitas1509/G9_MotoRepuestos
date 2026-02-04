@@ -1,0 +1,47 @@
+﻿@model G9MotoRepuestos.Models.Usuario
+@{
+    ViewData["Title"] = "Mi Perfil";
+}
+
+<link rel="stylesheet" href="~/css/PerfilUsuario.css" asp-append-version="true" />
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg profile-card">
+                <div class="profile-header"></div>
+                <div class="card-body text-center p-4">
+                    <div class="profile-avatar-container">
+                        <img src="@(Model.ImagenURL ?? "/images/default-avatar.png")" class="profile-avatar" />
+                    </div>
+
+                    <h3 class="fw-bold mb-1">@Model.NombreCompleto</h3>
+                    <span class="badge bg-danger mb-4 px-3 rounded-pill">@Model.Rol?.Tipo</span>
+
+                    <div class="text-start px-3">
+                        <p class="info-label">Correo Electrónico</p>
+                        <p class="info-value">@Model.Correo</p>
+
+                        <p class="info-label">Teléfono</p>
+                        <p class="info-value">@(string.IsNullOrEmpty(Model.Telefono) ? "No registrado" : Model.Telefono)</p>
+
+                        <p class="info-label">Estado de cuenta</p>
+                        <p class="info-value">
+                            <i class="fas fa-circle @(Model.Estado == true ? "text-success" : "text-secondary") me-1"></i>
+                            @(Model.Estado == true ? "Activa" : "Inactiva")
+                        </p>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4 px-3">
+                        <a asp-action="EditarPerfil" class="btn btn-dark fw-bold py-2 shadow-sm">
+                            <i class="fas fa-user-edit me-2"></i>EDITAR PERFIL
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm border-0">
+                            Volver al Catálogo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
