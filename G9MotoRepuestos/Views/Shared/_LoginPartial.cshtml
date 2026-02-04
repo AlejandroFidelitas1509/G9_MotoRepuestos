@@ -7,12 +7,14 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li>
+
                     <a class="dropdown-item small text-dark" asp-controller="Usuarios" asp-action="EditarPerfil">
                         <i class="fas fa-user-edit me-2 text-primary"></i>Editar Perfil
                     </a>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
+
                     <a class="dropdown-item small text-dark" asp-controller="Usuarios" asp-action="Logout">
                         <i class="fas fa-sign-out-alt me-2 text-danger"></i>Cerrar Sesión
                     </a>
@@ -22,11 +24,14 @@
     }
     else
     {
+
         <li class="nav-item">
             <a class="nav-link text-white fw-bold px-3" asp-controller="Usuarios" asp-action="Login">
                 Iniciar Sesión
             </a>
         </li>
+
+
         <li class="nav-item">
             <a class="nav-link text-danger fw-bold bg-white rounded-pill px-3 ms-lg-2 shadow-sm"
                asp-controller="Usuarios" asp-action="Registro">
@@ -34,5 +39,7 @@
             </a>
         </li>
     }
+
 </ul>
+
 

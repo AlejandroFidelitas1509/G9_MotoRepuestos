@@ -18,6 +18,7 @@ namespace G9MotoRepuestos.Controllers
             _context = context;
         }
 
+        // --- LOGIN ---
         [HttpGet]
         public IActionResult Login() => View();
 
@@ -43,7 +44,7 @@ namespace G9MotoRepuestos.Controllers
 
                 return RedirectToAction("Index", "Home");
             }
-            ViewBag.Error = "Datos incorrectos.";
+            ViewBag.Error = "Correo o contraseña incorrectos.";
             return View();
         }
 
@@ -53,8 +54,7 @@ namespace G9MotoRepuestos.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return RedirectToAction("Logout");
 
-            var usuario = await _context.Usuarios
-                .Include(u => u.Rol)
+            var usuario = await _context.Usuarios.Include(u => u.Rol)
                 .FirstOrDefaultAsync(u => u.IdUsuario == int.Parse(userId));
 
             if (usuario == null) return NotFound();
@@ -69,7 +69,11 @@ namespace G9MotoRepuestos.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return RedirectToAction("Logout");
 
-            var usuario = await _context.Usuarios.Include(u => u.Rol).FirstOrDefaultAsync(u => u.IdUsuario == int.Parse(userId));
+            var usuario = await _context.Usuarios.Include(u => u.Rol)
+                .FirstOrDefaultAsync(u => u.IdUsuario == int.Parse(userId));
+
+            if (usuario == null) return NotFound();
+
             ViewBag.Roles = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo", usuario.IdRol);
             return View(usuario);
         }
@@ -101,7 +105,6 @@ namespace G9MotoRepuestos.Controllers
                 model.ImagenURL = original.ImagenURL;
             }
 
-
             var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             if (!string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase))
             {
@@ -116,8 +119,8 @@ namespace G9MotoRepuestos.Controllers
             {
                 _context.Update(model);
                 await _context.SaveChangesAsync();
-                TempData["Mensaje"] = "Perfil actualizado correctamente.";
-                return RedirectToAction("Index", "Home");
+                TempData["Mensaje"] = "Perfil actualizado con éxito.";
+                return RedirectToAction("Perfil");
             }
 
             ViewBag.Roles = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo", model.IdRol);
@@ -140,7 +143,7 @@ namespace G9MotoRepuestos.Controllers
             ModelState.Remove("Rol");
             if (ModelState.IsValid)
             {
-                usuario.IdRol = 2;
+                usuario.IdRol = 2; 
                 usuario.Estado = true;
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();

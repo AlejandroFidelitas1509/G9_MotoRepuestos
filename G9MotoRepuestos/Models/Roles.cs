@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace G9MotoRepuestos.Models
+
 {
     [Table("Roles", Schema = "dbo")]
     public class Rol
@@ -9,5 +10,6 @@ namespace G9MotoRepuestos.Models
         [Key]
         public int IdRol { get; set; }
         public string? Tipo { get; set; }
+
     }
 }

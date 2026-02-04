@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace G9MotoRepuestos.Models
+
 {
     [Table("Usuarios", Schema = "dbo")]
     public class Usuario

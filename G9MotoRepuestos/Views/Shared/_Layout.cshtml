@@ -3,7 +3,7 @@
     // Buscamos el nombre del usuario de forma segura
     var nombreUsuario = User.Identity?.Name;
 
-    // Buscamos el rol probando ambos nombres posibles
+    // Buscamos el rol probando ambos nombres posibles de forma única
     var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role" || c.Type == ClaimTypes.Role)?.Value;
 
     bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);

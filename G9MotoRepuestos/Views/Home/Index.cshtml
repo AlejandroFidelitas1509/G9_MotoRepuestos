@@ -1,6 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Moto Repuestos Rojas - Inicio";
 
+    // LÓGICA AUTOMÁTICA:
+    // Si el usuario NO está logueado, esto será 'false' y mostrará el catálogo por defecto.
     bool esPersonalTaller = User.HasClaim(c => c.Type == "Role" && (c.Value == "Admin" || c.Value == "Vendedor"));
 }
 

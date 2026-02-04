@@ -1,4 +1,4 @@
-ï»¿using G9MotoRepuestos.Data;
+using G9MotoRepuestos.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using MR.AccesoDatos.Bitacora;
@@ -12,7 +12,7 @@ using MR.Abstracciones.LogicaDeNegocio.Bitacora;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CONFIGURACIÃ“N DE BASE DE DATOS ---
+// --- CONFIGURACIÓN DE BASE DE DATOS ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -21,29 +21,32 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// --- SISTEMA DE AUTENTICACIÃ“N (Login Personalizado) ---
-// Quitamos Identity y dejamos solo Cookies para que tu Login funcione al 100%
+// --- SISTEMA DE AUTENTICACIÓN (Tu Login con Cookies) ---
+// Quitamos el Identity por defecto para que no choque con tu lógica
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Usuarios/Login";
         options.AccessDeniedPath = "/Home/Privacy";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-        options.SlidingExpiration = true; // Renueva el tiempo si el usuario estÃ¡ activo
-        options.Cookie.Name = "MotoRepuestosRojas.Session"; // Nombre personalizado para la cookie
+        options.SlidingExpiration = true;
+        options.Cookie.Name = "MotoRepuestosRojas.Session";
     });
 
 builder.Services.AddControllersWithViews();
 
-// --- INYECCIÃ“N DE DEPENDENCIAS (Capas de tus compaÃ±eros) ---
+// --- INYECCIÓN DE DEPENDENCIAS (Arquitectura por capas) ---
+// Bitácora
 builder.Services.AddScoped<IBitacoraProductosAD>(_ => new BitacoraProductosAD(connectionString));
 builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
+
+// Productos
 builder.Services.AddScoped<IProductosAD>(_ => new ProductosAD(connectionString));
 builder.Services.AddScoped<IProductosLN, ProductosLN>();
 
 var app = builder.Build();
 
-// --- PIPELINE DE LA APLICACIÃ“N ---
+// --- PIPELINE DE LA APLICACIÓN ---
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -55,18 +58,16 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(); // ? Fundamental para que se vean las fotos en wwwroot/perfiles
 
 app.UseRouting();
 
-// âœ… El orden es fundamental para que sepa quiÃ©n eres antes de darte permiso
+// ? El orden es Sagrado: Autenticación antes que Autorización
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// MapRazorPages se queda quitado para no cargar el registro viejo de Identity
 
 app.Run();
