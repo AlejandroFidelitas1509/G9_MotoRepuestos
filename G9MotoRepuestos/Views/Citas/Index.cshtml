@@ -1,147 +1,65 @@
-
 @{
-    ViewData["Title"] = " Citas -  Moto Repuestos Rojas";
+    ViewData["Title"] = "Gestión de Citas - Moto Repuestos Rojas";
 }
 
-<div class="usuarios-container">
-    <h2 class="titulo-rojo">Citas</h2>
-
-    <div style="margin-bottom:12px;">
-        <a href="/Citas/Create" class="btn-guardar">Crear Cita</a>
-        <a href="/Citas/BloquearFecha" class="btn-cancelar">Bloquear Fechas</a>
-        <a href="/Citas/Historial" class="btn-cancelar">Historial</a>
+<div class="container-fluid fade-in pb-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+            <h2 class="fw-bold text-dark"><i class="fas fa-calendar-check me-2 text-danger"></i>Gestión de <span class="text-danger">Citas</span></h2>
+            <p class="text-muted small">Administre la agenda del taller y las revisiones mecánicas de Moto Repuestos Rojas.</p>
+        </div>
+        <div class="col-md-6 text-md-end text-center">
+            <a href="/Citas/Create" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                <i class="fas fa-plus me-2"></i>Nueva Cita
+            </a>
+            <a href="/Citas/BloquearFecha" class="btn btn-dark rounded-pill px-4 shadow-sm ms-2">
+                <i class="fas fa-lock me-2"></i>Bloquear
+            </a>
+        </div>
     </div>
 
-    <div style="color:green;font-weight:bold;">
-        Mensaje: Cita eliminada correctamente.
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary small text-uppercase fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha y Hora</th>
+                            <th>Estado</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="ps-4 fw-bold text-muted">#1</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-cita me-3">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="fw-bold text-dark">Carlos Monge</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-dark"><i class="far fa-calendar-alt me-2 text-muted"></i>05/12/2025</div>
+                                <div class="small text-muted"><i class="far fa-clock me-2 text-muted"></i>10:00 AM</div>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Pendiente</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-xs rounded-3">
+                                    <a href="/Citas/Details/1" class="btn btn-light btn-sm border-end"><i class="fas fa-eye"></i></a>
+                                    <a href="/Citas/Edit/1" class="btn btn-light btn-sm text-primary border-end"><i class="fas fa-edit"></i></a>
+                                    <a href="/Citas/Delete/1" class="btn btn-light btn-sm text-danger"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-    <table style="width:100%; border-collapse:collapse;">
-        <thead>
-            <tr style="background:#f5f5f5;">
-                <th>Id</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>Carlos Monge</td>
-                <td>05/12/2025 10:00 AM</td>
-                <td>Pendiente</td>
-                <td>
-                    <a href="/Citas/Details/1" class="btn-cancelar">Ver</a>
-                    <a href="/Citas/Edit/1" class="btn-guardar">Editar</a>
-                    <a href="/Citas/Delete/1" class="btn-cancelar">Eliminar</a>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Laura Solís</td>
-                <td>05/12/2025 14:30 PM</td>
-                <td>En Taller</td>
-                <td>
-                    <a href="/Citas/Details/2" class="btn-cancelar">Ver</a>
-                    <a href="/Citas/Edit/2" class="btn-guardar">Editar</a>
-                    <a href="/Citas/Delete/2" class="btn-cancelar">Eliminar</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </div>
-
-<style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: #f2f2f2;
-        color: #222;
-    }
-
-    .usuarios-container {
-        margin: 30px auto;
-        max-width: 900px;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .titulo-rojo {
-        color: #d32f2f;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .form-usuario {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .form-row {
-        flex: 1 1 45%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .input-text {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        transition: border-color 0.3s;
-    }
-
-        .input-text:hover {
-            border-color: #d32f2f;
-        }
-
-    .acciones-form {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .btn-guardar {
-        background-color: #d32f2f;
-        color: #fff;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-        .btn-guardar:hover {
-            background-color: #b71c1c;
-            text-decoration: none;
-        }
-
-    .btn-cancelar {
-        background-color: #333;
-        color: #fff;
-        padding: 10px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-left: 10px;
-        display: inline-block; 
-    }
-
-        .btn-cancelar:hover {
-            background-color: #555;
-            text-decoration: none;
-        }
-
-    table, th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-    }
-
-    thead th {
-        background-color: #eee;
-    }
-</style>
