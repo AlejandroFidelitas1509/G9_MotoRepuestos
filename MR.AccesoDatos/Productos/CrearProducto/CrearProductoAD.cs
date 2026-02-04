@@ -21,12 +21,21 @@ namespace MR.AccesoDatos.Productos.CrearProducto
         public async Task<int> EjecutarAsync(ProductoDto p)
         {
             const string sql = @"
+DECLARE @NewIdProducto INT;
+
 INSERT INTO dbo.Productos
 (Nombre, Descripcion, Marca, PrecioCosto, PrecioVenta, CodigoBarras, Estado, ImageURL, IdCategoria)
 VALUES
 (@Nombre, @Descripcion, @Marca, @PrecioCosto, @PrecioVenta, @CodigoBarras, @Estado, @ImageURL, @IdCategoria);
 
-SELECT CAST(SCOPE_IDENTITY() as int);";
+SET @NewIdProducto = CAST(SCOPE_IDENTITY() as int);
+
+INSERT INTO dbo.Inventario (StockActual, StockMinimo, StockMaximo, IdProducto)
+VALUES (@StockActual, NULL, NULL, @NewIdProducto);
+
+SELECT @NewIdProducto;
+";
+
 
             using var db = Db();
 
@@ -40,8 +49,10 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 p.CodigoBarras,
                 Estado = p.Estado ?? true,
                 p.ImageURL,
-                p.IdCategoria
+                p.IdCategoria,
+                StockActual = p.StockActual ?? 0
             });
+
         }
     }
 }

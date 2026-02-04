@@ -30,11 +30,14 @@
             <span asp-validation-for="Marca" class="text-danger"></span>
         </div>
 
-        <!-- ⚠️ Stock inicial NO se guarda aún porque es Inventario, no Productos -->
         <div class="form-row">
             <label>Stock inicial:</label>
-            <input type="number" class="input-text" placeholder="Cantidad en stock (se guardará después)" disabled />
-            <small class="text-muted">* Por ahora solo se guarda el producto. El stock se implementa después.</small>
+            <input asp-for="StockActual"
+                   type="number"
+                   min="0"
+                   class="input-text"
+                   placeholder="Cantidad en stock" />
+            <span asp-validation-for="StockActual" class="text-danger"></span>
         </div>
 
         <!-- Campos opcionales (si quieres irlos agregando ya) -->

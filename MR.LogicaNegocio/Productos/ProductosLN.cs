@@ -24,21 +24,28 @@ namespace MR.LogicaNegocio.Productos
         public Task<int> CrearAsync(ProductoDto producto)
             => new CrearProductoLN(_ad).EjecutarAsync(producto);
 
-        //  Pendientes por ahora
         public Task<IEnumerable<ProductoDto>> ListarAsync(bool soloActivos = true)
-            => throw new NotImplementedException("ListarAsync aún no implementado.");
+            => _ad.ListarAsync(soloActivos);
 
         public Task<ProductoDto?> ObtenerPorIdAsync(int id)
-            => throw new NotImplementedException("ObtenerPorIdAsync aún no implementado.");
+            => _ad.ObtenerPorIdAsync(id);
 
-        public Task<bool> ActualizarAsync(ProductoDto producto)
-            => throw new NotImplementedException("ActualizarAsync aún no implementado.");
+        public async Task<bool> ActualizarAsync(ProductoDto p)
+        {
+            if (p.IdProducto <= 0) throw new ArgumentException("Id inválido.");
+            if (string.IsNullOrWhiteSpace(p.Nombre)) throw new ArgumentException("Nombre es requerido.");
+            if (string.IsNullOrWhiteSpace(p.Marca)) throw new ArgumentException("Marca es requerida.");
+            if (!p.PrecioVenta.HasValue || p.PrecioVenta.Value <= 0) throw new ArgumentException("PrecioVenta debe ser mayor a 0.");
+            if (!p.StockActual.HasValue || p.StockActual.Value < 0) throw new ArgumentException("Stock inválido.");
+
+            return await _ad.ActualizarAsync(p);
+        }
+        
+        public Task<bool> DesactivarAsync(int id)
+            => _ad.CambiarEstadoAsync(id, false);
 
         public Task<bool> ActivarAsync(int id)
-            => throw new NotImplementedException("ActivarAsync aún no implementado.");
-
-        public Task<bool> DesactivarAsync(int id)
-            => throw new NotImplementedException("DesactivarAsync aún no implementado.");
+            => _ad.CambiarEstadoAsync(id, true);
     }
 
 }
