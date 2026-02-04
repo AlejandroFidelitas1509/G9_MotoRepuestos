@@ -1,234 +1,151 @@
 ﻿@{
-    ViewData["Title"] = "Panel Principal";
+    ViewData["Title"] = "Moto Repuestos Rojas - Inicio";
+
+    // LÓGICA AUTOMÁTICA:
+    // Si el usuario NO está logueado, esto será 'false' y mostrará el catálogo por defecto.
+    bool esPersonalTaller = User.HasClaim(c => c.Type == "Role" && (c.Value == "Admin" || c.Value == "Vendedor"));
 }
 
 <div class="container-fluid fade-in pb-5">
-    <div class="row mb-4">
-        <div class="col-12 text-center text-md-start">
-            <h2 class="fw-bold text-dark">Panel de Control <span class="text-danger">Rojas</span></h2>
-            <p class="text-muted">Gestión de inventario y servicios en tiempo real para Moto Repuestos Rojas.</p>
-        </div>
-    </div>
 
-    <div class="row g-3 mb-5">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover border-start border-danger border-4">
-                <div class="card-body text-center">
-                    <div class="icon-box bg-light-danger mb-3 py-3 rounded"><i class="fas fa-boxes fa-2x text-danger"></i></div>
-                    <h6 class="fw-bold">Inventario</h6>
-                    <a asp-controller="Inventario" asp-action="Index" class="btn btn-sm btn-danger w-100 shadow-sm">Administrar</a>
-                </div>
+    @if (esPersonalTaller)
+    {
+        <div class="row mb-4">
+            <div class="col-12 text-center text-md-start">
+                <h2 class="fw-bold text-dark">Panel de Control <span class="text-danger">Rojas</span></h2>
+                <p class="text-muted small">Gestión interna para el equipo de Mercedes Norte, Heredia.</p>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover border-start border-success border-4">
-                <div class="card-body text-center">
-                    <div class="icon-box bg-light-success mb-3 py-3 rounded"><i class="fas fa-cash-register fa-2x text-success"></i></div>
-                    <h6 class="fw-bold">Nueva Venta</h6>
-                    <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-sm btn-success w-100 shadow-sm">Abrir Caja</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover border-start border-info border-4">
-                <div class="card-body text-center">
-                    <div class="icon-box bg-light-info mb-3 py-3 rounded"><i class="fas fa-motorcycle fa-2x text-info"></i></div>
-                    <h6 class="fw-bold">Taller</h6>
-                    <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-info text-white w-100 shadow-sm">Ver Agenda</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card shadow-sm border-0 h-100 card-hover border-start border-warning border-4">
-                <div class="card-body text-center">
-                    <div class="icon-box bg-light-warning mb-3 py-3 rounded"><i class="fas fa-file-invoice-dollar fa-2x text-warning"></i></div>
-                    <h6 class="fw-bold">Finanzas</h6>
-                    <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-sm btn-warning text-white w-100 shadow-sm">Reportes</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div id="carouselMoto" class="carousel slide carousel-fade shadow rounded overflow-hidden mb-5 border border-light" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselMoto" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#carouselMoto" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#carouselMoto" data-bs-slide-to="2"></button>
+        <div class="row g-3 mb-5">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100 card-hover border-start border-danger border-4">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-light-danger mb-3 py-3 rounded"><i class="fas fa-boxes fa-2x text-danger"></i></div>
+                        <h6 class="fw-bold">Inventario</h6>
+                        <a asp-controller="Inventario" asp-action="Index" class="btn btn-sm btn-danger w-100 shadow-sm">Administrar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100 card-hover border-start border-success border-4">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-light-success mb-3 py-3 rounded"><i class="fas fa-cash-register fa-2x text-success"></i></div>
+                        <h6 class="fw-bold">Nueva Venta</h6>
+                        <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-sm btn-success w-100 shadow-sm">Abrir Caja</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100 card-hover border-start border-info border-4">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-light-info mb-3 py-3 rounded"><i class="fas fa-motorcycle fa-2x text-info"></i></div>
+                        <h6 class="fw-bold">Taller</h6>
+                        <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-info text-white w-100 shadow-sm">Ver Agenda</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100 card-hover border-start border-warning border-4">
+                    <div class="card-body text-center">
+                        <div class="icon-box bg-light-warning mb-3 py-3 rounded"><i class="fas fa-file-invoice-dollar fa-2x text-warning"></i></div>
+                        <h6 class="fw-bold">Finanzas</h6>
+                        <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-sm btn-warning text-white w-100 shadow-sm">Reportes</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active" data-bs-interval="4000">
-                <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.4);">
-                <div class="carousel-caption d-none d-md-block text-start mb-4">
-                    <h1 class="fw-bold">Potencia y Rendimiento</h1>
-                    <p class="fs-5">Repuestos de alta gama para que su motor nunca se detenga.</p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 90px; z-index: 10;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4"><i class="fas fa-filter text-danger me-2"></i>Filtrar</h5>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Categorías</label>
+                            <div class="list-group list-group-flush small">
+                                <a href="#" class="list-group-item list-group-item-action border-0 px-0">Motor</a>
+                                <a href="#" class="list-group-item list-group-item-action border-0 px-0">Frenos</a>
+                                <a href="#" class="list-group-item list-group-item-action border-0 px-0">Aceites</a>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger w-100 rounded-pill py-2 shadow-sm">Aplicar Filtros</button>
+                    </div>
                 </div>
             </div>
-            <div class="carousel-item" data-bs-interval="4000">
-                <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.4);">
-                <div class="carousel-caption d-none d-md-block mb-4">
-                    <h1 class="fw-bold text-warning">Kits de Arrastre Racing</h1>
-                    <p class="fs-5 text-white">Seguridad y durabilidad certificada para su motocicleta.</p>
-                </div>
-            </div>
-            <div class="carousel-item" data-bs-interval="4000">
-                <img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.4);">
-                <div class="carousel-caption d-none d-md-block text-end mb-4">
-                    <h1 class="fw-bold text-white">Mantenimiento Profesional</h1>
-                    <p class="fs-5 text-white">Visítenos en Mercedes Norte, Heredia.</p>
-                </div>
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselMoto" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselMoto" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-    </div>
 
-    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
-        <h4 class="fw-bold mb-0 text-danger"><i class="fas fa-star me-2"></i>Novedades</h4>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderNov" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderNov" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    </div>
-    <div id="sliderNov" class="carousel slide mb-5" data-bs-ride="false">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="row g-3">
-                    @for (int i = 0; i < 4; i++)
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold text-dark mb-0">Nuestros <span class="text-danger">Repuestos</span></h2>
+                    <button class="btn btn-dark rounded-pill px-4 shadow-sm position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
+                        <i class="fas fa-shopping-cart text-danger me-2"></i> Mi Carrito
+                    </button>
+                </div>
+
+                <div class="row g-4 mt-2">
+                    @for (int i = 1; i <= 6; i++)
                     {
-                        <div class="col-md-3">
-                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center">
-                                <i class="fas fa-box fa-3x text-light mb-3"></i>
-                                <h6 class="fw-bold mb-1 small">Repuesto #@i</h6>
-                                <p class="text-danger fw-bold mb-1">₡ 25,500</p>
-                                <button class="btn btn-sm btn-outline-danger w-100 mt-2">Detalles</button>
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm product-card-client overflow-hidden rounded-4">
+                                <div class="bg-light p-4 text-center position-relative">
+                                    <i class="fas fa-motorcycle fa-4x text-white opacity-50"></i>
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 shadow-sm">Nuevo</span>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-1">Repuesto #@i</h6>
+                                    <h5 class="text-danger fw-bold">₡ 15,000</h5>
+                                    <button class="btn btn-outline-danger btn-sm w-100 mt-2 rounded-pill">Añadir</button>
+                                </div>
                             </div>
                         </div>
                     }
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
-        <h4 class="fw-bold mb-0 text-primary"><i class="fas fa-percentage me-2"></i>Ofertas</h4>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderOf" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderOf" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    </div>
-    <div id="sliderOf" class="carousel slide mb-5" data-bs-ride="false">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="row g-3">
-                    @for (int i = 0; i < 4; i++)
-                    {
-                        <div class="col-md-3">
-                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center">
-                                <i class="fas fa-tag fa-3x text-light mb-3"></i>
-                                <h6 class="fw-bold mb-1 small">Oferta Aceite</h6>
-                                <p class="text-primary fw-bold mb-1">₡ 8,500</p>
-                                <button class="btn btn-sm btn-outline-primary w-100 mt-2">Ver Oferta</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
-        <h4 class="fw-bold mb-0 text-dark"><i class="fas fa-cog me-2"></i>Repuestos</h4>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderRep" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderRep" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    </div>
-    <div id="sliderRep" class="carousel slide mb-5" data-bs-ride="false">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="row g-3">
-                    @for (int i = 0; i < 4; i++)
-                    {
-                        <div class="col-md-3">
-                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center">
-                                <i class="fas fa-tools fa-3x text-light mb-3"></i>
-                                <h6 class="fw-bold mb-1 small">Pastillas de Freno</h6>
-                                <p class="text-dark fw-bold mb-1">₡ 12,000</p>
-                                <button class="btn btn-sm btn-outline-dark w-100 mt-2">Detalles</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
-        <h4 class="fw-bold mb-0 text-success"><i class="fas fa-calendar-check me-2"></i>Servicios de Taller</h4>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderSer" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" type="button" data-bs-target="#sliderSer" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    </div>
-    <div id="sliderSer" class="carousel slide mb-5" data-bs-ride="false">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="row g-3">
-                    @for (int i = 0; i < 4; i++)
-                    {
-                        <div class="col-md-3">
-                            <div class="card h-100 border-0 shadow-sm product-card-hover p-4 text-center border-bottom border-success border-3">
-                                <i class="fas fa-screwdriver-wrench fa-3x text-light mb-3"></i>
-                                <h6 class="fw-bold mb-1 small">Mantenimiento</h6>
-                                <p class="text-success fw-bold mb-1 text-uppercase small">Placa: ABC-123</p>
-                                <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-success w-100 mt-2">Agendar</a>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-light py-5 mb-5 rounded shadow-sm">
-        <div class="container text-center">
-            <h6 class="text-muted text-uppercase small mb-4 fw-bold">Marcas que manejamos</h6>
-            <div class="d-flex flex-wrap justify-content-center align-items-center gap-5 opacity-75">
-                <h4 class="fw-bold text-secondary">HONDA</h4>
-                <h4 class="fw-bold text-secondary">YAMAHA</h4>
-                <h4 class="fw-bold text-secondary">VIPER</h4>
-                <h4 class="fw-bold text-secondary">REPSOL</h4>
-                <h4 class="fw-bold text-secondary">BELRAY</h4>
-                <h4 class="fw-bold text-secondary">VINI</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="chatbox-wrapper shadow-lg d-none d-md-block" id="chatboxRojas">
-        <div class="chatbox-header bg-dark text-white p-2 d-flex justify-content-between align-items-center" onclick="toggleChat()" style="cursor: pointer;">
-            <small class="fw-bold text-danger"><i class="fas fa-robot me-2"></i>Asistente Rojas</small>
-            <i class="fas fa-minus small" id="chatIcon"></i>
-        </div>
-        <div id="chatContent">
-            <div class="chatbox-body bg-light p-3" style="height: 200px; overflow-y: auto;">
-                <div class="chat-msg mb-2">
-                    <span class="badge bg-danger">Bot</span>
-                    <p class="small bg-white p-2 rounded shadow-sm mb-0 mt-1">¡Hola Sebas! ¿Cómo va el trabajo hoy en Heredia?</p>
-                </div>
-            </div>
-            <div class="chatbox-footer p-2 bg-white border-top">
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" placeholder="Escribe un mensaje...">
-                    <button class="btn btn-danger"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    }
 </div>
+
+<div class="offcanvas offcanvas-end border-0 shadow-lg rounded-start-4" tabindex="-1" id="offcanvasCart">
+    <div class="offcanvas-header bg-dark text-white py-4">
+        <h5 class="offcanvas-title fw-bold"><i class="fas fa-shopping-cart text-danger me-2"></i>Su Selección</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+        <div class="flex-grow-1 overflow-auto">
+            <p class="text-muted text-center">Tu carrito está vacío</p>
+        </div>
+        <div class="border-top pt-3 text-center">
+            <h3 class="fw-bolder text-danger mb-4">₡ 0</h3>
+            <button class="btn btn-danger btn-lg w-100 py-3 fw-bold rounded-pill shadow-lg">PAGAR</button>
+        </div>
+    </div>
+</div>
+
+<div class="chatbox-wrapper shadow-lg d-none d-md-block" id="chatboxRojas">
+    <div class="chatbox-header bg-dark text-white p-2 d-flex justify-content-between align-items-center" onclick="toggleChat()" style="cursor: pointer;">
+        <small class="fw-bold text-danger"><i class="fas fa-robot me-2"></i>Asistente Rojas</small>
+        <i class="fas fa-minus small" id="chatIcon"></i>
+    </div>
+    <div id="chatContent">
+        <div class="chatbox-body bg-light p-3" style="height: 200px; overflow-y: auto;">
+            <div class="chat-msg mb-2 text-center">
+                <p class="small bg-white p-2 rounded shadow-sm mb-0">¡Hola Sebas! ¿En qué puedo ayudarte hoy?</p>
+            </div>
+        </div>
+        <div class="chatbox-footer p-2 bg-white border-top">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" placeholder="Escribe...">
+                <button class="btn btn-danger"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
 
 @section Scripts {
     <script src="~/js/chatbox.js" asp-append-version="true"></script>

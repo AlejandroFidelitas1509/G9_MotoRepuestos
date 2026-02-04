@@ -1,16 +1,20 @@
 ﻿function toggleChat() {
-    const content = document.getElementById("chatContent");
-    const icon = document.getElementById("chatIcon");
+    const chatContent = document.getElementById("chatContent");
+    const chatIcon = document.getElementById("chatIcon");
 
-    if (content.style.display === "none") {
-        content.style.display = "block";
-        icon.classList.replace("fa-plus", "fa-minus");
+    if (!chatContent || !chatIcon) return;
+
+    if (chatContent.style.display === "none") {
+        chatContent.style.display = "block";
+        chatIcon.classList.remove("fa-plus");
+        chatIcon.classList.add("fa-minus");
     } else {
-        content.style.display = "none";
-        icon.classList.replace("fa-minus", "fa-plus");
+        chatContent.style.display = "none";
+        chatIcon.classList.remove("fa-minus");
+        chatIcon.classList.add("fa-plus");
     }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-     toggleChat(); 
+    console.log("Chatbox Rojas cargado correctamente.");
 });

@@ -1,293 +1,203 @@
-﻿@model IEnumerable<G9MotoRepuestos.Models.PuntoVenta>
-
+﻿@model IEnumerable<dynamic>
 @{
     ViewData["Title"] = "Punto de Venta - Moto Repuestos Rojas";
+    // INTERRUPTOR: Cambia a 'false' para ver la vista de Carrito/Cliente
+    bool esVendedor = true;
 }
 
-<div class="punto-venta-container">
-    <h2 class="titulo">Punto de Venta</h2>
+@if (esVendedor)
+{
+    <div class="pos-admin-container fade-in">
+        <div class="pos-shortcuts bg-dark text-white d-flex align-items-center px-3 py-2 justify-content-between">
+            <div class="d-flex gap-4">
+                <span><kbd class="bg-danger">F1</kbd> Buscar</span>
+                <span><kbd class="bg-danger">F10</kbd> Cobrar</span>
+            </div>
+            <div class="text-danger fw-bold">PUNTO DE VENTA - MODO CAJERO</div>
+        </div>
 
-    <div class="cuerpo-venta">
+        <div class="row g-0 main-pos-height">
+            <div class="col-md-1 pos-sidebar d-flex flex-column align-items-center py-4">
+                <button class="pos-side-btn active" title="Ventas"><i class="fas fa-cash-register"></i></button>
+                <button class="pos-side-btn" title="Inventario"><i class="fas fa-boxes"></i></button>
+                <button class="pos-side-btn" title="Cierre"><i class="fas fa-calculator"></i></button>
+            </div>
 
-        <div class="panel-detalle">
-     
-            <div class="buscador-productos">           
-                <input type="text" id="buscar-producto" placeholder="" class="input-busqueda">
-                <button class="btn-buscar">
-                    <i class="fas fa-search"></i> Buscar
+            <div class="col-md-8 bg-white p-4 d-flex flex-column">
+                <div class="search-section mb-3">
+                    <div class="input-group input-group-lg shadow-sm border rounded-3 overflow-hidden">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-barcode text-muted"></i></span>
+                        <input type="text" id="CodigoBarras" class="form-control border-0 bg-light" placeholder="Escanear Código de Barras o Nombre...">
+                        <button class="btn btn-dark px-4 border-0">Añadir</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive flex-grow-1 border rounded-4 bg-light shadow-inner">
+                    <table class="table table-hover align-middle mb-0 bg-white">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th>Cod.</th>
+                                <th>Descripción</th>
+                                <th class="text-center">Cant.</th>
+                                <th class="text-end">Precio</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaVenta">
+                            <tr class="border-bottom">
+                                <td class="fw-bold text-muted">744102</td>
+                                <td>
+                                    <div class="fw-bold text-dark">Kit de Arrastre Racing</div>
+                                    <small class="text-muted">Supersprox - Stock: 12</small>
+                                </td>
+                                <td class="text-center" style="width: 120px;">
+                                    <input type="number" class="form-control form-control-sm text-center fw-bold border-2" value="1">
+                                </td>
+                                <td class="text-end text-dark">₡ 25,500</td>
+                                <td class="text-end fw-bold text-dark">₡ 25,500</td>
+                                <td class="text-center"><button class="btn btn-link text-danger p-0"><i class="fas fa-times-circle"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-3 bg-light border-start p-4 d-flex flex-column">
+                <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                    <div class="card-body bg-white">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small fw-bold">SUBTOTAL</span>
+                            <span class="fw-bold text-dark" id="SubTotal">₡ 22,566</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-0">
+                            <span class="text-muted small fw-bold">IVA (13%)</span>
+                            <span class="fw-bold text-dark" id="IVA">₡ 2,934</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="total-box-eleventa bg-danger text-white p-4 rounded-4 text-center shadow-lg mb-4">
+                    <small class="text-uppercase fw-bold opacity-75">Total Factura</small>
+                    <h1 class="fw-bolder mb-0" id="Total">₡ 25,500</h1>
+                </div>
+
+                <div class="payment-methods mb-4">
+                    <label class="form-label small fw-bold text-uppercase text-secondary mb-3">Forma de Pago</label>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="metodoPago" id="efectivo" value="Efectivo" checked onchange="cambiarMetodoPago()">
+                            <label class="btn btn-outline-danger w-100 py-3 rounded-3" for="efectivo">
+                                <i class="fas fa-money-bill-wave d-block mb-1"></i><small>Efectivo</small>
+                            </label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="metodoPago" id="tarjeta" value="Tarjeta" onchange="cambiarMetodoPago()">
+                            <label class="btn btn-outline-danger w-100 py-3 rounded-3" for="tarjeta">
+                                <i class="fas fa-credit-card d-block mb-1"></i><small>Tarjeta</small>
+                            </label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="metodoPago" id="sinpe" value="SINPE" onchange="cambiarMetodoPago()">
+                            <label class="btn btn-outline-danger w-100 py-3 rounded-3" for="sinpe">
+                                <i class="fas fa-mobile-alt d-block mb-1"></i><small>SINPE</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fieldEfectivo" class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Monto Recibido</label>
+                    <input type="number" class="form-control form-control-lg border-2 text-center fw-bold mb-3" id="montoRecibido" placeholder="0">
+                    <div class="d-flex justify-content-between p-3 bg-white rounded-3 border">
+                        <span class="fw-bold text-secondary">Vuelto</span>
+                        <span class="fw-bolder text-danger" id="vueltoMonto">₡ 0</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-success btn-lg w-100 py-3 fw-bold mt-auto shadow rounded-3">
+                    <i class="fas fa-cash-register me-2"></i>FINALIZAR (F10)
                 </button>
             </div>
-          
-            <div class="tabla-scroll">
-                <table class="tabla-items">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Descripción</th>
-                            <th>Cant.</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        <tr>
-                            <td>231234</td>
-                            <td>Batería 12V</td>
-                            <td>
-                                <input type="number" value="2" min="1" class="input-cantidad">
-                            </td>
-                            <td>₡18000</td>
-                            <td>
-                                <button class="btn-eliminar-item">Eliminar</button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>12441</td>
-                            <td>Filtro de Aceite</td>
-                            <td>
-                                <input type="number" value="1" min="1" class="input-cantidad">
-                            </td>
-                            <td>₡3000</td>
-                            <td>
-                                <button class="btn-eliminar-item">Eliminar</button>
-                            </td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-            </div>
         </div>
-
-        <div class="panel-resumen">
-            <h3 class="subtitulo">Resumen de Venta</h3>
-
-            <div class="resumen-detalle">
-                <div class="linea-resumen">
-                    <span>Subtotal:</span>
-                    <span id="subtotal-valor">₡21000</span>
-                </div>
-                <div class="linea-resumen">
-                    <span>IVA:</span>
-                    <span id="impuestos-valor">₡2730</span>
-                </div>
-                <div class="linea-resumen total-linea">
-                    <span>TOTAL A PAGAR:</span>
-                    <span id="total-valor">₡23730</span>
-                </div>
-            </div>
-
-            <div class="acciones-venta">
-               
-                <a asp-action="Cobrar" class="btn-facturar">Cobrar</a>
-                <button type="reset" class="btn-danger">Reiniciar</button>
-
-            </div>
-
-        </div>
-      
     </div>
+}
+else
+{
+    <div class="container py-4 fade-in">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold text-dark">Tienda <span class="text-danger">Rojas</span></h3>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark rounded-pill px-4 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Categorías
+                        </button>
+                        <ul class="dropdown-menu border-0 shadow">
+                            <li><a class="dropdown-item" href="#">Motor</a></li>
+                            <li><a class="dropdown-item" href="#">Accesorios</a></li>
+                            <li><a class="dropdown-item" href="#">Aceites</a></li>
+                        </ul>
+                    </div>
+                </div>
 
-</div>
+                <div class="row g-4">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm product-card-client overflow-hidden rounded-4">
+                                <div class="bg-light p-5 text-center position-relative">
+                                    <i class="fas fa-motorcycle fa-4x text-white opacity-50"></i>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-1">Repuesto de Prueba #@i</h6>
+                                    <p class="small text-muted mb-2">Marca: @(i % 2 == 0 ? "Honda" : "Yamaha")</p>
+                                    <h5 class="text-danger fw-bold">₡ 15,000</h5>
+                                    <button class="btn btn-danger btn-sm w-100 mt-2 rounded-pill shadow-sm">
+                                        <i class="fas fa-cart-plus me-1"></i> Añadir al carrito
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
 
-<style>
-    
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: #f2f2f2;
-        color: #222;
-    }
+            <div class="col-md-4">
+                <div class="card shadow-lg border-0 rounded-4 sticky-top" style="top: 20px;">
+                    <div class="card-header bg-dark text-white py-3 border-0">
+                        <h5 class="mb-0 fw-bold d-flex justify-content-between">
+                            <span><i class="fas fa-shopping-cart text-danger me-2"></i>Mi Orden</span>
+                            <span class="badge bg-danger rounded-pill">1</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="cart-items-list mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-light p-2 rounded me-3"><i class="fas fa-box text-muted"></i></div>
+                                <div class="flex-grow-1">
+                                    <h6 class="small fw-bold mb-0">Aceite Motul 4T</h6>
+                                    <small class="text-muted">1 x ₡ 8,500</small>
+                                </div>
+                                <button class="btn btn-sm text-danger"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="border-top pt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span class="fw-bold text-muted small uppercase">Total estimado</span>
+                                <h3 class="fw-bolder text-danger mb-0">₡ 8,500</h3>
+                            </div>
+                            <button class="btn btn-danger w-100 py-3 fw-bold rounded-pill shadow-lg">
+                                PROCEDER AL PAGO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
-    .punto-venta-container {
-        margin: 30px auto;
-        max-width: 1200px; 
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .titulo {
-        color: #d32f2f;
-        text-align: center;
-        margin-bottom: 25px;
-        font-size: 2em;
-        font-weight: bold;
-        border-bottom: 2px solid #ccc;
-        padding-bottom: 10px;
-    }
-
-    .subtitulo {
-        font-weight: bold;
-        color: #333;
-        font-size: 1.1em;
-    }
-
-    .cuerpo-venta {
-        display: flex;
-        gap: 25px;
-    }
-
-    .panel-detalle {
-        flex: 3;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .panel-resumen {
-        flex: 1; 
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        border: 1px solid #ccc;
-        min-width: 250px;
-    }
-
-    .buscador-productos {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        align-items: flex-end;
-        padding-bottom: 15px;
-        border-bottom: 1px dashed #ccc;
-    }
-
-        .buscador-productos label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-    .input-busqueda {
-        flex-grow: 1;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    .btn-buscar {
-        background-color: #333;
-        color: #fff;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.3s;
-    }
-
-        .btn-buscar:hover {
-            background-color: #555;
-        }
-
-    .tabla-scroll {
-        overflow-y: auto;
-        max-height: 400px; 
-    }
-
-    .tabla-items {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-        .tabla-items th {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: left;
-            position: sticky; 
-            top: 0;
-        }
-
-        .tabla-items td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-
-        .tabla-items tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-    .input-cantidad {
-        width: 60px;
-        text-align: center;
-        padding: 3px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-    }
-
-    .btn-eliminar-item {
-        background-color: #b71c1c;
-        color: #fff;
-        padding: 5px 8px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.3s;
-    }
-
-    .resumen-detalle {
-        margin: 20px 0;
-        padding: 15px 0;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .linea-resumen {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 1em;
-    }
-
-    .total-linea {
-        font-weight: bold;
-        color: #d32f2f; 
-        font-size: 1.3em;
-        padding-top: 10px;
-        border-top: 2px solid #d32f2f;
-    }
-
-    .acciones-venta {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .btn-facturar {
-        background-color: #d32f2f;
-        color: #fff;
-        padding: 15px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        font-size: 1.1em;
-        text-decoration: none;
-        text-align: center;
-    }
-
-        .btn-facturar {
-            background-color: #b71c1c;
-        }
-
-    .btn-danger {
-        background-color: #6c757d;
-        color: #fff;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .btn-danger{
-            background-color: #5a6268;
-        }
-
-</style>
+@section Scripts {
+    <script src="~/js/PuntoVenta.js" asp-append-version="true"></script>
+}

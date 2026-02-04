@@ -1,0 +1,105 @@
+﻿@model G9MotoRepuestos.Models.Usuario
+@{
+    ViewData["Title"] = "Editar Perfil";
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+    bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
+}
+
+<link rel="stylesheet" href="~/css/EditarPerfil.css" asp-append-version="true" />
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-lg card-editar-perfil">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h4 class="mb-0 fw-bold">CONFIGURACIÓN DE PERFIL</h4>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdUsuario" />
+
+                        @if (!esAdmin)
+                        {
+                            <input type="hidden" asp-for="IdRol" />
+                            <input type="hidden" asp-for="Estado" />
+                        }
+
+                        <div class="text-center mb-4">
+                            <img id="imgPreview" src="@(Model.ImagenURL ?? "/images/default-avatar.png")" class="preview-img" />
+                            <div class="drop-zone" id="dropZone">
+                                <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                                <p class="mb-0 small">Arrastra tu foto o haz clic para seleccionarla</p>
+                                <input type="file" name="fotoArchivo" id="fotoArchivo" hidden accept="image/*" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="label-small">Nombre Completo</label>
+                                <input asp-for="NombreCompleto" class="form-control form-control-lg" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="label-small">Correo Electrónico</label>
+                                <input asp-for="Correo" type="email" class="form-control" required />
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label class="label-small">Teléfono</label>
+                                <input asp-for="Telefono" class="form-control" placeholder="8888-8888" />
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label class="label-small">Nueva Contraseña</label>
+                                <input asp-for="PasswordHash" type="password" class="form-control" required />
+                            </div>
+
+                            @if (esAdmin)
+                            {
+                                <div class="col-sm-6">
+                                    <label class="label-small">Rol del Usuario</label>
+                                    <select asp-for="IdRol" class="form-select" asp-items="ViewBag.Roles"></select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="label-small">Estado de Cuenta</label>
+                                    <select asp-for="Estado" class="form-select">
+                                        <option value="true">Activo</option>
+                                        <option value="false">Inactivo</option>
+                                    </select>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-danger btn-guardar text-white">
+                                GUARDAR CAMBIOS
+                            </button>
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-link text-muted">Volver al inicio</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const dz = document.getElementById('dropZone');
+        const fi = document.getElementById('fotoArchivo');
+        const pr = document.getElementById('imgPreview');
+
+        dz.addEventListener('click', () => fi.click());
+
+        fi.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => pr.src = e.target.result;
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}
