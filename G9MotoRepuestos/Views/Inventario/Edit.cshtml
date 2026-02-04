@@ -1,45 +1,53 @@
-﻿@{
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model ProductoDto
+
+@{
     ViewData["Title"] = "Editar Producto";
 }
 
 <div class="usuarios-container">
     <h2 class="titulo-rojo">Editar Producto</h2>
 
-    <form class="form-usuario">
-        <div class="form-row">
-            <label>Id Producto:</label>
-            <input type="text" class="input-text" value="1" readonly />
-        </div>
+    <form asp-action="Edit" method="post" class="form-usuario">
+        @Html.AntiForgeryToken()
+
+        <!-- Id oculto -->
+        <input asp-for="IdProducto" type="hidden" />
 
         <div class="form-row">
             <label>Nombre:</label>
-            <input type="text" class="input-text" value="Filtro de aire Yamaha" />
+            <input asp-for="Nombre" type="text" class="input-text" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
 
         <div class="form-row">
-            <label>Precio:</label>
-            <input type="text" class="input-text" value="₡8,500" />
+            <label>Precio venta:</label>
+            <input asp-for="PrecioVenta" type="number" step="0.01" class="input-text" />
+            <span asp-validation-for="PrecioVenta" class="text-danger"></span>
         </div>
-
-
 
         <div class="form-row">
             <label>Marca:</label>
-            <input type="text" class="input-text" value="Yamaha" />
+            <input asp-for="Marca" type="text" class="input-text" />
+            <span asp-validation-for="Marca" class="text-danger"></span>
         </div>
 
         <div class="form-row">
-            <label>Stock:</label>
-            <input type="text" class="input-text" value="25" readonly />
+            <label>Stock actual:</label>
+            <input asp-for="StockActual" type="number" min="0" class="input-text" />
+            <span asp-validation-for="StockActual" class="text-danger"></span>
         </div>
 
         <div class="acciones-form">
-            <a href="/Inventario" class="btn-guardar">Actualizar</a>
-
-            <a href="/Inventario" class="btn-cancelar">Cancelar</a>
+            <button type="submit" class="btn-guardar">Guardar cambios</button>
+            <a asp-action="Index" class="btn-cancelar">Cancelar</a>
         </div>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 
 <style>
     body {
@@ -58,7 +66,7 @@
     }
 
     .titulo-rojo {
-        color: #d32f2f; /* rojo fuerte */
+        color: #d32f2f;
         text-align: center;
         margin-bottom: 20px;
     }
@@ -82,7 +90,6 @@
         transition: border-color 0.3s;
     }
 
-        /* Hover en los campos */
         .input-text:hover {
             border-color: #d32f2f;
         }
@@ -101,10 +108,12 @@
         font-weight: bold;
         cursor: pointer;
         text-decoration: none;
+        display: inline-block;
     }
 
         .btn-guardar:hover {
-            background-color: #b71c1c; /* rojo más oscuro */
+            background-color: #b71c1c;
+            text-decoration: none;
         }
 
     .btn-cancelar {
@@ -118,5 +127,6 @@
 
         .btn-cancelar:hover {
             background-color: #555;
+            text-decoration: none;
         }
 </style>

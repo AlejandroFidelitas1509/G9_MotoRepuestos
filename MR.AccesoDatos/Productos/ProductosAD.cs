@@ -50,14 +50,104 @@ ORDER BY p.IdProducto DESC;";
 
         //  Pendientes (por ahora)
 
-        public Task<ProductoDto?> ObtenerPorIdAsync(int id)
-            => throw new NotImplementedException("ObtenerPorIdAsync aún no implementado.");
+        public async Task<ProductoDto?> ObtenerPorIdAsync(int id)
+        {
+            const string sql = @"
+SELECT
+    p.IdProducto,
+    p.Nombre,
+    p.Descripcion,
+    p.Marca,
+    p.PrecioCosto,
+    p.PrecioVenta,
+    p.CodigoBarras,
+    p.Estado,
+    p.ImageURL,
+    p.IdCategoria,
+    i.StockActual
+FROM dbo.Productos p
+LEFT JOIN dbo.Inventario i ON i.IdProducto = p.IdProducto
+WHERE p.IdProducto = @Id;";
 
-        public Task<bool> ActualizarAsync(ProductoDto producto)
-            => throw new NotImplementedException("ActualizarAsync aún no implementado.");
+            using IDbConnection db = new SqlConnection(_cn);
+            return await db.QueryFirstOrDefaultAsync<ProductoDto>(sql, new { Id = id });
+        }
 
-        public Task<bool> CambiarEstadoAsync(int id, bool estado)
-            => throw new NotImplementedException("CambiarEstadoAsync aún no implementado.");
+
+        public async Task<bool> ActualizarAsync(ProductoDto p)
+        {
+            const string sql = @"
+BEGIN TRAN;
+
+UPDATE dbo.Productos
+SET
+    Nombre = @Nombre,
+    Descripcion = @Descripcion,
+    Marca = @Marca,
+    PrecioCosto = @PrecioCosto,
+    PrecioVenta = @PrecioVenta,
+    CodigoBarras = @CodigoBarras,
+    Estado = @Estado,
+    ImageURL = @ImageURL,
+    IdCategoria = @IdCategoria
+WHERE IdProducto = @IdProducto;
+
+-- Asegura que exista fila en Inventario:
+IF EXISTS (SELECT 1 FROM dbo.Inventario WHERE IdProducto = @IdProducto)
+BEGIN
+    UPDATE dbo.Inventario
+    SET StockActual = @StockActual
+    WHERE IdProducto = @IdProducto;
+END
+ELSE
+BEGIN
+    INSERT INTO dbo.Inventario (StockActual, StockMinimo, StockMaximo, IdProducto)
+    VALUES (@StockActual, NULL, NULL, @IdProducto);
+END
+
+COMMIT;
+
+SELECT 1;
+";
+
+            using IDbConnection db = new SqlConnection(_cn);
+
+            var ok = await db.ExecuteScalarAsync<int>(sql, new
+            {
+                p.IdProducto,
+                p.Nombre,
+                p.Descripcion,
+                p.Marca,
+                p.PrecioCosto,
+                p.PrecioVenta,
+                p.CodigoBarras,
+                Estado = p.Estado ?? true,
+                p.ImageURL,
+                p.IdCategoria,
+                StockActual = p.StockActual ?? 0
+            });
+
+            return ok == 1;
+        }
+
+
+        public async Task<bool> CambiarEstadoAsync(int id, bool estado)
+        {
+            const string sql = @"
+UPDATE dbo.Productos
+SET Estado = @Estado
+WHERE IdProducto = @IdProducto;";
+
+            using IDbConnection db = new SqlConnection(_cn);
+
+            var filas = await db.ExecuteAsync(sql, new
+            {
+                IdProducto = id,
+                Estado = estado ? 1 : 0
+            });
+
+            return filas > 0;
+        }
     }
 }
 

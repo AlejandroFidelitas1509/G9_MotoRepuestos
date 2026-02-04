@@ -1,12 +1,14 @@
 ﻿using G9MotoRepuestos.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-// ✅ Agrega estos using (para tus capas)
+using MR.AccesoDatos.Bitacora;
+using MR.LogicaNegocio.Bitacora;
 using MR.AccesoDatos.Productos;
 using MR.LogicaNegocio.Productos;
 using MR.Abstracciones.AccesoADatos.Productos;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
+using MR.Abstracciones.AccesoADatos.Bitacora;
+using MR.Abstracciones.LogicaDeNegocio.Bitacora;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,11 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
+
+// Bitácora Productos
+builder.Services.AddScoped<IBitacoraProductosAD>(_ => new BitacoraProductosAD(connectionString));
+builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
+
 
 // ✅ AGREGA ESTO (inyección de dependencias para tu CRUD Productos con Dapper)
 builder.Services.AddScoped<IProductosAD>(_ => new ProductosAD(connectionString));
