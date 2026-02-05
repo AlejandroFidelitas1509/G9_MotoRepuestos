@@ -1,0 +1,58 @@
+.pos-admin-container {
+    height: 88vh;
+    background: #fff;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+}
+
+.main-pos-height {
+    height: calc(100% - 40px);
+}
+
+.pos-sidebar {
+    background-color: #121212;
+}
+
+.pos-side-btn {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 1.4rem;
+    padding: 18px;
+    width: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .pos-side-btn:hover, .pos-side-btn.active {
+        color: #fff;
+        background-color: #B01E1E;
+    }
+
+.rounded-4 {
+    border-radius: 1.25rem !important;
+}
+
+.total-box-eleventa {
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.product-card-client {
+    transition: all 0.3s ease;
+}
+
+    .product-card-client:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+.main-pos-height kbd {
+    font-family: inherit;
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+}
+
+.shadow-inner {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}

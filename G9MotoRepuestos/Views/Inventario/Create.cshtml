@@ -1,39 +1,79 @@
-﻿@{
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model ProductoDto
+
+@{
     ViewData["Title"] = "Crear Producto";
 }
 
 <div class="usuarios-container">
     <h2 class="titulo-rojo">Crear Producto</h2>
 
-    <form class="form-usuario">
+    <!-- ✅ FORM REAL -->
+    <form asp-action="Create" method="post" class="form-usuario">
+        @Html.AntiForgeryToken()
+
         <div class="form-row">
             <label>Nombre:</label>
-            <input type="text" class="input-text" placeholder="Nombre del producto" />
+            <input asp-for="Nombre" type="text" class="input-text" placeholder="Nombre del producto" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
 
         <div class="form-row">
-            <label>Precio:</label>
-            <input type="text" class="input-text" placeholder="Precio" />
+            <label>Precio venta:</label>
+            <input asp-for="PrecioVenta" type="number" step="0.01" class="input-text" placeholder="Precio venta" />
+            <span asp-validation-for="PrecioVenta" class="text-danger"></span>
         </div>
-
 
         <div class="form-row">
             <label>Marca:</label>
-            <input type="text" class="input-text" placeholder="Marca" />
+            <input asp-for="Marca" type="text" class="input-text" placeholder="Marca" />
+            <span asp-validation-for="Marca" class="text-danger"></span>
         </div>
 
         <div class="form-row">
             <label>Stock inicial:</label>
-            <input type="number" class="input-text" placeholder="Cantidad en stock" />
+            <input asp-for="StockActual"
+                   type="number"
+                   min="0"
+                   class="input-text"
+                   placeholder="Cantidad en stock" />
+            <span asp-validation-for="StockActual" class="text-danger"></span>
+        </div>
+
+        <!-- Campos opcionales (si quieres irlos agregando ya) -->
+        <div class="form-row">
+            <label>Precio costo (opcional):</label>
+            <input asp-for="PrecioCosto" type="number" step="0.01" class="input-text" placeholder="Precio costo" />
+        </div>
+
+        <div class="form-row">
+            <label>Código de barras (opcional):</label>
+            <input asp-for="CodigoBarras" type="text" class="input-text" placeholder="Código de barras" />
+        </div>
+
+        <div class="form-row">
+            <label>Descripción (opcional):</label>
+            <input asp-for="Descripcion" type="text" class="input-text" placeholder="Descripción" />
+        </div>
+
+        <div class="form-row">
+            <label>URL Imagen (opcional):</label>
+            <input asp-for="ImageURL" type="text" class="input-text" placeholder="https://..." />
         </div>
 
         <div class="acciones-form">
-            <!-- Botón Guardar como enlace al Index -->
-            <a href="/Inventario" class="btn-guardar">Guardar</a>
-            <a href="/Inventario" class="btn-cancelar">Cancelar</a>
+            <!-- ✅ Guardar envía el POST -->
+            <button type="submit" class="btn-guardar">Guardar</button>
+
+            <!-- Cancelar solo navega -->
+            <a asp-action="Index" class="btn-cancelar">Cancelar</a>
         </div>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 
 <style>
     body {
@@ -52,7 +92,7 @@
     }
 
     .titulo-rojo {
-        color: #d32f2f; /* rojo fuerte */
+        color: #d32f2f;
         text-align: center;
         margin-bottom: 20px;
     }
@@ -76,7 +116,6 @@
         transition: border-color 0.3s;
     }
 
-        /* Hover en los campos */
         .input-text:hover {
             border-color: #d32f2f;
         }
@@ -99,7 +138,7 @@
     }
 
         .btn-guardar:hover {
-            background-color: #b71c1c; /* rojo más oscuro */
+            background-color: #b71c1c;
             text-decoration: none;
         }
 

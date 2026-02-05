@@ -17,4 +17,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MR.Abstracciones\MR.Abstracciones.csproj" />
+    <ProjectReference Include="..\MR.AccesoDatos\MR.AccesoDatos.csproj" />
+    <ProjectReference Include="..\MR.LogicaNegocio\MR.LogicaNegocio.csproj" />
+  </ItemGroup>
+
 </Project>

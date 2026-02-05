@@ -1,56 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Bitácora de Eventos";
+﻿@using MR.Abstracciones.EntidadesParaUI;
+@model IEnumerable<BitacoraProductosDto>
+
+@{
+    ViewData["Title"] = "Bitácora de Productos";
 }
 
 <h1 class="text-danger">@ViewData["Title"]</h1>
 <hr />
 
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-dark">Volver al Inventario</a>
+</div>
+
 <div class="table-responsive">
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
-                <th>IdBitacora</th>
-                <th>Tabla</th>
-                <th>Acción</th>
-                <th>Id Objeto</th>
+                <th>Id</th>
                 <th>Fecha</th>
-                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Tabla</th>
+                <th>IdUsuario</th>
             </tr>
         </thead>
         <tbody>
-            
-            <tr>
-                <td>1</td>
-                <td>Usuarios</td>
-                <td>Create</td>
-                <td>101</td>
-                <td>2025-12-01 10:30 AM</td>
-                <td>Admin</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Usuarios</td>
-                <td>Edit</td>
-                <td>101</td>
-                <td>2025-12-01 11:00 AM</td>
-                <td>Admin</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Productos</td>
-                <td>Create</td>
-                <td>205</td>
-                <td>2025-12-01 02:15 PM</td>
-                <td>Mecánico</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Productos</td>
-                <td>Edit</td>
-                <td>205</td>
-                <td>2025-12-01 03:00 PM</td>
-                <td>Admin</td>
-            </tr>
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center">No hay eventos registrados.</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.IdBitacora</td>
+                        <td>@(item.Fecha?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td>@item.Accion</td>
+                        <td>@item.TablaAfectada</td>
+                        <td>@(item.IdUsuario?.ToString() ?? "N/A")</td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 </div>
@@ -79,9 +71,12 @@
         vertical-align: middle;
     }
 
-    /* Hover rojo en las celdas */
-    tbody td:hover {
-        color: #d32f2f;
-        
+    .btn-dark {
+        background-color: #333 !important;
+        color: #fff !important;
     }
+
+        .btn-dark:hover {
+            background-color: #555 !important;
+        }
 </style>

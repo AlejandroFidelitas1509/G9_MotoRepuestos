@@ -1,61 +1,99 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Security.Claims
+@{
+    // Buscamos el nombre del usuario de forma segura
+    var nombreUsuario = User.Identity?.Name;
 
+    // Buscamos el rol probando ambos nombres posibles de forma única
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role" || c.Type == ClaimTypes.Role)?.Value;
+
+    bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
+    bool esVendedor = string.Equals(userRole, "Vendedor", StringComparison.OrdinalIgnoreCase);
+
+    // El Admin debe poder ver las herramientas de taller
+    bool esPersonalTaller = esAdmin || esVendedor;
+}
+
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Moto Repuestos Rojas</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/G9MotoRepuestos.styles.css" asp-append-version="true" />
-</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/Layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/CrearCuenta.css" asp-append-version="true" />
 
+</head>
 <body>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-rojas shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Moto Repuestos Rojas</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="btn btn-outline-light me-3 border-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCategorias">
+                    <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
+                </button>
+
+                <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/LogoLocal.jpeg" alt="Logo" width="40" height="40" class="d-inline-block align-top me-2 logo-navbar">
+                    <span class="d-none d-sm-inline">MOTO REPUESTOS ROJAS</span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @if (esPersonalTaller)
+                        {
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="PuntoVenta" asp-action="Index">Punto de Venta</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Contabilidad" asp-action="Index">Contabilidad</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reportes" asp-action="Index">Reportes</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Inventario" asp-action="Index">Inventario</a>
-                        </li>
-
+                            <li class="nav-item"><a class="nav-link text-white fw-bold" asp-controller="PuntoVenta" asp-action="Index"><i class="fas fa-cash-register me-1 text-warning"></i> Caja</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Inventario" asp-action="Index">Inventario</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Citas" asp-action="Index">Citas</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Contabilidad" asp-action="Index">Finanzas</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Usuarios" asp-action="Index">Usuarios</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Index"><i class="fas fa-store me-1"></i> Catálogo</a></li>
+                        }
                     </ul>
+
+                    <form class="d-flex mx-lg-4 my-2 my-lg-0 search-form" asp-controller="Inventario" asp-action="Index" method="get">
+                        <div class="input-group">
+                            <input name="buscar" class="form-control" type="search" placeholder="¿Qué repuesto buscas?">
+                            <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
+
+
+    <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="menuCategorias">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title fw-bold text-danger"><i class="fas fa-motorcycle me-2"></i>PRODUCTOS</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link"><i class="fas fa-cogs me-2"></i> Repuestos de Motor</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link"><i class="fas fa-tools me-2"></i> Accesorios</a>
+                <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link"><i class="fas fa-oil-can me-2"></i> Aceites y Lubricantes</a>
+                <div class="sidebar-footer">
+                    <a asp-controller="Home" asp-action="Nosotros" class="list-group-item list-group-item-action bg-dark text-white sidebar-link">
+                        <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <main role="main" class="pb-3">
@@ -63,9 +101,31 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="bg-dark text-white pt-4 pb-2 border-top border-danger border-4 mt-auto">
         <div class="container">
-            &copy; 2025 - G9MotoRepuestos - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                    <h6 class="text-uppercase fw-bold text-danger mb-1 small">Moto Repuestos Rojas</h6>
+                    <p class="small text-secondary mb-0" style="font-size: 0.75rem;">Calidad y asesoría honesta en Mercedes Norte desde 2024.</p>
+                </div>
+                <div class="col-md-5 text-center mb-3 mb-md-0">
+                    <div class="d-inline-block text-start">
+                        <p class="small mb-0" style="font-size: 0.8rem;"><i class="fas fa-map-marker-alt text-danger me-2"></i>Mercedes Norte, Heredia</p>
+                        <p class="small mb-0" style="font-size: 0.8rem;"><i class="fab fa-whatsapp text-success me-2"></i>+506 7243-2805</p>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center text-md-end">
+                    <a href="https://wa.me/50672432805" target="_blank" class="social-icon-sm me-2"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.facebook.com/share/1831P2NdY6/" target="_blank" class="social-icon-sm me-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/motorepuestosrojas" target="_blank" class="social-icon-sm"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <hr class="my-3 border-secondary opacity-25">
+            <div class="row pb-2">
+                <div class="col-12 text-center">
+                    <p class="mb-0 text-secondary" style="font-size: 0.7rem;">© 2026 <strong>Moto Repuestos Rojas</strong>. Pasión por las motos.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -73,6 +133,5 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

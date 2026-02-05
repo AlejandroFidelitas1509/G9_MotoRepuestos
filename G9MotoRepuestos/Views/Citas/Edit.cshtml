@@ -1,38 +1,43 @@
-@model G9MotoRepuestos.Models.Cita
+
 @{
     ViewData["Title"] = "Editar Cita";
 }
+
 <div class="usuarios-container">
     <h2 class="titulo-rojo">Editar Cita</h2>
 
-    <form asp-action="Edit" method="post" class="form-usuario">
-        <input type="hidden" asp-for="Id" />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form action="/Citas/Edit" method="post" class="form-usuario">
+
+        <input type="hidden" name="Id" value="123" />
+
+        <div class="text-danger"></div>
 
         <div class="form-row">
             <label>Cliente:</label>
-            <input asp-for="NombreCliente" class="input-text" />
-            <span asp-validation-for="NombreCliente" class="text-danger"></span>
+            <input name="NombreCliente" value="Juan PÈrez" class="input-text" />
+            <span class="text-danger"></span>
         </div>
 
         <div class="form-row">
-            <label>Descripci√≥n:</label>
-            <input asp-for="Descripcion" class="input-text" />
-            <span asp-validation-for="Descripcion" class="text-danger"></span>
+            <label>DescripciÛn:</label>
+            <input name="Descripcion" value="Cambio de aceite y revisiÛn general" class="input-text" />
+            <span class="text-danger"></span>
         </div>
 
         <div class="form-row">
             <label>Fecha y hora:</label>
-            <input asp-for="Fecha" type="datetime-local" class="input-text" />
-            <span asp-validation-for="Fecha" class="text-danger"></span>
+            <input name="Fecha" type="datetime-local" value="2025-12-05T10:00" class="input-text" />
+            <span class="text-danger"></span>
         </div>
 
         <div class="acciones-form">
             <button type="submit" class="btn-guardar">Guardar cambios</button>
-            <a href="@Url.Action("Index")" class="btn-cancelar">Cancelar</a>
+
+            <a href="/Citas/Index" class="btn-cancelar">Cancelar</a>
         </div>
     </form>
 </div>
+
 <style>
     body {
         font-family: Arial, Helvetica, sans-serif;
@@ -50,7 +55,7 @@
     }
 
     .titulo-rojo {
-        color: #d32f2f; /* rojo fuerte */
+        color: #d32f2f;
         text-align: center;
         margin-bottom: 20px;
     }
@@ -74,7 +79,6 @@
         transition: border-color 0.3s;
     }
 
-        /* Hover en los campos */
         .input-text:hover {
             border-color: #d32f2f;
         }
@@ -97,7 +101,7 @@
     }
 
         .btn-guardar:hover {
-            background-color: #b71c1c; /* rojo m√°s oscuro */
+            background-color: #b71c1c;
             text-decoration: none;
         }
 
