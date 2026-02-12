@@ -1,0 +1,63 @@
+@model G9MotoRepuestos.Models.Usuario
+
+@{
+    ViewData["Title"] = "Crea tu Cuenta - Moto Repuestos Rojas";
+}
+
+<div class="auth-wrapper shadow-lg">
+    <div class="col-md-6 col-lg-5 px-3">
+        <div class="card glass-card border-0 rounded-4 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="bg-white d-inline-block p-3 rounded-circle mb-3 shadow">
+                        <i class="fas fa-user-plus fa-2x text-danger"></i>
+                    </div>
+                    <h2 class="fw-bold text-white">Crea tu Cuenta</h2>
+                    <p class="text-light-muted small">Sé parte de la familia Moto Repuestos Rojas</p>
+                </div>
+
+                <form asp-action="Registro" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-white">Nombre Completo</label>
+                        <input asp-for="NombreCompleto" class="form-control rounded-pill form-control-custom" placeholder="Ej: Sebastian Rojas" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-white">Correo Electrónico</label>
+                        <input asp-for="Correo" type="email" class="form-control rounded-pill form-control-custom" placeholder="correo@ejemplo.com" required />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-white">Contraseña</label>
+                        <input asp-for="PasswordHash" type="password" class="form-control rounded-pill form-control-custom" placeholder="••••••••" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-rojas-auth w-100 rounded-pill py-2 shadow mb-3">
+                        REGISTRARME
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 border-top border-light pt-3">
+                    <p class="small text-white mb-1">¿Ya tienes una cuenta?</p>
+                    <a asp-action="Login" class="text-warning fw-bold text-decoration-none small">
+                        Inicia Sesión aquí
+                    </a>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a asp-controller="Home" asp-action="Index" class="text-light-muted small text-decoration-none">
+                        <i class="fas fa-arrow-left me-1"></i> Volver al Catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

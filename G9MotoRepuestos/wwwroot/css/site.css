@@ -1,24 +1,24 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .bg-light-danger {
@@ -122,7 +122,7 @@ body {
 
     .btn-search:hover {
         background-color: white;
-        color: #B01E1E; 
+        color: #B01E1E;
         border: 1px solid white;
     }
 
@@ -134,7 +134,7 @@ body {
 }
 
     .sidebar-link:hover {
-        padding-left: 30px; 
+        padding-left: 30px;
     }
 
 
@@ -151,7 +151,7 @@ body {
     }
 
     .sidebar-link:hover {
-        padding-left: 35px; 
+        padding-left: 35px;
         color: white !important;
     }
 
@@ -179,15 +179,16 @@ html, body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    background-color: #212529; 
+    background-color: #212529;
+    footer
 
-footer {
+{
     margin-bottom: 0 !important;
 }
 
-    footer .container {
-        padding-bottom: 0;
-    }
+footer .container {
+    padding-bottom: 0;
+}
 
 .social-icon-sm {
     width: 32px;
@@ -211,8 +212,8 @@ footer {
     }
 
 .img-carrusel {
-    height: 500px; 
-    object-fit: cover; 
+    height: 500px;
+    object-fit: cover;
     filter: brightness(0.8);
 }
 
@@ -233,7 +234,7 @@ footer {
 
 @media (max-width: 768px) {
     .img-carrusel {
-        height: 300px; 
+        height: 300px;
     }
 }
 
@@ -296,7 +297,7 @@ footer {
 
 .product-card-hover img {
     height: 160px;
-    object-fit: contain; 
+    object-fit: contain;
     background-color: #f8f9fa;
 }
 
