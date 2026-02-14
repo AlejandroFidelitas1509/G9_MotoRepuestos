@@ -9,7 +9,7 @@
     <h2 class="titulo-rojo">Crear Producto</h2>
 
     <!-- ✅ FORM REAL -->
-    <form asp-action="Create" method="post" class="form-usuario">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="form-usuario">
         @Html.AntiForgeryToken()
 
         <div class="form-row">
@@ -40,7 +40,7 @@
             <span asp-validation-for="StockActual" class="text-danger"></span>
         </div>
 
-        <!-- Campos opcionales (si quieres irlos agregando ya) -->
+        <!-- Campos opcionales -->
         <div class="form-row">
             <label>Precio costo (opcional):</label>
             <input asp-for="PrecioCosto" type="number" step="0.01" class="input-text" placeholder="Precio costo" />
@@ -57,8 +57,8 @@
         </div>
 
         <div class="form-row">
-            <label>URL Imagen (opcional):</label>
-            <input asp-for="ImageURL" type="text" class="input-text" placeholder="https://..." />
+            <label>Imagen (opcional):</label>
+            <input type="file" name="imagen" accept="image/*" />
         </div>
 
         <div class="acciones-form">

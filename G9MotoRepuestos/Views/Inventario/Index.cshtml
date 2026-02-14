@@ -23,99 +23,101 @@
                 <th>Stock</th>
                 <th>Precio</th>
                 <th>Acciones</th>
+                <th>Imagen</th>
             </tr>
         </thead>
+
         <tbody>
             @if (Model == null || !Model.Any())
             {
                 <tr>
-                    <td colspan="5" class="text-center">
-                        No hay productos registrados.
-                    </td>
+                    <td colspan="6" class="text-center">No hay productos registrados.</td>
                 </tr>
             }
             else
             {
                 foreach (var item in Model)
                 {
-                    var modalId = $"modalEliminarProducto_{item.IdProducto}";
                     <tr>
                         <td>@item.IdProducto</td>
                         <td>@item.Nombre</td>
                         <td>@(item.StockActual ?? 0)</td>
-                        <td>₡@(item.PrecioVenta?.ToString("N0") ?? "0")</td>
-                        <td>
-                            <a asp-action="Edit"
-                               asp-route-id="@item.IdProducto"
-                               class="btn btn-sm btn-danger">
-                                Editar
-                            </a>
+                        <td>@(item.PrecioVenta?.ToString("C0") ?? "₡0")</td>
 
-                            <a href="#"
-                               class="btn btn-sm btn-dark"
-                               data-bs-toggle="modal"
-                               data-bs-target="#@modalId">
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-sm btn-danger">Editar</a>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-dark"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEliminarProducto-@item.IdProducto">
                                 Eliminar
-                            </a>
+                            </button>
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.ImageURL))
+                            {
+                                <img src="@item.ImageURL"
+                                     alt="Imagen"
+                                     style="width:60px;height:60px;object-fit:cover;border-radius:8px;" />
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
                         </td>
                     </tr>
                 }
             }
         </tbody>
-
     </table>
 
-    @foreach (var item in Model ?? Enumerable.Empty<ProductoDto>())
+    @* Modales fuera de la tabla *@
+    @if (Model != null && Model.Any())
     {
-        var modalId = $"modalEliminarProducto_{item.IdProducto}";
-        <div class="modal fade"
-             id="@modalId"
-             tabindex="-1"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        foreach (var item in Model)
+        {
+            <div class="modal fade"
+                 id="modalEliminarProducto-@item.IdProducto"
+                 tabindex="-1"
+                 aria-labelledby="modalEliminarProductoLabel-@item.IdProducto"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
 
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title">Confirmar Eliminación</h5>
-                        <button type="button"
-                                class="btn-close btn-close-white"
-                                data-bs-dismiss="modal"></button>
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="modalEliminarProductoLabel-@item.IdProducto">Confirmar Eliminación</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="text-danger fw-bold">¿Está seguro que desea eliminar este producto?</p>
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Id:</strong> @item.IdProducto</li>
+                                <li class="list-group-item"><strong>Nombre:</strong> @item.Nombre</li>
+                                <li class="list-group-item"><strong>Stock:</strong> @(item.StockActual ?? 0)</li>
+                                <li class="list-group-item"><strong>Precio:</strong> @(item.PrecioVenta?.ToString("C0") ?? "₡0")</li>
+                            </ul>
+                        </div>
+
+                        <div class="modal-footer">
+                            <form asp-action="Delete" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.IdProducto" />
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+
+                            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+
                     </div>
-
-                    <div class="modal-body">
-                        <p class="text-danger fw-bold">
-                            ¿Está seguro que desea eliminar este producto?
-                        </p>
-                        <ul class="list-group">
-                            <li class="list-group-item"><strong>Id:</strong> @item.IdProducto</li>
-                            <li class="list-group-item"><strong>Nombre:</strong> @item.Nombre</li>
-                            <li class="list-group-item"><strong>Stock:</strong> @(item.StockActual ?? 0)</li>
-                            <li class="list-group-item">
-                                <strong>Precio:</strong> ₡@(item.PrecioVenta?.ToString("N0") ?? "0")
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="modal-footer">
-                        <form asp-action="Delete" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@item.IdProducto" />
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-                        <button type="button"
-                                class="btn btn-dark"
-                                data-bs-dismiss="modal">
-                            Cancelar
-                        </button>
-                    </div>
-
                 </div>
             </div>
-        </div>
+        }
     }
-
-
 </div>
+
 
 <style>
     h1 {
