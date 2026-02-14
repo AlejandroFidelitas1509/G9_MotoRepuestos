@@ -20,10 +20,22 @@ namespace MR.AccesoDatos.Productos.ListarProductos
         public async Task<IEnumerable<ProductoDto>> EjecutarAsync(bool soloActivos)
         {
             var sql = @"
-SELECT IdProductos, Nombre, Descripcion, Marca, PrecioCosto, PrecioVenta, CodigoBarras, Estado, ImageURL, IdCategoria
+SELECT
+    IdProductos   AS IdProducto,
+    Nombre,
+    Descripcion,
+    Marca,
+    PrecioCosto,
+    PrecioVenta,
+    CodigoBarras,
+    Estado,
+    ImageURL,
+    IdCategoria,
+    StockActual
 FROM dbo.Productos
 WHERE (@soloActivos = 0) OR (ISNULL(Estado,0)=1)
 ORDER BY IdProductos DESC;";
+
 
             using var db = Db();
             return await db.QueryAsync<ProductoDto>(sql, new { soloActivos = soloActivos ? 1 : 0 });

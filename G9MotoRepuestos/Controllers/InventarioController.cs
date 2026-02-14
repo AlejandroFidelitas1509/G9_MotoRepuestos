@@ -2,6 +2,8 @@
 using MR.Abstracciones.EntidadesParaUI;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
 using MR.Abstracciones.LogicaDeNegocio.Bitacora;
+using Microsoft.AspNetCore.Hosting;
+
 
 namespace G9MotoRepuestos.Controllers
 {
@@ -9,13 +11,17 @@ namespace G9MotoRepuestos.Controllers
     {
         private readonly IProductosLN _ln;
         private readonly IBitacoraProductosLN _bitacora;
+        private readonly IWebHostEnvironment _env;
+
 
         public InventarioController(
             IProductosLN ln,
-            IBitacoraProductosLN bitacora)
+            IBitacoraProductosLN bitacora,
+            IWebHostEnvironment env)
         {
             _ln = ln;
             _bitacora = bitacora;
+            _env = env;
         }
 
         public async Task<IActionResult> Index()
@@ -31,27 +37,57 @@ namespace G9MotoRepuestos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductoDto model)
+        public async Task<IActionResult> Create(ProductoDto model, IFormFile? imagen)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            await _ln.CrearAsync(model);
+            try
+            {
+                if (imagen != null && imagen.Length > 0)
+                {
+                    if (string.IsNullOrWhiteSpace(imagen.ContentType) || !imagen.ContentType.StartsWith("image/"))
+                    {
+                        ModelState.AddModelError("", "El archivo debe ser una imagen.");
+                        return View(model);
+                    }
 
+                    if (string.IsNullOrWhiteSpace(_env.WebRootPath))
+                    {
+                        ModelState.AddModelError("", "No se encontró la carpeta wwwroot (WebRootPath está vacío).");
+                        return View(model);
+                    }
 
-            await _bitacora.RegistrarAsync("CREAR", "Productos", null);
+                    var uploadsFolder = Path.Combine(_env.WebRootPath, "images", "productos");
+                    Directory.CreateDirectory(uploadsFolder);
 
-            return RedirectToAction(nameof(Index));
+                    var extension = Path.GetExtension(imagen.FileName);
+                    if (string.IsNullOrWhiteSpace(extension)) extension = ".jpg";
+
+                    var fileName = $"{Guid.NewGuid():N}{extension}";
+                    var fullPath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await imagen.CopyToAsync(stream);
+                    }
+
+                    model.ImageURL = $"/images/productos/{fileName}";
+                }
+
+                await _ln.CrearAsync(model);
+                await _bitacora.RegistrarAsync("CREAR", "Productos", null);
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error subiendo imagen: {ex.Message}");
+                return View(model);
+            }
         }
 
-        public async Task<IActionResult> Edit(int id)
-        {
-            var model = await _ln.ObtenerPorIdAsync(id);
-            if (model == null)
-                return NotFound();
 
-            return View(model);
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

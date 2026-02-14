@@ -44,6 +44,15 @@ builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
 builder.Services.AddScoped<IProductosAD>(_ => new ProductosAD(connectionString));
 builder.Services.AddScoped<IProductosLN, ProductosLN>();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(lo =>
+    {
+        lo.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1;
+    });
+});
+
+
 var app = builder.Build();
 
 // --- PIPELINE DE LA APLICACIÓN ---
