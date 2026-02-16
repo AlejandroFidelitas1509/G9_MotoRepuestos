@@ -1,84 +1,93 @@
 ﻿@model G9MotoRepuestos.Models.Usuario
 @{
     ViewData["Title"] = "Editar Perfil";
-    var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role" || c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
     bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
 }
 
-<link rel="stylesheet" href="~/css/EditarPerfil.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/usuarios/EditarPerfil.css" asp-append-version="true" />
 
-<div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-6">
-            <div class="card shadow-lg card-editar-perfil">
-                <div class="card-header bg-dark text-white text-center py-4">
-                    <h4 class="mb-0 fw-bold">CONFIGURACIÓN DE PERFIL</h4>
-                </div>
+<div class="edit-page-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg card-editar-perfil">
 
-                <div class="card-body p-4 p-md-5">
-                    <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="IdUsuario" />
+                    <div class="profile-header-edit">
+                        <h4 class="mb-0 fw-bold text-white">CONFIGURACIÓN DE PERFIL</h4>
+                    </div>
 
-                        @if (!esAdmin)
-                        {
-                            <input type="hidden" asp-for="IdRol" />
-                            <input type="hidden" asp-for="Estado" />
-                        }
+                    <div class="card-body p-4 p-md-5">
+                        <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="IdUsuario" />
 
-                        <div class="text-center mb-4">
-                            <img id="imgPreview" src="@(Model.ImagenURL ?? "/images/default-avatar.png")" class="preview-img" />
-                            <div class="drop-zone" id="dropZone">
-                                <i class="fas fa-cloud-upload-alt fa-2x"></i>
-                                <p class="mb-0 small">Arrastra tu foto o haz clic para seleccionarla</p>
-                                <input type="file" name="fotoArchivo" id="fotoArchivo" hidden accept="image/*" />
-                            </div>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="label-small">Nombre Completo</label>
-                                <input asp-for="NombreCompleto" class="form-control form-control-lg" required />
-                            </div>
-
-                            <div class="col-12">
-                                <label class="label-small">Correo Electrónico</label>
-                                <input asp-for="Correo" type="email" class="form-control" required />
-                            </div>
-
-                            <div class="col-sm-6">
-                                <label class="label-small">Teléfono</label>
-                                <input asp-for="Telefono" class="form-control" placeholder="8888-8888" />
-                            </div>
-
-                            <div class="col-sm-6">
-                                <label class="label-small">Nueva Contraseña</label>
-                                <input asp-for="PasswordHash" type="password" class="form-control" required />
-                            </div>
-
-                            @if (esAdmin)
+                            @if (!esAdmin)
                             {
-                                <div class="col-sm-6">
-                                    <label class="label-small">Rol del Usuario</label>
-                                    <select asp-for="IdRol" class="form-select" asp-items="ViewBag.Roles"></select>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label class="label-small">Estado de Cuenta</label>
-                                    <select asp-for="Estado" class="form-select">
-                                        <option value="true">Activo</option>
-                                        <option value="false">Inactivo</option>
-                                    </select>
-                                </div>
+                                <input type="hidden" asp-for="IdRol" />
+                                <input type="hidden" asp-for="Estado" />
                             }
-                        </div>
 
-                        <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-danger btn-guardar text-white">
-                                GUARDAR CAMBIOS
-                            </button>
-                            <a asp-action="Index" asp-controller="Home" class="btn btn-link text-muted">Volver al inicio</a>
-                        </div>
-                    </form>
+                            <div class="text-center mb-4">
+                                <div class="position-relative d-inline-block profile-avatar-container">
+                                    <img id="imgPreview" src="@(string.IsNullOrEmpty(Model.ImagenURL) ? "/images/default-avatar.png" : Model.ImagenURL)"
+                                         class="preview-img shadow" style="width: 130px; height: 130px; object-fit: cover;" />
+
+                                    <div class="drop-zone" id="dropZone">
+                                        <i class="fas fa-camera text-muted small"></i>
+                                        <p class="mb-0 small text-muted fw-bold">Cambiar foto</p>
+                                        <input type="file" name="fotoArchivo" id="fotoArchivo" hidden accept="image/*" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="label-small fw-bold text-muted">NOMBRE COMPLETO</label>
+                                    <input asp-for="NombreCompleto" class="form-control rounded-pill px-3" required />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="label-small fw-bold text-muted">CORREO ELECTRÓNICO</label>
+                                    <input asp-for="Correo" type="email" class="form-control rounded-pill px-3" required />
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="label-small fw-bold text-muted">TELÉFONO</label>
+                                    <input asp-for="Telefono" class="form-control rounded-pill px-3" />
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label class="label-small fw-bold text-muted">NUEVA CONTRASEÑA</label>
+                                    <input name="NuevaPassword" type="password" class="form-control rounded-pill px-3" placeholder="Omitir para no cambiar" />
+                                </div>
+
+                                @if (esAdmin)
+                                {
+                                    <div class="col-sm-6">
+                                        <label class="label-small fw-bold text-muted">ROL</label>
+                                        <select asp-for="IdRol" class="form-select rounded-pill px-3" asp-items="ViewBag.Roles"></select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="label-small fw-bold text-muted">ESTADO</label>
+                                        <select asp-for="Estado" class="form-select rounded-pill px-3">
+                                            <option value="true">Activo</option>
+                                            <option value="false">Inactivo</option>
+                                        </select>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="d-grid gap-2 mt-5">
+                                <button type="submit" class="btn btn-danger text-white fw-bold py-2 rounded-pill shadow">
+                                    <i class="fas fa-save me-2"></i>GUARDAR CAMBIOS
+                                </button>
+                                <a asp-action="Perfil" class="btn btn-link text-muted text-decoration-none small">
+                                    Cancelar y volver
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,20 +95,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        const dz = document.getElementById('dropZone');
-        const fi = document.getElementById('fotoArchivo');
-        const pr = document.getElementById('imgPreview');
-
-        dz.addEventListener('click', () => fi.click());
-
-        fi.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => pr.src = e.target.result;
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+    <script src="~/js/usuarios/EditarPerfil.js" asp-append-version="true"></script>
 }
