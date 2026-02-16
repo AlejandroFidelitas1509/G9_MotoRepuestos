@@ -1,0 +1,58 @@
+.auth-wrapper {
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/FachadaLocal.jpeg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+
+.auth-wrapper h2,
+.auth-wrapper label,
+.auth-wrapper p,
+.auth-wrapper span {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.text-light-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.text-warning {
+    color: #FFC107 !important;
+    font-weight: bold;
+}
+
+.auth-wrapper a.text-light-muted {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.form-control-custom {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: none !important;
+    color: #000 !important;
+}
+
+.btn-rojas-auth {
+    background-color: #B01E1E !important;
+    border: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+    .btn-rojas-auth:hover {
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+    }

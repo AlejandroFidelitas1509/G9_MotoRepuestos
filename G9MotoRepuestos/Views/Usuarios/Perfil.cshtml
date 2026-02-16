@@ -1,44 +1,80 @@
 ﻿@model G9MotoRepuestos.Models.Usuario
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Mi Perfil";
+
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role" || c.Type == ClaimTypes.Role)?.Value;
+    bool esPersonalAdmin = userRole == "Admin" || userRole == "Administrador" || userRole == "Vendedor";
 }
 
-<link rel="stylesheet" href="~/css/PerfilUsuario.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/usuarios/Perfil.css" asp-append-version="true" />
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg profile-card">
-                <div class="profile-header"></div>
-                <div class="card-body text-center p-4">
-                    <div class="profile-avatar-container">
-                        <img src="@(Model.ImagenURL ?? "/images/default-avatar.png")" class="profile-avatar" />
-                    </div>
+<div class="profile-page-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="card shadow-lg profile-card border-0">
+                    <div class="profile-header"></div>
 
-                    <h3 class="fw-bold mb-1">@Model.NombreCompleto</h3>
-                    <span class="badge bg-danger mb-4 px-3 rounded-pill">@Model.Rol?.Tipo</span>
+                    <div class="card-body text-center p-4">
+                        <div class="profile-avatar-container">
+                            @if (!string.IsNullOrEmpty(Model.ImagenURL))
+                            {
+                                <img src="@Model.ImagenURL" class="profile-avatar shadow" />
+                            }
+                            else
+                            {
+                                <div class="profile-avatar bg-danger d-inline-flex align-items-center justify-content-center shadow">
+                                    <i class="fas fa-user fa-4x text-white"></i>
+                                </div>
+                            }
+                        </div>
 
-                    <div class="text-start px-3">
-                        <p class="info-label">Correo Electrónico</p>
-                        <p class="info-value">@Model.Correo</p>
+                        <h2 class="fw-bold mb-1">@Model.NombreCompleto</h2>
+                        <span class="badge bg-danger mb-4 px-3 py-2 rounded-pill text-uppercase">
+                            @(Model.Rol?.Tipo ?? "Cliente")
+                        </span>
 
-                        <p class="info-label">Teléfono</p>
-                        <p class="info-value">@(string.IsNullOrEmpty(Model.Telefono) ? "No registrado" : Model.Telefono)</p>
+                        <div class="text-start px-3">
+                            <div class="mb-3">
+                                <p class="info-label">CORREO ELÉCTRONICO</p>
+                                <p class="info-value border-bottom">@Model.Correo</p>
+                            </div>
 
-                        <p class="info-label">Estado de cuenta</p>
-                        <p class="info-value">
-                            <i class="fas fa-circle @(Model.Estado == true ? "text-success" : "text-secondary") me-1"></i>
-                            @(Model.Estado == true ? "Activa" : "Inactiva")
-                        </p>
-                    </div>
+                            <div class="mb-3">
+                                <p class="info-label">TELÉFONO</p>
+                                <p class="info-value border-bottom">
+                                    @(string.IsNullOrEmpty(Model.Telefono) ? "No registrado" : Model.Telefono)
+                                </p>
+                            </div>
 
-                    <div class="d-grid gap-2 mt-4 px-3">
-                        <a asp-action="EditarPerfil" class="btn btn-dark fw-bold py-2 shadow-sm">
-                            <i class="fas fa-user-edit me-2"></i>EDITAR PERFIL
-                        </a>
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm border-0">
-                            Volver al Catálogo
-                        </a>
+                            <div class="mb-3">
+                                <p class="info-label">ESTADO DE CUENTA</p>
+                                <p class="info-value">
+                                    <i class="fas fa-circle @(Model.Estado == true ? "text-success" : "text-secondary") me-2"></i>
+                                    @(Model.Estado == true ? "Activa" : "Inactiva")
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4 px-3">
+                            <a asp-action="EditarPerfil" asp-route-id="@Model.IdUsuario" class="btn btn-dark fw-bold py-2 shadow-sm rounded-pill">
+                                <i class="fas fa-user-edit me-2"></i>EDITAR MI INFORMACIÓN
+                            </a>
+
+                            @if (esPersonalAdmin)
+                            {
+                                <a asp-controller="Home" asp-action="PanelControl" class="btn btn-outline-danger btn-sm border-0 mt-2">
+                                    <i class="fas fa-tachometer-alt me-1"></i> Volver al Panel de Control
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm border-0 mt-2">
+                                    <i class="fas fa-store me-1"></i> Volver al Inicio
+                                </a>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
