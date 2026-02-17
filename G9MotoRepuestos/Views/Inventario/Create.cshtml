@@ -5,154 +5,397 @@
     ViewData["Title"] = "Crear Producto";
 }
 
-<div class="usuarios-container">
-    <h2 class="titulo-rojo">Crear Producto</h2>
+<div class="cp-wrap">
 
-    <!-- ✅ FORM REAL -->
-    <form asp-action="Create" method="post" enctype="multipart/form-data" class="form-usuario">
-        @Html.AntiForgeryToken()
+    <!-- Header -->
+    <div class="cp-hero rounded-4 shadow-sm p-4 mb-4">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+            <div>
+                <div class="cp-kicker">Inventario</div>
+                <h1 class="cp-title m-0">Crear Producto</h1>
+                <div class="cp-sub mt-2">Completa la información y guarda el producto en el inventario.</div>
+            </div>
 
-        <div class="form-row">
-            <label>Nombre:</label>
-            <input asp-for="Nombre" type="text" class="input-text" placeholder="Nombre del producto" />
-            <span asp-validation-for="Nombre" class="text-danger"></span>
+            <div class="d-flex gap-2 flex-wrap">
+                <a asp-action="Index" class="btn btn-outline-dark cp-btn">
+                    ← Volver al inventario
+                </a>
+                <a asp-controller="Categorias" asp-action="Index" class="btn btn-dark cp-btn">
+                    Categorías
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
+        <div class="cp-card-header p-3 px-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="fw-bold text-white">Datos del producto</div>
+                <div class="cp-header-hint">Campos obligatorios marcados con *</div>
+            </div>
         </div>
 
-        <div class="form-row">
-            <label>Precio venta:</label>
-            <input asp-for="PrecioVenta" type="number" step="0.01" class="input-text" placeholder="Precio venta" />
-            <span asp-validation-for="PrecioVenta" class="text-danger"></span>
-        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" class="cp-form">
+                @Html.AntiForgeryToken()
 
-        <div class="form-row">
-            <label>Marca:</label>
-            <input asp-for="Marca" type="text" class="input-text" placeholder="Marca" />
-            <span asp-validation-for="Marca" class="text-danger"></span>
-        </div>
+                <!-- Resumen de validación -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-        <div class="form-row">
-            <label>Stock inicial:</label>
-            <input asp-for="StockActual"
-                   type="number"
-                   min="0"
-                   class="input-text"
-                   placeholder="Cantidad en stock" />
-            <span asp-validation-for="StockActual" class="text-danger"></span>
-        </div>
+                <div class="row g-4">
+                    <!-- Columna izquierda -->
+                    <div class="col-12 col-lg-7">
+                        <div class="cp-section mb-4">
+                            <div class="cp-section-title">Información básica</div>
+                            <div class="cp-section-sub">Nombre y marca para identificar el repuesto.</div>
 
-        <!-- Campos opcionales -->
-        <div class="form-row">
-            <label>Precio costo (opcional):</label>
-            <input asp-for="PrecioCosto" type="number" step="0.01" class="input-text" placeholder="Precio costo" />
-        </div>
+                            <div class="row g-3 mt-1">
+                                <div class="col-12">
+                                    <label asp-for="Nombre" class="form-label cp-label">Nombre *</label>
+                                    <input asp-for="Nombre" class="form-control cp-input" placeholder="Ej: Aceite 10W-40" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
 
-        <div class="form-row">
-            <label>Código de barras (opcional):</label>
-            <input asp-for="CodigoBarras" type="text" class="input-text" placeholder="Código de barras" />
-        </div>
+                                <div class="col-12">
+                                    <label asp-for="Marca" class="form-label cp-label">Marca *</label>
+                                    <input asp-for="Marca" class="form-control cp-input" placeholder="Ej: Motul, Castrol..." />
+                                    <span asp-validation-for="Marca" class="text-danger"></span>
+                                </div>
 
-        <div class="form-row">
-            <label>Descripción (opcional):</label>
-            <input asp-for="Descripcion" type="text" class="input-text" placeholder="Descripción" />
-        </div>
+                                <div class="col-12">
+                                    <label asp-for="Descripcion" class="form-label cp-label">Descripción (opcional)</label>
+                                    <textarea asp-for="Descripcion" class="form-control cp-input" rows="3" placeholder="Describe el producto..."></textarea>
+                                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
 
-        <div class="form-row">
-            <label>Imagen (opcional):</label>
-            <input type="file" name="imagen" accept="image/*" />
-        </div>
+                        <div class="cp-section">
+                            <div class="cp-section-title">Precios y stock</div>
+                            <div class="cp-section-sub">Define el precio de venta y el stock inicial.</div>
 
-        <div class="acciones-form">
-            <!-- ✅ Guardar envía el POST -->
-            <button type="submit" class="btn-guardar">Guardar</button>
+                            <div class="row g-3 mt-1">
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="PrecioCosto" class="form-label cp-label">Precio costo (opcional)</label>
+                                    <input asp-for="PrecioCosto" class="form-control cp-input" placeholder="₡0" />
+                                    <span asp-validation-for="PrecioCosto" class="text-danger"></span>
+                                </div>
 
-            <!-- Cancelar solo navega -->
-            <a asp-action="Index" class="btn-cancelar">Cancelar</a>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="PrecioVenta" class="form-label cp-label">Precio venta *</label>
+                                    <input asp-for="PrecioVenta" class="form-control cp-input" placeholder="₡0" />
+                                    <span asp-validation-for="PrecioVenta" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="StockActual" class="form-label cp-label">Stock inicial *</label>
+                                    <input asp-for="StockActual" class="form-control cp-input" placeholder="0" />
+                                    <span asp-validation-for="StockActual" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="CodigoBarras" class="form-label cp-label">Código de barras (opcional)</label>
+                                    <input asp-for="CodigoBarras" class="form-control cp-input" placeholder="Ej: 7501031311309" />
+                                    <span asp-validation-for="CodigoBarras" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha -->
+                    <div class="col-12 col-lg-5">
+                        <div class="cp-side card border-0 rounded-4 p-3 shadow-sm">
+                            <div class="cp-side-title">Categoría e imagen</div>
+                            <div class="cp-side-sub">Organiza y agrega una foto para el catálogo.</div>
+
+                            <div class="mt-3">
+                                <label asp-for="IdCategoria" class="form-label cp-label">Categoría</label>
+
+                                <div class="d-flex gap-2">
+                                    <select asp-for="IdCategoria"
+                                            class="form-select cp-input"
+                                            asp-items="(IEnumerable<SelectListItem>)ViewBag.Categorias">
+                                        <option value="">-- Seleccione --</option>
+                                    </select>
+
+                                    <a asp-controller="Categorias" asp-action="Create" class="btn btn-dark cp-btn-sm">
+                                        Nueva
+                                    </a>
+                                </div>
+
+                                <div class="mt-2">
+                                    <a asp-controller="Categorias" asp-action="Index" class="cp-link">
+                                        Administrar categorías →
+                                    </a>
+                                </div>
+
+                                <span asp-validation-for="IdCategoria" class="text-danger"></span>
+                            </div>
+
+                            <hr class="cp-hr" />
+
+                            <div>
+                                <label class="form-label cp-label">Imagen (opcional)</label>
+
+                                <input name="imagen" id="imagenInput" type="file" class="form-control cp-input" accept="image/*" />
+
+                                <div class="cp-preview mt-3">
+                                    <div class="cp-preview-label">Vista previa</div>
+                                    <div class="cp-preview-box">
+                                        <img id="previewImg" alt="preview" style="display:none;" />
+                                        <div id="previewEmpty" class="cp-preview-empty">
+                                            Sin imagen
+                                        </div>
+                                    </div>
+                                    <div class="cp-preview-hint">Se guardará en <strong>/wwwroot/images/productos</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cp-tips mt-3">
+                            <div class="cp-tip">
+                                <div class="cp-tip-title">Tip rápido</div>
+                                <div class="cp-tip-text">
+                                    Si la categoría no existe, crea una nueva y vuelve a seleccionar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer buttons -->
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-dark cp-btn">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-danger cp-btn">
+                        Guardar
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<script>
+    const input = document.getElementById('imagenInput');
+    const img = document.getElementById('previewImg');
+    const empty = document.getElementById('previewEmpty');
+
+    if (input) {
+        input.addEventListener('change', () => {
+            const file = input.files && input.files[0];
+            if (!file) {
+                img.style.display = 'none';
+                empty.style.display = 'flex';
+                img.src = '';
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                img.style.display = 'none';
+                empty.style.display = 'flex';
+                img.src = '';
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+            img.src = url;
+            img.style.display = 'block';
+            empty.style.display = 'none';
+        });
+    }
+</script>
 
 <style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: #f2f2f2;
-        color: #222;
+    /* Paleta: rojo/negro como tu sitio */
+    .cp-wrap {
+        padding-bottom: 24px;
     }
 
-    .usuarios-container {
-        margin: 30px auto;
-        max-width: 900px;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    .cp-hero {
+        background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+        border: 1px solid rgba(0,0,0,.06);
     }
 
-    .titulo-rojo {
+    .cp-kicker {
+        color: #6c757d;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        font-size: .8rem;
+    }
+
+    .cp-title {
         color: #d32f2f;
-        text-align: center;
-        margin-bottom: 20px;
+        font-weight: 900;
+        letter-spacing: -0.02em;
     }
 
-    .form-usuario {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
+    .cp-sub {
+        color: #6c757d;
     }
 
-    .form-row {
-        flex: 1 1 45%;
-        display: flex;
-        flex-direction: column;
+    .cp-card-header {
+        background: #222;
     }
 
-    .input-text {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        transition: border-color 0.3s;
+    .cp-header-hint {
+        color: rgba(255,255,255,.75);
+        font-size: .85rem;
+        font-weight: 600;
     }
 
-        .input-text:hover {
-            border-color: #d32f2f;
+    .cp-section-title {
+        font-weight: 900;
+        color: #111;
+        font-size: 1rem;
+    }
+
+    .cp-section-sub {
+        color: #6c757d;
+        font-size: .9rem;
+    }
+
+    .cp-label {
+        font-weight: 700;
+        color: #333;
+    }
+
+    .cp-input {
+        border-radius: 12px;
+        padding: .65rem .85rem;
+        border-color: rgba(0,0,0,.15);
+    }
+
+        .cp-input:focus {
+            border-color: rgba(211,47,47,.45);
+            box-shadow: 0 0 0 .2rem rgba(211,47,47,.15);
         }
 
-    .acciones-form {
+    .cp-btn {
+        border-radius: 12px;
+        padding: .6rem 1rem;
+        font-weight: 800;
+    }
+
+    .cp-btn-sm {
+        border-radius: 12px;
+        font-weight: 800;
+        padding: .55rem .9rem;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        background-color: #d32f2f !important;
+        border: none !important;
+    }
+
+        .btn-danger:hover {
+            background-color: #b71c1c !important;
+        }
+
+    .btn-dark {
+        background-color: #222 !important;
+        border: none !important;
+    }
+
+        .btn-dark:hover {
+            background-color: #444 !important;
+        }
+
+    .btn-outline-dark {
+        border-radius: 12px;
+        font-weight: 800;
+    }
+
+    .cp-side {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.06);
+    }
+
+    .cp-side-title {
+        font-weight: 900;
+        color: #111;
+    }
+
+    .cp-side-sub {
+        color: #6c757d;
+        font-size: .9rem;
+    }
+
+    .cp-hr {
+        margin: 16px 0;
+        border-color: rgba(0,0,0,.08);
+    }
+
+    .cp-link {
+        color: #d32f2f;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+        .cp-link:hover {
+            text-decoration: underline;
+        }
+
+    .cp-preview-label {
+        font-weight: 800;
+        color: #111;
+        margin-bottom: 6px;
+    }
+
+    .cp-preview-box {
+        border: 1px dashed rgba(0,0,0,.18);
+        border-radius: 16px;
+        height: 210px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,.02);
+        overflow: hidden;
+    }
+
+    #previewImg {
         width: 100%;
-        margin-top: 20px;
+        height: 100%;
+        object-fit: cover;
     }
 
-    .btn-guardar {
-        background-color: #d32f2f;
-        color: #fff;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
+    .cp-preview-empty {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #d32f2f;
+        background: rgba(211,47,47,.06);
     }
 
-        .btn-guardar:hover {
-            background-color: #b71c1c;
-            text-decoration: none;
-        }
-
-    .btn-cancelar {
-        background-color: #333;
-        color: #fff;
-        padding: 10px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-left: 10px;
+    .cp-preview-hint {
+        margin-top: 8px;
+        color: #6c757d;
+        font-size: .85rem;
     }
 
-        .btn-cancelar:hover {
-            background-color: #555;
-            text-decoration: none;
-        }
+    .cp-tips .cp-tip {
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        padding: 14px;
+        background: #fff;
+    }
+
+    .cp-tip-title {
+        font-weight: 900;
+        color: #111;
+        margin-bottom: 4px;
+    }
+
+    .cp-tip-text {
+        color: #6c757d;
+        font-size: .9rem;
+    }
 </style>

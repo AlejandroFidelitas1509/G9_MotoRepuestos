@@ -1,79 +1,214 @@
 ﻿@using MR.Abstracciones.EntidadesParaUI
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model IEnumerable<ProductoDto>
 
 @{
     ViewData["Title"] = "Inventario de Repuestos";
+    var total = Model?.Count() ?? 0;
+    var stockTotal = Model?.Sum(x => x.StockActual ?? 0) ?? 0;
+
+    var categoriasFiltro = ViewBag.CategoriasFiltro as List<SelectListItem> ?? new List<SelectListItem>();
 }
 
-<h1 class="text-danger">@ViewData["Title"]</h1>
-<hr />
+<div class="inv-page">
 
-<div class="mb-3">
-    <a asp-action="Create" class="btn btn-danger">Crear Producto</a>
-</div>
+    <!-- Header / Hero -->
+    <div class="inv-hero shadow-sm rounded-4 p-4 mb-4">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+            <div>
+                <div class="inv-kicker">Panel de Control</div>
+                <h1 class="inv-title m-0">Inventario de Repuestos</h1>
+                <div class="inv-sub mt-2">
+                    Administra productos, stock, precios e imágenes.
+                </div>
+            </div>
 
-<a asp-action="BitacoraEventos" class="btn btn-danger mb-3">Ver Bitácora</a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a asp-action="Create" class="btn btn-danger inv-btn">
+                    <span class="me-1">＋</span> Crear producto
+                </a>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Id Producto</th>
-                <th>Nombre</th>
-                <th>Stock</th>
-                <th>Precio</th>
-                <th>Acciones</th>
-                <th>Imagen</th>
-            </tr>
-        </thead>
+                <a asp-controller="Categorias" asp-action="Index" class="btn btn-dark inv-btn">
+                    Categorías
+                </a>
 
-        <tbody>
-            @if (Model == null || !Model.Any())
-            {
-                <tr>
-                    <td colspan="6" class="text-center">No hay productos registrados.</td>
-                </tr>
-            }
-            else
-            {
-                foreach (var item in Model)
-                {
+                <a asp-action="BitacoraEventos" class="btn btn-outline-dark inv-btn">
+                    Bitácora
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats (sin "Con imagen") -->
+        <div class="row g-3 mt-3">
+            <div class="col-12 col-md-6">
+                <div class="inv-stat card border-0 rounded-4 shadow-sm p-3 h-100">
+                    <div class="inv-stat-label">Productos</div>
+                    <div class="inv-stat-value">@total</div>
+                    <div class="inv-stat-hint">Registrados en el sistema</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="inv-stat card border-0 rounded-4 shadow-sm p-3 h-100">
+                    <div class="inv-stat-label">Stock total</div>
+                    <div class="inv-stat-value">@stockTotal</div>
+                    <div class="inv-stat-hint">Unidades sumadas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters (pro / compactos / grid) -->
+    <div class="card border-0 rounded-4 shadow-sm p-3 mb-3">
+        <div class="d-flex align-items-start align-items-lg-center justify-content-between gap-2 flex-column flex-lg-row">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div class="inv-tools-title">
+                    <div class="fw-bold">Filtros</div>
+                    <div class="text-muted small">Refina por nombre, stock o categoría</div>
+                </div>
+
+                <span class="badge inv-badge ms-lg-2">
+                    Mostrando: <span id="countShown">@total</span> / @total
+                </span>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-dark inv-btn" type="button" onclick="clearFilters()">
+                    Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-2 mt-2">
+            <div class="col-12 col-lg-5">
+                <label class="form-label inv-label mb-1">Buscar</label>
+                <input id="searchBox" class="form-control inv-search"
+                       placeholder="Nombre, marca, código..."
+                       oninput="applyFilters()" />
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <label class="form-label inv-label mb-1">Stock</label>
+                <select id="stockFilter" class="form-select inv-select" onchange="applyFilters()">
+                    <option value="all">Todos</option>
+                    <option value="zero">0</option>
+                    <option value="low">Bajo (1-3)</option>
+                    <option value="ok">OK (4+)</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <label class="form-label inv-label mb-1">Categoría</label>
+                <select id="catFilter" class="form-select inv-select" onchange="applyFilters()">
+                    <option value="all">Todas</option>
+                    @foreach (var c in categoriasFiltro)
+                    {
+                        <option value="@c.Value">@c.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table inv-table m-0">
+                <thead>
                     <tr>
-                        <td>@item.IdProducto</td>
-                        <td>@item.Nombre</td>
-                        <td>@(item.StockActual ?? 0)</td>
-                        <td>@(item.PrecioVenta?.ToString("C0") ?? "₡0")</td>
-
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-sm btn-danger">Editar</a>
-
-                            <button type="button"
-                                    class="btn btn-sm btn-dark"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEliminarProducto-@item.IdProducto">
-                                Eliminar
-                            </button>
-                        </td>
-
-                        <td>
-                            @if (!string.IsNullOrWhiteSpace(item.ImageURL))
-                            {
-                                <img src="@item.ImageURL"
-                                     alt="Imagen"
-                                     style="width:60px;height:60px;object-fit:cover;border-radius:8px;" />
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
-                        </td>
+                        <th style="width:90px;">ID</th>
+                        <th>Producto</th>
+                        <th style="width:140px;">Stock</th>
+                        <th style="width:160px;">Precio</th>
+                        <th style="width:190px;">Acciones</th>
+                        @* Quitamos columna Imagen *@
                     </tr>
-                }
-            }
-        </tbody>
-    </table>
+                </thead>
 
-    @* Modales fuera de la tabla *@
+                <tbody id="invTbody">
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="inv-empty">
+                                    <div class="inv-empty-title">No hay productos registrados</div>
+                                    <div class="inv-empty-sub">Crea tu primer producto para empezar.</div>
+                                    <a asp-action="Create" class="btn btn-danger mt-3 inv-btn">Crear producto</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            var stock = item.StockActual ?? 0;
+                            var stockClass = stock == 0 ? "inv-pill-danger" : (stock <= 3 ? "inv-pill-warn" : "inv-pill-ok");
+                            var stockText = stock == 0 ? "Sin stock" : (stock <= 3 ? "Bajo" : "OK");
+                            var catId = item.IdCategoria?.ToString() ?? "";
+
+                            <tr class="inv-row"
+                                data-name="@(item.Nombre ?? "")"
+                                data-stock="@stock"
+                                data-cat="@catId">
+
+                                <td class="text-muted fw-semibold">@item.IdProducto</td>
+
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="inv-mini">
+                                            @if (!string.IsNullOrWhiteSpace(item.ImageURL))
+                                            {
+                                                <img src="@item.ImageURL" alt="Imagen" />
+                                            }
+                                            else
+                                            {
+                                                <div class="inv-mini-placeholder">MR</div>
+                                            }
+                                        </div>
+                                        <div class="text-start">
+                                            <div class="fw-semibold inv-name">@item.Nombre</div>
+                                            <div class="inv-meta">
+                                                Marca: <span class="text-muted">@(item.Marca ?? "-")</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <span class="inv-pill @stockClass">@stockText</span>
+                                        <span class="fw-semibold">@stock</span>
+                                    </div>
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @(item.PrecioVenta?.ToString("C0") ?? "₡0")
+                                </td>
+
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                        <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-sm btn-danger inv-btn-sm">
+                                            Editar
+                                        </a>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-dark inv-btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalEliminarProducto-@item.IdProducto">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modales fuera de la tabla -->
     @if (Model != null && Model.Any())
     {
         foreach (var item in Model)
@@ -84,15 +219,15 @@
                  aria-labelledby="modalEliminarProductoLabel-@item.IdProducto"
                  aria-hidden="true">
                 <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="modal-content rounded-4 overflow-hidden">
 
-                        <div class="modal-header bg-dark text-white">
-                            <h5 class="modal-title" id="modalEliminarProductoLabel-@item.IdProducto">Confirmar Eliminación</h5>
+                        <div class="modal-header inv-modal-header">
+                            <h5 class="modal-title" id="modalEliminarProductoLabel-@item.IdProducto">Confirmar eliminación</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <div class="modal-body">
-                            <p class="text-danger fw-bold">¿Está seguro que desea eliminar este producto?</p>
+                            <p class="text-danger fw-bold">¿Seguro que deseas eliminar este producto?</p>
                             <ul class="list-group">
                                 <li class="list-group-item"><strong>Id:</strong> @item.IdProducto</li>
                                 <li class="list-group-item"><strong>Nombre:</strong> @item.Nombre</li>
@@ -105,10 +240,10 @@
                             <form asp-action="Delete" method="post" style="display:inline;">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.IdProducto" />
-                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                <button type="submit" class="btn btn-danger inv-btn">Eliminar</button>
                             </form>
 
-                            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-dark inv-btn" data-bs-dismiss="modal">Cancelar</button>
                         </div>
 
                     </div>
@@ -118,39 +253,86 @@
     }
 </div>
 
+<script>
+    function applyFilters() {
+        const q = (document.getElementById('searchBox').value || '').toLowerCase().trim();
+        const stockFilter = document.getElementById('stockFilter').value;
+        const catFilter = document.getElementById('catFilter').value;
+
+        const rows = document.querySelectorAll('#invTbody .inv-row');
+        let shown = 0;
+
+        rows.forEach(r => {
+            const name = (r.getAttribute('data-name') || '').toLowerCase();
+            const stock = parseInt(r.getAttribute('data-stock') || '0', 10);
+            const rowCat = (r.getAttribute('data-cat') || '');
+
+            let okSearch = !q || name.includes(q);
+
+            let okStock = true;
+            if (stockFilter === 'zero') okStock = stock === 0;
+            if (stockFilter === 'low') okStock = stock >= 1 && stock <= 3;
+            if (stockFilter === 'ok') okStock = stock >= 4;
+
+            let okCat = true;
+            if (catFilter !== 'all') okCat = rowCat === catFilter;
+
+            const show = okSearch && okStock && okCat;
+            r.style.display = show ? '' : 'none';
+            if (show) shown++;
+        });
+
+        const el = document.getElementById('countShown');
+        if (el) el.textContent = shown.toString();
+    }
+
+    function clearFilters() {
+        document.getElementById('searchBox').value = '';
+        document.getElementById('stockFilter').value = 'all';
+        document.getElementById('catFilter').value = 'all';
+        applyFilters();
+    }
+
+    document.addEventListener('DOMContentLoaded', applyFilters);
+</script>
 
 <style>
-    h1 {
-        font-weight: bold;
-        margin-bottom: 20px;
+    .inv-page {
+        padding-bottom: 24px;
     }
 
-    table {
-        border: 1px solid #333;
+    .inv-hero {
+        background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+        border: 1px solid rgba(0,0,0,.06);
     }
 
-    thead {
-        background-color: #333;
-        color: #fff;
+    .inv-kicker {
+        color: #6c757d;
+        font-weight: 600;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        font-size: .8rem;
     }
 
-    tbody tr:hover {
-        background-color: #f2f2f2;
-    }
-
-    td, th {
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    tbody td:hover {
+    .inv-title {
         color: #d32f2f;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .inv-sub {
+        color: #6c757d;
+    }
+
+    .inv-btn {
+        border-radius: 12px;
+        padding: .6rem 1rem;
+        font-weight: 700;
     }
 
     .btn-danger {
         background-color: #d32f2f !important;
-        border: none;
-        font-weight: bold;
+        border: none !important;
     }
 
         .btn-danger:hover {
@@ -158,11 +340,166 @@
         }
 
     .btn-dark {
-        background-color: #333 !important;
-        color: #fff !important;
+        background-color: #222 !important;
+        border: none !important;
     }
 
         .btn-dark:hover {
-            background-color: #555 !important;
+            background-color: #444 !important;
         }
+
+    .btn-outline-dark {
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .inv-stat-label {
+        color: #6c757d;
+        font-weight: 700;
+    }
+
+    .inv-stat-value {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #111;
+    }
+
+    .inv-stat-hint {
+        color: #6c757d;
+        font-size: .9rem;
+    }
+
+    /* labels para filtros */
+    .inv-label {
+        font-size: .85rem;
+        color: #6c757d;
+        font-weight: 700;
+    }
+
+    .inv-search {
+        border-radius: 12px;
+    }
+
+    .inv-select {
+        border-radius: 12px;
+    }
+
+    .inv-badge {
+        background: rgba(211,47,47,.08);
+        color: #b71c1c;
+        border: 1px solid rgba(211,47,47,.2);
+        border-radius: 999px;
+        padding: .45rem .75rem;
+        font-weight: 800;
+    }
+
+    .inv-table thead th {
+        background: #111;
+        color: #fff;
+        border: none;
+        text-align: center;
+        padding: 14px 12px;
+        font-weight: 800;
+    }
+
+    .inv-table tbody td {
+        border-color: rgba(0,0,0,.06);
+        vertical-align: middle;
+        text-align: center;
+        padding: 14px 12px;
+    }
+
+    .inv-row:hover {
+        background: #fafafa;
+    }
+
+    .inv-name {
+        color: #111;
+    }
+
+    .inv-meta {
+        font-size: .85rem;
+        color: #6c757d;
+    }
+
+    /* mini imagen del producto (única imagen) */
+    .inv-mini {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,.08);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 48px;
+    }
+
+        .inv-mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .inv-mini-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: #d32f2f;
+        background: rgba(211,47,47,.08);
+    }
+
+    /* pill stock */
+    .inv-pill {
+        padding: .35rem .6rem;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: .75rem;
+        border: 1px solid transparent;
+        min-width: 70px;
+        text-align: center;
+    }
+
+    .inv-pill-danger {
+        background: rgba(211,47,47,.12);
+        color: #b71c1c;
+        border-color: rgba(211,47,47,.25);
+    }
+
+    .inv-pill-warn {
+        background: rgba(255,193,7,.15);
+        color: #a66a00;
+        border-color: rgba(255,193,7,.35);
+    }
+
+    .inv-pill-ok {
+        background: rgba(25,135,84,.12);
+        color: #146c43;
+        border-color: rgba(25,135,84,.25);
+    }
+
+    .inv-btn-sm {
+        border-radius: 10px;
+        font-weight: 800;
+        padding: .35rem .7rem;
+    }
+
+    .inv-modal-header {
+        background: #222;
+        color: #fff;
+        border: none;
+    }
+
+    .inv-empty-title {
+        font-weight: 900;
+        font-size: 1.1rem;
+    }
+
+    .inv-empty-sub {
+        color: #6c757d;
+    }
 </style>

@@ -9,6 +9,11 @@ using MR.Abstracciones.AccesoADatos.Productos;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
 using MR.Abstracciones.AccesoADatos.Bitacora;
 using MR.Abstracciones.LogicaDeNegocio.Bitacora;
+using MR.AccesoDatos.Categorias;
+using MR.LogicaNegocio.Categorias;
+using MR.Abstracciones.AccesoADatos.Categorias;
+using MR.Abstracciones.LogicaDeNegocio.Categorias;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +48,10 @@ builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
 // Productos
 builder.Services.AddScoped<IProductosAD>(_ => new ProductosAD(connectionString));
 builder.Services.AddScoped<IProductosLN, ProductosLN>();
+
+builder.Services.AddScoped<ICategoriasAD>(_ => new CategoriasAD(connectionString));
+builder.Services.AddScoped<ICategoriasLN, CategoriasLN>();
+
 
 builder.WebHost.ConfigureKestrel(options =>
 {
