@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Panel de Control";
+}
+
+<div class="container my-5 py-4">
+    <div class="mb-5">
+        <h2 class="fw-bold text-uppercase" style="letter-spacing: 1px;">
+            PANEL DE CONTROL <i class="fas fa-tachometer-alt text-danger ms-2"></i>
+        </h2>
+        <p class="text-muted">Bienvenido, @User.Identity?.Name. Resumen general de Moto Repuestos Rojas.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100 border-start border-danger border-4">
+                <div class="text-danger mb-2"><i class="fas fa-boxes fa-2x"></i></div>
+                <h6 class="text-muted small text-uppercase fw-bold">Productos</h6>
+                <h3 class="fw-bold mb-0">124</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100 border-start border-warning border-4">
+                <div class="text-warning mb-2"><i class="fas fa-users fa-2x"></i></div>
+                <h6 class="text-muted small text-uppercase fw-bold">Usuarios</h6>
+                <h3 class="fw-bold mb-0">45</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100 border-start border-success border-4">
+                <div class="text-success mb-2"><i class="fas fa-shopping-cart fa-2x"></i></div>
+                <h6 class="text-muted small text-uppercase fw-bold">Ventas Hoy</h6>
+                <h3 class="fw-bold mb-0">₡85,000</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100 border-start border-info border-4">
+                <div class="text-info mb-2"><i class="fas fa-calendar-check fa-2x"></i></div>
+                <h6 class="text-muted small text-uppercase fw-bold">Citas Hoy</h6>
+                <h3 class="fw-bold mb-0">8</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 bg-dark rounded-4 shadow">
+        <h5 class="text-white fw-bold mb-4 border-bottom border-secondary pb-2">Gestión del Negocio</h5>
+
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a asp-controller="Usuarios" asp-action="GestionUsuarios" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-user-cog mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">USUARIOS</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Inventario" asp-action="Index" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-tools mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">INVENTARIO</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-cash-register mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">CAJA (POS)</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Citas" asp-action="Index" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-calendar-alt mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">CITAS TALLER</span>
+                </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-file-invoice-dollar mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">FINANZAS</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="SeguimientoServicios" asp-action="Index" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-motorcycle mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">SERVICIOS</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Reportes" asp-action="Index" class="btn btn-outline-light w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-chart-bar mb-2 fa-2x text-danger"></i>
+                    <span class="fw-bold">REPORTES</span>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-danger w-100 py-4 rounded-4 border-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-external-link-alt mb-2 fa-2x text-white"></i>
+                    <span class="fw-bold text-white">IR A TIENDA</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

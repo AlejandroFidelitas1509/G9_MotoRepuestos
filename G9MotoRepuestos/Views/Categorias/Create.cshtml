@@ -1,0 +1,22 @@
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model CategoriaDto
+
+@{
+    ViewData["Title"] = "Crear Categoría";
+}
+
+<h2 class="text-danger">Crear Categoría</h2>
+<hr />
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label">Nombre</label>
+        <input asp-for="Nombre" class="form-control" placeholder="Ej: Frenos, Aceites..." />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Guardar</button>
+    <a asp-action="Index" class="btn btn-dark">Cancelar</a>
+</form>

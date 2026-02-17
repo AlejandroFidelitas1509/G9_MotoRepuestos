@@ -23,4 +23,8 @@
     <ProjectReference Include="..\MR.LogicaNegocio\MR.LogicaNegocio.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\productos\" />
+  </ItemGroup>
+
 </Project>
