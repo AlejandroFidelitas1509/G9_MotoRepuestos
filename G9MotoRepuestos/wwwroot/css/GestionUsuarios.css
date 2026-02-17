@@ -1,0 +1,103 @@
+/* Estilos exclusivos para la tabla de gestión de usuarios */
+body {
+    background-color: #f8f9fa;
+}
+
+.custom-table th {
+    font-weight: 600;
+    border-bottom: 2px solid #f0f0f0;
+    color: #6c757d;
+}
+
+.custom-table td {
+    border-bottom: 1px solid #f8f9fa;
+    vertical-align: middle;
+}
+
+.custom-table tbody tr {
+    transition: background-color 0.2s ease;
+    background-color: #fff;
+}
+
+    .custom-table tbody tr:hover {
+        background-color: #f1f4f8; /* Gris muy suave al pasar el mouse */
+    }
+
+/* Efecto para el buscador */
+.form-control:focus {
+    box-shadow: none;
+    border-color: #dc3545; /* Rojo Moto Repuestos Rojas */
+}
+
+/* Insignias (Badges) personalizadas */
+.badge {
+    letter-spacing: 0.5px;
+    padding: 0.5em 0.8em;
+    font-weight: 600;
+}
+
+
+/* Ajustes para el buscador */
+.search-container {
+    max-width: 400px;
+}
+
+.search-input-group {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+    .search-input-group:focus-within {
+        border-color: #dc3545;
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.1);
+    }
+
+/* Estilos de la tabla y estados */
+.user-row {
+    transition: all 0.2s ease;
+}
+
+    .user-row.hidden {
+        display: none;
+    }
+
+.avatar-circle {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.status-badge {
+    padding: 0.5em 1em;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.avatar-circle {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+}
+
+.custom-table tbody tr {
+    transition: background-color 0.2s ease;
+    vertical-align: middle;
+}
+
+    .custom-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+.badge {
+    font-weight: 600;
+}

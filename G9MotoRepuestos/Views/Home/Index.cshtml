@@ -1,134 +1,324 @@
 ﻿@{
-    ViewData["Title"] = "Moto Repuestos Rojas - Inicio";
-
-    // LÓGICA AUTOMÁTICA:
-    // Si el usuario NO está logueado, esto será 'false' y mostrará el catálogo por defecto.
-    bool esPersonalTaller = User.HasClaim(c => c.Type == "Role" && (c.Value == "Admin" || c.Value == "Vendedor"));
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="container-fluid fade-in pb-5">
+<link rel="stylesheet" href="~/css/HomeStyles.css" asp-append-version="true" />
 
-    @if (esPersonalTaller)
-    {
-        <div class="row mb-4">
-            <div class="col-12 text-center text-md-start">
-                <h2 class="fw-bold text-dark">Panel de Control <span class="text-danger">Rojas</span></h2>
-                <p class="text-muted small">Gestión interna para el equipo de Mercedes Norte, Heredia.</p>
+@* --- CAROUSEL PRINCIPAL --- *@
+<div id="mainCarousel" class="carousel slide carousel-fade shadow-lg" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
+    </div>
+
+    <div class="carousel-inner">
+        <div class="carousel-item active" data-bs-interval="5000">
+            <img src="" class="d-block w-100 carousel-img" alt="Repuestos">
+            <div class="overlay-dark"></div>
+            <div class="carousel-caption d-md-block text-start mb-5">
+                <h1 class="display-3 fw-bold">TODO PARA <span class="text-danger">TU MOTO</span></h1>
+                <p class="lead">Repuestos de alta calidad en Mercedes Norte.</p>
+                <a asp-action="Catalogo" class="btn btn-danger btn-lg rounded-pill px-5 fw-bold shadow">VER CATÁLOGO</a>
             </div>
         </div>
-
-        <div class="row g-3 mb-5">
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card shadow-sm border-0 h-100 card-hover border-start border-danger border-4">
-                    <div class="card-body text-center">
-                        <div class="icon-box bg-light-danger mb-3 py-3 rounded"><i class="fas fa-boxes fa-2x text-danger"></i></div>
-                        <h6 class="fw-bold">Inventario</h6>
-                        <a asp-controller="Inventario" asp-action="Index" class="btn btn-sm btn-danger w-100 shadow-sm">Administrar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card shadow-sm border-0 h-100 card-hover border-start border-success border-4">
-                    <div class="card-body text-center">
-                        <div class="icon-box bg-light-success mb-3 py-3 rounded"><i class="fas fa-cash-register fa-2x text-success"></i></div>
-                        <h6 class="fw-bold">Nueva Venta</h6>
-                        <a asp-controller="PuntoVenta" asp-action="Index" class="btn btn-sm btn-success w-100 shadow-sm">Abrir Caja</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card shadow-sm border-0 h-100 card-hover border-start border-info border-4">
-                    <div class="card-body text-center">
-                        <div class="icon-box bg-light-info mb-3 py-3 rounded"><i class="fas fa-motorcycle fa-2x text-info"></i></div>
-                        <h6 class="fw-bold">Taller</h6>
-                        <a asp-controller="Citas" asp-action="Index" class="btn btn-sm btn-info text-white w-100 shadow-sm">Ver Agenda</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card shadow-sm border-0 h-100 card-hover border-start border-warning border-4">
-                    <div class="card-body text-center">
-                        <div class="icon-box bg-light-warning mb-3 py-3 rounded"><i class="fas fa-file-invoice-dollar fa-2x text-warning"></i></div>
-                        <h6 class="fw-bold">Finanzas</h6>
-                        <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-sm btn-warning text-white w-100 shadow-sm">Reportes</a>
-                    </div>
-                </div>
+        <div class="carousel-item" data-bs-interval="5000">
+            <img src="" class="d-block w-100 carousel-img" alt="Taller">
+            <div class="overlay-dark"></div>
+            <div class="carousel-caption d-md-block text-center mb-5">
+                <h2 class="display-4 fw-bold">ASESORÍA <span class="text-warning">HONESTA</span></h2>
+                <p class="lead">Mecánica profesional para tu seguridad.</p>
+                <a href="https://wa.me/50672432805" target="_blank" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow">AGENDAR CITA</a>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="row">
-            <div class="col-lg-3 d-none d-lg-block">
-                <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 90px; z-index: 10;">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4"><i class="fas fa-filter text-danger me-2"></i>Filtrar</h5>
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold text-uppercase text-muted">Categorías</label>
-                            <div class="list-group list-group-flush small">
-                                <a href="#" class="list-group-item list-group-item-action border-0 px-0">Motor</a>
-                                <a href="#" class="list-group-item list-group-item-action border-0 px-0">Frenos</a>
-                                <a href="#" class="list-group-item list-group-item-action border-0 px-0">Aceites</a>
-                            </div>
-                        </div>
-                        <button class="btn btn-danger w-100 rounded-pill py-2 shadow-sm">Aplicar Filtros</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold text-dark mb-0">Nuestros <span class="text-danger">Repuestos</span></h2>
-                    <button class="btn btn-dark rounded-pill px-4 shadow-sm position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
-                        <i class="fas fa-shopping-cart text-danger me-2"></i> Mi Carrito
-                    </button>
-                </div>
-
-                <div class="row g-4 mt-2">
-                    @for (int i = 1; i <= 6; i++)
-                    {
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card h-100 border-0 shadow-sm product-card-client overflow-hidden rounded-4">
-                                <div class="bg-light p-4 text-center position-relative">
-                                    <i class="fas fa-motorcycle fa-4x text-white opacity-50"></i>
-                                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 shadow-sm">Nuevo</span>
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-1">Repuesto #@i</h6>
-                                    <h5 class="text-danger fw-bold">₡ 15,000</h5>
-                                    <button class="btn btn-outline-danger btn-sm w-100 mt-2 rounded-pill">Añadir</button>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
+        <div class="carousel-item" data-bs-interval="5000">
+            <img src="" class="d-block w-100 carousel-img" alt="Lubricantes">
+            <div class="overlay-dark"></div>
+            <div class="carousel-caption d-md-block text-end mb-5">
+                <h2 class="display-4 fw-bold text-white text-uppercase">Potencia <span class="text-danger">Garantizada</span></h2>
+                <p class="lead">Los mejores aceites para tu motor.</p>
+                <a asp-action="Catalogo" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold border-2">OFERTAS</a>
             </div>
         </div>
-    }
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev" style="z-index: 10;">
+        <span class="carousel-control-prev-icon bg-dark rounded-circle p-3"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next" style="z-index: 10;">
+        <span class="carousel-control-next-icon bg-dark rounded-circle p-3"></span>
+    </button>
 </div>
 
-<div class="offcanvas offcanvas-end border-0 shadow-lg rounded-start-4" tabindex="-1" id="offcanvasCart">
-    <div class="offcanvas-header bg-dark text-white py-4">
-        <h5 class="offcanvas-title fw-bold"><i class="fas fa-shopping-cart text-danger me-2"></i>Su Selección</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+@* --- CATEGORÍAS --- *@
+<div class="container my-5 py-4">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">¿QUÉ BUSCAS <span class="text-danger">HOY?</span></h2>
     </div>
-    <div class="offcanvas-body d-flex flex-column">
-        <div class="flex-grow-1 overflow-auto">
-            <p class="text-muted text-center">Tu carrito está vacío</p>
+
+    <div class="row g-4 justify-content-center">
+        @* CATEGORÍA: REPUESTOS *@
+        <div class="col-12 col-md-5">
+            <div class="category-card-new shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="img-container">
+                    <img src="" alt="Repuestos" class="category-img">
+                    <div class="category-overlay"></div>
+                </div>
+                <div class="p-4 text-center card-content-new">
+                    <h4 class="fw-bold mb-1">Repuestos</h4>
+                    <p class="small text-muted mb-0">Motor, lubricantes y frenos</p>
+                </div>
+                <a asp-action="Catalogo" class="stretched-link"></a>
+            </div>
         </div>
-        <div class="border-top pt-3 text-center">
-            <h3 class="fw-bolder text-danger mb-4">₡ 0</h3>
-            <button class="btn btn-danger btn-lg w-100 py-3 fw-bold rounded-pill shadow-lg">PAGAR</button>
+
+        @* CATEGORÍA: ACCESORIOS *@
+        <div class="col-12 col-md-5">
+            <div class="category-card-new shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="img-container">
+                    <img src="" alt="Accesorios" class="category-img">
+                    <div class="category-overlay"></div>
+                </div>
+                <div class="p-4 text-center card-content-new">
+                    <h4 class="fw-bold mb-1">Accesorios</h4>
+                    <p class="small text-muted mb-0">Cascos, luces y estética</p>
+                </div>
+                <a asp-action="Catalogo" class="stretched-link"></a>
+            </div>
         </div>
     </div>
 </div>
 
+@* --- SECCIÓN: CITAS TALLER (VERSION CORTA) --- *@
+<div class="container my-4">
+    <div class="appointment-banner shadow-lg rounded-4 overflow-hidden position-relative">
+        <div class="row g-0 align-items-center">
+            <div class="col-lg-7 p-4 p-md-5 text-white position-relative z-2">
+                <span class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill fw-bold" style="font-size: 0.7rem;">
+                    <i class="fas fa-certificate me-1"></i> SERVICIO PROFESIONAL
+                </span>
+                <h2 class="fw-bold mb-2" style="font-size: 2rem;">¿Tu moto necesita un <span class="text-warning">ajuste?</span></h2>
+                <p class="mb-3 opacity-75 small">Mecánica y repuestos en Mercedes Norte.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="https://wa.me/50672432805" target="_blank" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fab fa-whatsapp me-2"></i>Agendar WhatsApp
+                    </a>
+                    <a asp-controller="Citas" asp-action="Index" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                        Ver Disponibilidad
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block position-relative" style="height: 280px;">
+
+                <img src="https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?auto=format&fit=crop&w=800&q=80"
+                     class="appointment-img" alt="Mecánico Rojas">
+                <div class="img-gradient-overlay"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* --- SECCIÓN: MÁS VENDIDOS --- *@
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h3 class="fw-bold mb-0">MÁS VENDIDOS <i class="fas fa-fire text-danger"></i></h3>
+                <p class="text-muted mb-0 small">Los preferidos por nuestros clientes</p>
+            </div>
+            <a asp-action="Catalogo" class="text-danger fw-bold text-decoration-none small">Ver catálogo <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+                        <img src="" alt="Aceite Motul">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Aceite Motul 5100 10W40</h6>
+                        <p class="text-muted small mb-2">Semi-sintético 4T (1L)</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡9,500</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Comprar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+                        <img src="" alt="Kit de Arrastre">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Kit de Arrastre Reforzado</h6>
+                        <p class="text-muted small mb-2">Acero alto carbono</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡18,000</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Comprar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+                        <img src="" alt="Frenos">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Pastillas de Freno Cerámicas</h6>
+                        <p class="text-muted small mb-2">Máxima seguridad</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡6,500</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Comprar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">                  
+                    <div class="product-img-wrap bg-white">
+                        <img src="" alt="Bujía">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Bujía Iridium NGK</h6>
+                        <p class="text-muted small mb-2">Mejor encendido</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡4,200</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Comprar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* --- SECCIÓN: NUEVOS INGRESOS --- *@
+<div class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h3 class="fw-bold mb-0">NUEVOS INGRESOS <i class="fas fa-bolt text-success"></i></h3>
+                <p class="text-muted mb-0 small">Lo más reciente en Mercedes Norte</p>
+            </div>
+            <a asp-action="Catalogo" class="text-success fw-bold text-decoration-none small">Ver novedades <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+
+                        <img src="" alt="Casco">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Casco Integral DOT</h6>
+                        <p class="text-muted small mb-2">Certificado, doble visor</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡35,000</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+                        <img src="" alt="Casco">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Casco Integral DOT</h6>
+                        <p class="text-muted small mb-2">Certificado, doble visor</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡35,000</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+                        <img src="" alt="Casco">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Casco Integral DOT</h6>
+                        <p class="text-muted small mb-2">Certificado, doble visor</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡35,000</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="product-img-wrap bg-white">
+
+                        <img src="" alt="Casco">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold mb-1">Casco Integral DOT</h6>
+                        <p class="text-muted small mb-2">Certificado, doble visor</p>
+                        <h5 class="text-danger fw-bold mt-auto mb-3">₡35,000</h5>
+                        <a asp-action="Catalogo" class="btn btn-outline-dark btn-sm rounded-pill w-100 fw-bold">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@* --- SECCIÓN MARCAS MEJORADA --- *@
+<div class="section-marcas">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">LAS MEJORES <span class="text-danger">MARCAS</span></h3>
+        </div>
+
+        <div id="brandsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+
+                <div class="carousel-item active">
+                    <div class="d-flex justify-content-center align-items-center flex-wrap gap-4">
+                        <div class="brand-item"><img src="~/images/marcas/LogoRepsol.png" alt="Repsol"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoFox.png" alt="Fox"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoProTaper.png" alt="ProTaper"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoCien.png" alt="100%"></div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="d-flex justify-content-center align-items-center flex-wrap gap-4">
+                        <div class="brand-item"><img src="~/images/marcas/LogoTroyLee.png" alt="Troy Lee"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoFreedom.png" alt="Freedom"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoVini.png" alt="Vini"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoRaloy.png" alt="Raloy"></div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="d-flex justify-content-center align-items-center flex-wrap gap-4">
+                        <div class="brand-item"><img src="~/images/marcas/LogoBelray.png" alt="Belray"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoTimsun.png" alt="Timsun"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoKenda.png" alt="Kenda"></div>
+                        <div class="brand-item"><img src="~/images/marcas/LogoFlamingo.png" alt="Flamingo"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-indicators position-relative mt-4">
+                <button type="button" data-bs-target="#brandsCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#brandsCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#brandsCarousel" data-bs-slide-to="2"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* --- CHATBOX Y WHATSAPP --- *@
 <div class="chatbox-wrapper shadow-lg d-none d-md-block" id="chatboxRojas">
     <div class="chatbox-header bg-dark text-white p-2 d-flex justify-content-between align-items-center" onclick="toggleChat()" style="cursor: pointer;">
         <small class="fw-bold text-danger"><i class="fas fa-robot me-2"></i>Asistente Rojas</small>
-        <i class="fas fa-minus small" id="chatIcon"></i>
+        <i class="fas fa-plus small" id="chatIcon"></i>
     </div>
-    <div id="chatContent">
+    <div id="chatContent" style="display: none;">
         <div class="chatbox-body bg-light p-3" style="height: 200px; overflow-y: auto;">
             <div class="chat-msg mb-2 text-center">
                 <p class="small bg-white p-2 rounded shadow-sm mb-0">¡Hola Sebas! ¿En qué puedo ayudarte hoy?</p>
@@ -148,5 +338,5 @@
 </a>
 
 @section Scripts {
-    <script src="~/js/chatbox.js" asp-append-version="true"></script>
+    <script src="~/js/chatbox/ChatBox.js" asp-append-version="true"></script>
 }

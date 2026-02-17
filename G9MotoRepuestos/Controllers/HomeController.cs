@@ -2,6 +2,8 @@ using System.Diagnostics;
 using G9MotoRepuestos.Models;
 using G9MotoRepuestos.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace G9MotoRepuestos.Controllers
 {
@@ -20,10 +22,23 @@ namespace G9MotoRepuestos.Controllers
 
         public IActionResult Index()
         {
+            var userRole = User.FindFirstValue(ClaimTypes.Role) ?? User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            if (userRole == "Admin" || userRole == "Administrador" || userRole == "Vendedor")
+            {
+                return RedirectToAction("PanelControl");
+            }
             return View();
         }
 
-        public IActionResult Privacy()
+        [Authorize(Roles = "Admin,Administrador,Vendedor")]
+        public IActionResult PanelControl()
+        {
+
+            return View();
+        }
+
+        public IActionResult Catalogo()
         {
             return View();
         }
@@ -33,11 +48,22 @@ namespace G9MotoRepuestos.Controllers
             return View();
         }
 
-        // ?? PRUEBA DE CONEXIÓN
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
         public IActionResult TestConexion()
         {
-            bool conecta = _context.Database.CanConnect();
-            return Content(conecta ? "Conexión OK ?" : "No conecta ?");
+            try
+            {
+                bool conecta = _context.Database.CanConnect();
+                return Content(conecta ? "Conexión a la Base de Datos: OK ?" : "Error: No se pudo conectar a la base de datos ?");
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error crítico: {ex.Message}");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
