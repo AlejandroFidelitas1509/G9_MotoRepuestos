@@ -35,6 +35,7 @@ SELECT
     p.PrecioVenta,
     p.Estado,
     p.ImageURL,      -- <-- AQUI
+  p.IdCategoria, 
     i.StockActual
 FROM dbo.Productos p
 LEFT JOIN dbo.Inventario i ON i.IdProducto = p.IdProducto
