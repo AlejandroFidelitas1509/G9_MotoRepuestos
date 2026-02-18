@@ -1,0 +1,79 @@
+﻿@model G9MotoRepuestos.Models.Finanzas
+
+@{
+    ViewData["Title"] = "Eliminar Movimiento";
+}
+
+<div class="container">
+    <h2 class="titulo">Eliminar Movimiento</h2>
+
+    <div class="card">
+        <p>¿Seguro que deseas eliminar este movimiento?</p>
+
+        <ul>
+            <li><strong>Fecha:</strong> @Model.Fecha.ToString("yyyy-MM-dd")</li>
+            <li><strong>Tipo:</strong> @Model.Tipo</li>
+            <li><strong>Categoría:</strong> @Model.Categoria</li>
+            <li><strong>Monto:</strong> ₡@Model.Monto.ToString("N2")</li>
+        </ul>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.IdFinanzas" />
+            <button class="btn-rojo" type="submit">Sí, eliminar</button>
+            <a asp-action="Index" class="btn-gray" style="display:inline-block;text-align:center;margin-top:10px;">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 0 10px rgba(0,0,0,.10);
+    }
+
+    .titulo {
+        text-align: center;
+        font-size: 28px;
+        margin-bottom: 25px;
+        color: #262626;
+        font-weight: bold;
+    }
+
+    .card {
+        background: #f3f4f6;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        border: 1px solid #d4d4d8;
+    }
+
+    .btn-rojo {
+        width: 100%;
+        background: #dc2626;
+        color: #fff;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: .2s;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .btn-gray {
+        width: 100%;
+        background: #6b7280;
+        color: white;
+        padding: 12px 18px;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: bold;
+        transition: .2s;
+    }
+</style>
