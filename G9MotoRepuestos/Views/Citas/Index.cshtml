@@ -1,65 +1,44 @@
+@using MR.LogicaNegocio.Dtos
+@model List<CitasDto>
+
 @{
-    ViewData["Title"] = "Gestión de Citas - Moto Repuestos Rojas";
+    ViewData["Title"] = "Listado de Citas";
 }
 
-<div class="container-fluid fade-in pb-5">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6 text-center text-md-start">
-            <h2 class="fw-bold text-dark"><i class="fas fa-calendar-check me-2 text-danger"></i>Gestión de <span class="text-danger">Citas</span></h2>
-            <p class="text-muted small">Administre la agenda del taller y las revisiones mecánicas de Moto Repuestos Rojas.</p>
-        </div>
-        <div class="col-md-6 text-md-end text-center">
-            <a href="/Citas/Create" class="btn btn-danger rounded-pill px-4 shadow-sm">
-                <i class="fas fa-plus me-2"></i>Nueva Cita
-            </a>
-            <a href="/Citas/BloquearFecha" class="btn btn-dark rounded-pill px-4 shadow-sm ms-2">
-                <i class="fas fa-lock me-2"></i>Bloquear
-            </a>
-        </div>
-    </div>
+<h2 class="text-center fw-bold mb-4">Listado de Citas</h2>
 
-    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-secondary small text-uppercase fw-bold">
-                        <tr>
-                            <th class="ps-4 py-3">ID</th>
-                            <th>Cliente</th>
-                            <th>Fecha y Hora</th>
-                            <th>Estado</th>
-                            <th class="text-end pe-4">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="ps-4 fw-bold text-muted">#1</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-cita me-3">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <span class="fw-bold text-dark">Carlos Monge</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="text-dark"><i class="far fa-calendar-alt me-2 text-muted"></i>05/12/2025</div>
-                                <div class="small text-muted"><i class="far fa-clock me-2 text-muted"></i>10:00 AM</div>
-                            </td>
-                            <td>
-                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Pendiente</span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group shadow-xs rounded-3">
-                                    <a href="/Citas/Details/1" class="btn btn-light btn-sm border-end"><i class="fas fa-eye"></i></a>
-                                    <a href="/Citas/Edit/1" class="btn btn-light btn-sm text-primary border-end"><i class="fas fa-edit"></i></a>
-                                    <a href="/Citas/Delete/1" class="btn btn-light btn-sm text-danger"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+<table class="table table-striped table-hover table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Id</th>
+            <th>Detalle</th>
+            <th>Fecha y Hora</th>
+            <th>Modelo</th>
+            <th>Placa</th>
+            <th>Estado</th>
+            <th>Usuario</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cita in Model)
+        {
+            <tr>
+                <td>@cita.IdCita</td>
+                <td>@cita.Detalle</td>
+                <td>@cita.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@cita.Modelo</td>
+                <td>@cita.Placa</td>
+                <td>@cita.Estado</td>
+                <td>@cita.IdUsuario</td>
+                <td class="text-center">
+                    <a asp-controller="Citas" asp-action="Edit" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-controller="Citas" asp-action="Details" asp-route-id="@cita.IdCita" class="btn btn-sm btn-info">Detalles</a>
+                    <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Citas" asp-action="Create" class="btn btn-success fw-bold">Nueva Cita</a>

@@ -1,0 +1,151 @@
+﻿<link rel="stylesheet" href="~/css/Sesion/Login.css" asp-append-version="true" />
+@model IEnumerable<G9MotoRepuestos.Models.Usuario>
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<link rel="stylesheet" href="~/css/GestionUsuarios.css" asp-append-version="true" />
+
+<div class="container my-5 py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">Gestión de Usuarios <i class="fas fa-users-cog text-danger ms-2"></i></h2>
+            <p class="text-muted small mt-1">Administración de personal y clientes</p>
+        </div>
+        <button class="btn btn-danger rounded-pill fw-bold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoUsuario">
+            <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom p-4">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                        <span class="input-group-text bg-white border-0 text-muted ps-3"><i class="fas fa-search"></i></span>
+                        <input type="text" id="userInput" class="form-control border-0 ps-2" placeholder="Buscar por nombre o correo...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 custom-table">
+                <thead class="bg-light text-uppercase small" style="letter-spacing: 1px;">
+                    <tr>
+                        <th class="ps-4 py-3">Usuario</th>
+                        <th class="py-3">Correo</th>
+                        <th class="py-3 text-center">Rol</th>
+                        <th class="py-3 text-center">Estado</th>
+                        <th class="py-3 text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                    @foreach (var item in Model)
+                    {
+                        bool estaActivo = item.Estado ?? false;
+                        bool esAdmin = item.Rol?.Tipo == "Admin" || item.Rol?.Tipo == "Administrador";
+
+                        <tr class="@(estaActivo ? "" : "opacity-50")">
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle @(esAdmin ? "bg-danger" : "bg-dark") text-white me-3 shadow-sm">
+                                        @{
+                                            string iniciales = "U";
+                                            if (!string.IsNullOrEmpty(item.NombreCompleto))
+                                            {
+                                                var p = item.NombreCompleto.Split(' ');
+                                                iniciales = p.Length > 1 ? $"{p[0][0]}{p[1][0]}".ToUpper() : p[0][0].ToString().ToUpper();
+                                            }
+                                        }
+                                        @iniciales
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold @(estaActivo ? "" : "text-decoration-line-through")">@item.NombreCompleto</h6>
+                                        <span class="text-muted small">ID: #@item.IdUsuario</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted">@item.Correo</td>
+                            <td class="text-center">
+                                <span class="badge @(esAdmin ? "bg-danger" : "bg-light text-dark border") shadow-sm">
+                                    @(item.Rol?.Tipo ?? "Cliente")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge @(estaActivo ? "bg-success" : "bg-danger") bg-opacity-10 @(estaActivo ? "text-success" : "text-danger") border rounded-pill px-3 shadow-sm">
+                                    @(estaActivo ? "Activo" : "Bloqueado")
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-action="EditarPerfil" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-light border rounded-circle text-primary shadow-sm" title="Editar"><i class="fas fa-pen"></i></a>
+                                @if (!esAdmin)
+                                {
+                                    <form asp-action="CambiarEstado" asp-route-id="@item.IdUsuario" method="post" class="d-inline ms-1">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-light border rounded-circle @(estaActivo ? "text-danger" : "text-success") shadow-sm" title="@(estaActivo ? "Bloquear" : "Activar")">
+                                            <i class="fas @(estaActivo ? "fa-ban" : "fa-check-circle")"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalNuevoUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-dark text-white border-0 py-3">
+                <h5 class="modal-title fw-bold">Nuevo Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Registro" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Nombre Completo</label>
+                        <input type="text" name="NombreCompleto" class="form-control rounded-3 border-0 bg-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Correo Electrónico</label>
+                        <input type="email" name="Correo" class="form-control rounded-3 border-0 bg-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Contraseña Inicial</label>
+                        <input type="password" name="PasswordHash" class="form-control rounded-3 border-0 bg-light" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Rol</label>
+                        <select name="IdRol" class="form-select rounded-3 border-0 bg-light">
+                            <option value="2">Cliente</option>
+                            <option value="3">Empleado</option>
+                            <option value="1">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Script para buscar en tiempo real en la tabla
+            $("#userInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#userTable tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+}

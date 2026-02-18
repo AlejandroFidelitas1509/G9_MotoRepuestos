@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MR.Abstracciones\MR.Abstracciones.csproj" />
+    <ProjectReference Include="..\MR.AccesoDatos\MR.AccesoDatos.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,62 @@
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model IEnumerable<CategoriaDto>
+
+@{
+    ViewData["Title"] = "Categorías";
+    var soloActivas = (bool)(ViewBag.SoloActivas ?? true);
+}
+
+<h2 class="text-danger">Categorías</h2>
+<hr />
+
+<div class="d-flex gap-2 mb-3">
+    <a asp-action="Create" class="btn btn-danger">Nueva categoría</a>
+
+    @if (soloActivas)
+    {
+        <a asp-action="Index" asp-route-soloActivas="false" class="btn btn-dark">Ver todas</a>
+    }
+    else
+    {
+        <a asp-action="Index" asp-route-soloActivas="true" class="btn btn-dark">Ver activas</a>
+    }
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.IdCategoria</td>
+                <td>@c.Nombre</td>
+                <td>@(c.Estado == true ? "Activa" : "Inactiva")</td>
+                <td>
+                    @if (c.Estado == true)
+                    {
+                        <form asp-action="Desactivar" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@c.IdCategoria" />
+                            <button class="btn btn-sm btn-dark" type="submit">Desactivar</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="Activar" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@c.IdCategoria" />
+                            <button class="btn btn-sm btn-danger" type="submit">Activar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

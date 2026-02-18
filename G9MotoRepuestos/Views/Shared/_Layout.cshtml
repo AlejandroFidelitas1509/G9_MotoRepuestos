@@ -1,16 +1,10 @@
 ﻿@using System.Security.Claims
 @{
-    // Buscamos el nombre del usuario de forma segura
     var nombreUsuario = User.Identity?.Name;
-
-    // Buscamos el rol probando ambos nombres posibles de forma única
     var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role" || c.Type == ClaimTypes.Role)?.Value;
-
     bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
     bool esVendedor = string.Equals(userRole, "Vendedor", StringComparison.OrdinalIgnoreCase);
-
-    // El Admin debe poder ver las herramientas de taller
-    bool esPersonalTaller = esAdmin || esVendedor;
+    bool esPersonalAdmin = esAdmin || esVendedor;
 }
 
 <!DOCTYPE html>
@@ -21,86 +15,124 @@
     <title>@ViewData["Title"] - Moto Repuestos Rojas</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/CrearCuenta.css" asp-append-version="true" />
 
+    <style>
+        .bg-rojas {
+            background-color: #CC0000 !important;
+        }
+
+        .font-main {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            z-index: 2000 !important;
+        }
+
+        .offcanvas {
+            z-index: 3000 !important;
+        }
+
+        /* Estilo para el botón de registro sin borde */
+        .btn-registro-fix {
+            border: none !important;
+            outline: none !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100 font-main">
 
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-rojas shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-rojas shadow mb-0 py-2">
             <div class="container-fluid">
-                <button class="btn btn-outline-light me-3 border-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCategorias">
-                    <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
-                </button>
+                @if (!esPersonalAdmin)
+                {
+                    <button class="btn btn-outline-light me-3 border-2 fw-bold"
+                            type="button"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#menuCategorias">
+                        <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
+                    </button>
+                }
 
                 <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/LogoLocal.jpeg" alt="Logo" width="40" height="40" class="d-inline-block align-top me-2 logo-navbar">
+                    <img src="~/images/LogoLocal.jpeg" alt="Logo" width="45" height="45" class="rounded me-2 border border-white border-1">
                     <span class="d-none d-sm-inline">MOTO REPUESTOS ROJAS</span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (esPersonalTaller)
-                        {
-
-                            <li class="nav-item"><a class="nav-link text-white fw-bold" asp-controller="PuntoVenta" asp-action="Index"><i class="fas fa-cash-register me-1 text-warning"></i> Caja</a></li>
-                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Inventario" asp-action="Index">Inventario</a></li>
-                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Citas" asp-action="Index">Citas</a></li>
-                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Contabilidad" asp-action="Index">Finanzas</a></li>
-                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Usuarios" asp-action="Index">Usuarios</a></li>
-                        }
-                        else
-                        {
-                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Index"><i class="fas fa-store me-1"></i> Catálogo</a></li>
-                        }
+                <div class="collapse navbar-collapse" id="navMain">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            @if (esPersonalAdmin)
+                            {
+                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="PanelControl">PANEL DE CONTROL</a>
+                            }
+                            else
+                            {
+                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>
+                            }
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
+                        </li>
                     </ul>
 
-                    <form class="d-flex mx-lg-4 my-2 my-lg-0 search-form" asp-controller="Inventario" asp-action="Index" method="get">
-                        <div class="input-group">
-                            <input name="buscar" class="form-control" type="search" placeholder="¿Qué repuesto buscas?">
-                            <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
-                        </div>
-                    </form>
+                    @if (!esPersonalAdmin)
+                    {
+                        <form class="d-flex mx-auto my-2 my-lg-0" asp-controller="Home" asp-action="Catalogo" method="get" style="flex: 1; max-width: 450px;">
+                            <div class="input-group">
+                                <input name="buscar" class="form-control border-0" type="search" placeholder="¿Qué repuesto buscas?">
+                                <button class="btn btn-white text-danger border-0 bg-white" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    }
 
-                    <partial name="_LoginPartial" />
+                    <div class="ms-auto">
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
+    @* MENÚ LATERAL *@
 
     <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="menuCategorias">
-        <div class="offcanvas-header border-bottom border-secondary">
-            <h5 class="offcanvas-title fw-bold text-danger"><i class="fas fa-motorcycle me-2"></i>PRODUCTOS</h5>
+        <div class="offcanvas-header border-bottom border-secondary py-3">
+            <h5 class="offcanvas-title fw-bold text-danger"><i class="fas fa-motorcycle me-2"></i> PRODUCTOS</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body p-0">
-            <div class="list-group list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link"><i class="fas fa-cogs me-2"></i> Repuestos de Motor</a>
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link"><i class="fas fa-tools me-2"></i> Accesorios</a>
-                <a href="#" class="list-group-item list-group-item-action bg-dark text-white sidebar-link"><i class="fas fa-oil-can me-2"></i> Aceites y Lubricantes</a>
-                <div class="sidebar-footer">
-                    <a asp-controller="Home" asp-action="Nosotros" class="list-group-item list-group-item-action bg-dark text-white sidebar-link">
-                        <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
-                    </a>
-                </div>
+        <div class="offcanvas-body p-0 d-flex flex-column">
+            <div class="list-group list-group-flush flex-grow-1">
+                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Motor" class="list-group-item list-group-item-action bg-dark text-white py-3 sidebar-link border-secondary border-bottom">Repuestos de Motor</a>
+                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Accesorios" class="list-group-item list-group-item-action bg-dark text-white py-3 sidebar-link border-secondary border-bottom">Accesorios</a>
+                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Aceites" class="list-group-item list-group-item-action bg-dark text-white py-3 sidebar-link border-secondary">Aceites y Lubricantes</a>
+            </div>
+
+            @* SECCIÓN SOBRE NOSOTROS RESTAURADA *@
+            <div class="sidebar-footer p-3 border-top border-secondary mt-auto">
+                <a asp-controller="Home" asp-action="Nosotros" class="list-group-item list-group-item-action bg-dark text-white sidebar-link border-0 rounded">
+                    <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <main role="main" class="flex-shrink-0">
+        @RenderBody()
+    </main>
 
+    @* FOOTER RESTAURADO CON TU DISEÑO ORIGINAL *@
     <footer class="bg-dark text-white pt-4 pb-2 border-top border-danger border-4 mt-auto">
         <div class="container">
             <div class="row align-items-center">
@@ -115,9 +147,9 @@
                     </div>
                 </div>
                 <div class="col-md-3 text-center text-md-end">
-                    <a href="https://wa.me/50672432805" target="_blank" class="social-icon-sm me-2"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://www.facebook.com/share/1831P2NdY6/" target="_blank" class="social-icon-sm me-2"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/motorepuestosrojas" target="_blank" class="social-icon-sm"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/50672432805" target="_blank" class="social-icon-sm me-2" style="color: #25D366; font-size: 1.2rem;"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.facebook.com/share/1831P2NdY6/" target="_blank" class="social-icon-sm me-2" style="color: #1877F2; font-size: 1.2rem;"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/motorepuestosrojas" target="_blank" class="social-icon-sm" style="color: #E4405F; font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
             <hr class="my-3 border-secondary opacity-25">

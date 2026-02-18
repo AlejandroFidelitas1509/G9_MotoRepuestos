@@ -34,6 +34,8 @@ SELECT
     p.Marca,
     p.PrecioVenta,
     p.Estado,
+    p.ImageURL,      -- <-- AQUI
+  p.IdCategoria, 
     i.StockActual
 FROM dbo.Productos p
 LEFT JOIN dbo.Inventario i ON i.IdProducto = p.IdProducto
@@ -47,8 +49,6 @@ ORDER BY p.IdProducto DESC;";
                 soloActivos = soloActivos ? 1 : 0
             });
         }
-
-        //  Pendientes (por ahora)
 
         public async Task<ProductoDto?> ObtenerPorIdAsync(int id)
         {

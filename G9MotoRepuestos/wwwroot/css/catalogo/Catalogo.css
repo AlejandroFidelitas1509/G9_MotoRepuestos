@@ -1,0 +1,89 @@
+.fade-in {
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+.icon-box {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover .icon-box {
+    transform: scale(1.1);
+}
+
+.list-group-item-action:hover {
+    color: #dc3545 !important;
+    background-color: #fff5f5 !important;
+    padding-left: 20px !important;
+}
+
+.product-card-client {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #f0f0f0 !important;
+}
+
+    .product-card-client:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important;
+    }
+
+    .product-card-client .bg-light {
+        transition: background 0.3s ease;
+    }
+
+    .product-card-client:hover .bg-light {
+        background-color: #dc3545 !important;
+    }
+
+    .product-card-client:hover .fa-motorcycle {
+        color: white !important;
+        opacity: 0.9 !important;
+        transform: rotate(-10deg) scale(1.1);
+    }
+
+.btn-outline-danger {
+    transition: all 0.3s ease;
+}
+
+.product-card-client:hover .btn-outline-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.offcanvas-body {
+    background-color: #fdfdfd;
+}
+
+.border-top h3 {
+    letter-spacing: 1px;
+}
+
+
+.container-fluid.fade-in {
+    padding-top: 30px; 
+}
+
+.col-lg-9 .d-flex.justify-content-between {
+    margin-bottom: 30px !important;
+}
