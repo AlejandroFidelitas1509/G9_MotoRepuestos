@@ -9,7 +9,7 @@
         public decimal Iva => Math.Round(Subtotal * IvaRate, 2);
         public decimal Total => Subtotal + Iva;
 
-        // Cobro
+        // Cobro9
         public string FormaPago { get; set; } = "Efectivo"; // Efectivo/Tarjeta/SINPE
         public decimal MontoRecibido { get; set; }
         public decimal Vuelto => MontoRecibido <= 0 ? 0 : Math.Max(0, MontoRecibido - Total);
