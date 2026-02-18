@@ -1,14 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 using G9MotoRepuestos.Models;
+using MR.LogicaNegocio.Servicios;
+using MR.LogicaNegocio.Dtos;
 
 namespace G9MotoRepuestos.Controllers
 {
     public class CitasController : Controller
     {
 
-        public IActionResult Index()
+        private readonly ILogger<CitasController> _logger;
+
+        private readonly ICitasServicio _citasServicio;
+
+        public CitasController(ILogger<CitasController> logger, ICitasServicio citasServicio)
         {
-            return View();
+            _logger = logger;
+            _citasServicio = citasServicio;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var respuesta = await _citasServicio.ObtenerCitasAsync();
+            return View(respuesta.Data);
         }
 
         public IActionResult Create()
@@ -16,27 +29,23 @@ namespace G9MotoRepuestos.Controllers
             return View();
         }
 
-        public IActionResult Delete()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CitasDto citaDto)
         {
-            return View();
-        }
+            if (ModelState.IsValid)
+            {
+                var respuesta = await _citasServicio.AgregarCitaAsync(citaDto);
+                if (!respuesta.EsError)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                ModelState.AddModelError(string.Empty, respuesta.Mensaje);
+            }
+            return View(citaDto);
 
-        public IActionResult Details()
-        {
-            return View();
-        }
 
-        public IActionResult Edit()
-        {
-            return View();
-        }
-        public IActionResult historial()
-        {
-            return View();
-        }
-        public IActionResult BloquearFecha()
-        {
-            return View();
+
         }
     }
 }
