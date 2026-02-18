@@ -42,6 +42,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "MotoRepuestosRojas.Session";
     });
 
+// --- SESSION (Para carrito de Punto de Venta) ---
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
 builder.Services.AddControllersWithViews();
 
 // --- INYECCIÓN DE DEPENDENCIAS (Arquitectura por capas) ---
@@ -92,6 +102,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles(); // ? Fundamental para que se vean las fotos en wwwroot/perfiles
 
 app.UseRouting();
+app.UseSession();
 
 // ? El orden es Sagrado: Autenticación antes que Autorización
 app.UseAuthentication();
