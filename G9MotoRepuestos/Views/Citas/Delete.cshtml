@@ -1,72 +1,38 @@
+@using MR.LogicaNegocio.Dtos
+@model CitasDto
 
 @{
     ViewData["Title"] = "Eliminar Cita";
 }
 
-<div class="usuarios-container">
-    <h2 class="titulo-rojo">Eliminar Cita</h2>
+<h2>Eliminar Cita</h2>
 
-    <p>¿Confirmas eliminar la cita de <strong>Carlos Monge</strong> el <strong>05/12/2025 10:00 AM</strong> ?</p>
+<h3>¿Estás seguro que deseas eliminar esta cita?</h3>
 
-    <form action="/Citas/Delete" method="post">
-        <input type="hidden" name="id" value="1" />
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Detalle</dt>
+        <dd class="col-sm-10">@Model.Detalle</dd>
 
-        <button type="submit" class="btn-guardar">Confirmar eliminación</button>
-        <a href="/Citas/Index" class="btn-cancelar">Cancelar</a>
-    </form>
+        <dt class="col-sm-2">Fecha</dt>
+        <dd class="col-sm-10">@Model.Fecha</dd>
+
+        <dt class="col-sm-2">Modelo</dt>
+        <dd class="col-sm-10">@Model.Modelo</dd>
+
+        <dt class="col-sm-2">Placa</dt>
+        <dd class="col-sm-10">@Model.Placa</dd>
+
+        <dt class="col-sm-2">Estado</dt>
+        <dd class="col-sm-10">
+            @(Model.Estado == 0 ? "Pendiente" :
+                        Model.Estado == 1 ? "Terminada" : "Cancelada")
+        </dd>
+    </dl>
 </div>
 
-<style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: #f2f2f2;
-        color: #222;
-    }
-
-    .usuarios-container {
-        margin: 30px auto;
-        max-width: 900px;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .titulo-rojo {
-        color: #d32f2f;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .btn-guardar {
-        background-color: #d32f2f;
-        color: #fff;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-        .btn-guardar:hover {
-            background-color: #b71c1c;
-            text-decoration: none;
-        }
-
-    .btn-cancelar {
-        background-color: #333;
-        color: #fff;
-        padding: 10px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-left: 10px;
-        display: inline-block;
-    }
-
-        .btn-cancelar:hover {
-            background-color: #555;
-            text-decoration: none;
-        }
-</style>
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="IdCita" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
