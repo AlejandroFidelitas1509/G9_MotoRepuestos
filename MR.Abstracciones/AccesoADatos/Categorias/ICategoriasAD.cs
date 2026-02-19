@@ -11,6 +11,8 @@ namespace MR.Abstracciones.AccesoADatos.Categorias
     {
         Task<IEnumerable<CategoriaDto>> ListarAsync(bool soloActivas = true);
         Task<int> CrearAsync(CategoriaDto categoria);
+        Task<bool> ActualizarAsync(CategoriaDto c);
+
         Task<bool> CambiarEstadoAsync(int idCategoria, bool estado);
     }
 }
