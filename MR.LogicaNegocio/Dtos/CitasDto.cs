@@ -23,7 +23,7 @@ namespace MR.LogicaNegocio.Dtos
         public int Estado { get; set; }
 
 
-        public int IdUsuario { get; set; }
+        public int ?IdUsuario { get; set; }
 
 
     }
