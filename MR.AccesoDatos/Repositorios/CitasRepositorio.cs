@@ -23,9 +23,21 @@ namespace MR.AccesoDatos.Repositorios
 
         public async Task<bool> ActualizarCitaAsync(Citas cita)
         {
-            _contexto.Citas.Update(cita);
+            var citaExistente = await _contexto.Citas.FindAsync(cita.IdCita);
+            if (citaExistente == null)
+                return false;
+
+            // Actualizar propiedades
+            citaExistente.Detalle = cita.Detalle;
+            citaExistente.Fecha = cita.Fecha;
+            citaExistente.Modelo = cita.Modelo;
+            citaExistente.Placa = cita.Placa;
+            citaExistente.Estado = cita.Estado;
+            citaExistente.IdUsuario = citaExistente.IdUsuario; // No se actualiza el IdUsuario
+
             await _contexto.SaveChangesAsync();
             return true;
+
         }
 
         public async Task<bool> EliminarCitaAsync(int id)
@@ -38,6 +50,7 @@ namespace MR.AccesoDatos.Repositorios
                 return true;
             }
             return false;
+
         }
 
         public async Task<Citas> ObtenerCitaPorIdAsync(int id)

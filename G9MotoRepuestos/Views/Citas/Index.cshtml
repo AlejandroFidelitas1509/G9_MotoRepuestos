@@ -6,6 +6,13 @@
 }
 
 <h2 class="text-center fw-bold mb-4">Listado de Citas</h2>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 
 <table class="table table-striped table-hover table-bordered">
     <thead class="table-dark">
@@ -29,11 +36,15 @@
                 <td>@cita.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>@cita.Modelo</td>
                 <td>@cita.Placa</td>
-                <td>@cita.Estado</td>
+                <td>
+                    @(cita.Estado == 0 ? "Pendiente" :
+                    cita.Estado == 1 ? "Revision" :
+                    cita.Estado == 2 ? "Finalizada" : "Desconocido")
+                </td>
                 <td>@cita.IdUsuario</td>
                 <td class="text-center">
                     <a asp-controller="Citas" asp-action="Edit" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning">Editar</a>
-                    <a asp-controller="Citas" asp-action="Details" asp-route-id="@cita.IdCita" class="btn btn-sm btn-info">Detalles</a>
+                    
                     <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Eliminar</a>
                 </td>
             </tr>
