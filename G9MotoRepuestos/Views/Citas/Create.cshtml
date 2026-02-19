@@ -1,128 +1,65 @@
+@using MR.LogicaNegocio.Dtos
+@model CitasDto
+
 @{
     ViewData["Title"] = "Crear Cita";
 }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<link rel="stylesheet" href="~/css/CrearCitas.css" />
+<h2 class="text-center fw-bold mb-4">Crear Nueva Cita</h2>
 
-<div class="usuarios-container">
-    <h2 class="titulo-rojo">Crear Cita  <i class="fas fa-calendar-check me-2 text-danger"></i></h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <form asp-action="Create" method="post" class="border p-4 rounded shadow bg-light">
+            <div class="mb-3">
+                <label asp-for="Detalle" class="form-label fw-bold"></label>
+                <input asp-for="Detalle" class="form-control" />
+                <span asp-validation-for="Detalle" class="text-danger"></span>
+            </div>
 
-    <form action="/Citas/Create" method="post" class="form-usuario">
-        <div class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Fecha" class="form-label fw-bold"></label>
+                <input asp-for="Fecha" type="datetime-local" class="form-control" />
+                <span asp-validation-for="Fecha" class="text-danger"></span>
+            </div>
 
-        <div class="form-row">
-            <label>Cliente:</label>
-            <input name="NombreCliente" class="input-text" placeholder="Nombre del cliente" />
-            <span class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Modelo" class="form-label fw-bold"></label>
+                <input asp-for="Modelo" class="form-control" />
+                <span asp-validation-for="Modelo" class="text-danger"></span>
+            </div>
 
-        <div class="form-row">
-            <label>Descripción:</label>
-            <input name="Descripcion" class="input-text" placeholder="Descripción de la cita" />
-            <span class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Placa" class="form-label fw-bold"></label>
+                <input asp-for="Placa" class="form-control" />
+                <span asp-validation-for="Placa" class="text-danger"></span>
+            </div>
 
-        <div class="form-row">
-            <label>Fecha y hora:</label>
-            <input name="Fecha" type="datetime-local" class="input-text" />
-            <span class="text-danger"></span>
-        </div>
+            <div class="mb-3">
+                <label asp-for="Estado" class="form-label fw-bold"></label>
+                <select asp-for="Estado" class="form-select">
+                    <option value="0">Pendiente</option>
+                    <option value="1">En Revision</option>
+                    <option value="2">Finalizada</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
 
-        <div class="acciones-form">
-            <!-- Botón guardar con icono -->
-            <button type="submit" class="btn-guardar">
-                <i class="fa-solid fa-save"></i> Guardar
-            </button>
+            <div class="mb-3">
+                <label asp-for="IdUsuario" class="form-label fw-bold"></label>
+                <input asp-for="IdUsuario" class="form-control" />
+                <span asp-validation-for="IdUsuario" class="text-danger"></span>
+            </div>
 
-            <!-- Botón cancelar con icono -->
-            <a href="/Citas/Index" class="btn-cancelar">
-                <i class="fa-solid fa-xmark"></i> Cancelar
-            </a>
-        </div>
-    </form>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success fw-bold">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary fw-bold">Volver al listado</a>
+            </div>
+        </form>
+    </div>
 </div>
 
-
-@* <style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: #f2f2f2;
-        color: #222;
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-    .usuarios-container {
-        margin: 30px auto;
-        max-width: 900px;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .titulo-rojo {
-        color: #d32f2f;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .form-usuario {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .form-row {
-        flex: 1 1 45%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .input-text {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        transition: border-color 0.3s;
-    }
-
-        .input-text:hover {
-            border-color: #d32f2f;
-        }
-
-    .acciones-form {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .btn-guardar {
-        background-color: #d32f2f;
-        color: #fff;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-        .btn-guardar:hover {
-            background-color: #b71c1c;
-            text-decoration: none;
-        }
-
-    .btn-cancelar {
-        background-color: #333;
-        color: #fff;
-        padding: 10px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-left: 10px;
-    }
-
-        .btn-cancelar:hover {
-            background-color: #555;
-            text-decoration: none;
-        }
- </style>  *@
-
+}
