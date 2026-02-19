@@ -1,38 +1,51 @@
-﻿@model List<G9MotoRepuestos.Models.Cierres>
+﻿@model List<G9MotoRepuestos.Models.Finanzas>
 
 @{
-    ViewData["Title"] = "Historial de Cierres Contables";
+    ViewData["Title"] = "Movimientos (Finanzas)";
 }
 
 <div class="panel">
-    <h2 class="titulo">Historial de Cierres Contables</h2>
+    <h2 class="titulo">Movimientos</h2>
+
+    @if (TempData["Ok"] != null)
+    {
+        <div class="alert alert-success">@TempData["Ok"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
 
     <div class="acciones-barra">
-        <a asp-controller="Contabilidad" asp-action="Index" class="btn-volver">⮐ Volver al Menú</a>
-        <a asp-controller="Contabilidad" asp-action="Cierres" class="btn-crear">+ Nuevo Cierre</a>
+        <a asp-controller="Finanzas" asp-action="Create" class="btn-crear">+ Nuevo Movimiento</a>
+        <a asp-controller="Contabilidad" asp-action="Index" class="btn-volver">⮐ Volver a Contabilidad</a>
     </div>
 
     <table class="tabla">
         <thead>
             <tr>
-                <th>Fecha Registro</th>
+                <th>Fecha</th>
                 <th>Tipo</th>
-                <th>Periodo</th>
-                <th>Balance</th>
-                <th>Acción</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+                <th>Acciones</th>
             </tr>
         </thead>
-
         <tbody>
-            @foreach (var c in Model)
+            @foreach (var m in Model)
             {
                 <tr>
-                    <td>@c.FechaRegistro.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@c.Tipo</td>
-                    <td>@c.FechaInicio.ToString("yyyy-MM-dd") - @c.FechaFin.ToString("yyyy-MM-dd")</td>
-                    <td style="font-weight:bold;">₡@c.BalanceTotal.ToString("N2")</td>
+                    <td>@m.Fecha.ToString("yyyy-MM-dd")</td>
+                    <td>@m.Tipo</td>
+                    <td>@m.Categoria</td>
+                    <td>@m.Descripcion</td>
+                    <td style="font-weight:bold; color:@(m.Tipo.ToLower() == "ingreso" ? "#2e7d32" : "#c62828")">
+                        @(m.Tipo.ToLower() == "ingreso" ? "+" : "-") ₡@m.Monto.ToString("N2")
+                    </td>
                     <td>
-                        <a class="accion-editar" asp-controller="Contabilidad" asp-action="CierreResultado" asp-route-id="@c.IdCierres">Ver</a>
+                        <a class="accion-editar" asp-action="Edit" asp-route-id="@m.IdFinanzas">Editar</a>
+                        <a class="accion-eliminar" asp-action="Delete" asp-route-id="@m.IdFinanzas">Eliminar</a>
                     </td>
                 </tr>
             }
@@ -46,7 +59,7 @@
     }
 
     .panel {
-        max-width: 900px;
+        max-width: 980px;
         margin: 40px auto;
         background: white;
         padding: 25px;
@@ -107,9 +120,10 @@
             color: #333;
         }
 
-    .accion-editar {
+    .accion-editar, .accion-eliminar {
         color: #d9534f;
         font-weight: bold;
+        margin-right: 10px;
         text-decoration: none;
     }
 </style>
