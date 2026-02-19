@@ -121,7 +121,7 @@ namespace G9MotoRepuestos.Controllers
             }
         }
 
-        // (Si quieres también categoría en Edit, lo hacemos después)
+        
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {

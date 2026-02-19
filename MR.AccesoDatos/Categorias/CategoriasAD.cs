@@ -29,6 +29,25 @@ ORDER BY Nombre;";
             return await db.QueryAsync<CategoriaDto>(sql, new { soloActivas = soloActivas ? 1 : 0 });
         }
 
+        public async Task<bool> ActualizarAsync(CategoriaDto c)
+        {
+            const string sql = @"
+UPDATE dbo.Categorias
+SET Nombre = @Nombre
+WHERE IdCategoria = @IdCategoria;";
+
+            using IDbConnection db = new SqlConnection(_cn);
+
+            var filas = await db.ExecuteAsync(sql, new
+            {
+                c.Nombre,
+                c.IdCategoria
+            });
+
+            return filas > 0;
+        }
+
+
         public async Task<int> CrearAsync(CategoriaDto categoria)
         {
             const string sql = @"

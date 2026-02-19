@@ -3,60 +3,520 @@
 
 @{
     ViewData["Title"] = "Categorías";
-    var soloActivas = (bool)(ViewBag.SoloActivas ?? true);
+
+    var categorias = Model?.ToList() ?? new List<CategoriaDto>();
+    var total = categorias.Count;
+    var activas = categorias.Count(x => x.Estado == true);
+    var inactivas = categorias.Count(x => x.Estado != true);
 }
 
-<h2 class="text-danger">Categorías</h2>
-<hr />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="d-flex gap-2 mb-3">
-    <a asp-action="Create" class="btn btn-danger">Nueva categoría</a>
+<div class="cat-shell">
 
-    @if (soloActivas)
-    {
-        <a asp-action="Index" asp-route-soloActivas="false" class="btn btn-dark">Ver todas</a>
-    }
-    else
-    {
-        <a asp-action="Index" asp-route-soloActivas="true" class="btn btn-dark">Ver activas</a>
-    }
+    <!-- HEADER -->
+    <div class="cat-header">
+        <div class="cat-title">Categorías</div>
+
+        <div class="cat-header-right">
+            <a asp-controller="Inventario" asp-action="Index" class="btn btn-dark cat-btn">
+                Inventario
+            </a>
+
+            <button type="button" class="btn btn-danger cat-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalNuevaCategoria">
+                ＋ Nueva categoría
+            </button>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="cat-stats">
+        <div class="cat-card">
+            <div>Total</div>
+            <strong>@total</strong>
+        </div>
+        <div class="cat-card">
+            <div>Activas</div>
+            <strong>@activas</strong>
+        </div>
+        <div class="cat-card">
+            <div>Inactivas</div>
+            <strong>@inactivas</strong>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="cat-filters">
+        <input id="catSearch"
+               class="form-control cat-input"
+               placeholder="Buscar categoría..."
+               oninput="applyCatFilters()" />
+
+        <select id="estadoFilter"
+                class="form-select cat-input"
+                onchange="applyCatFilters()">
+            <option value="all">Todas</option>
+            <option value="active">Activas</option>
+            <option value="inactive">Inactivas</option>
+        </select>
+
+        <button class="btn btn-outline-dark cat-btn"
+                type="button"
+                onclick="clearCatFilters()">
+            Limpiar
+        </button>
+    </div>
+
+    <!-- TABLA -->
+    <div class="cat-table-wrap">
+        <table class="table cat-table m-0">
+            <thead>
+                <tr>
+                    <th style="width:80px;">ID</th>
+                    <th>Nombre</th>
+                    <th style="width:140px;">Estado</th>
+                    <th style="width:120px;">Editar</th>
+                    <th style="width:150px;">Toggle</th>
+                </tr>
+            </thead>
+
+            <tbody id="catTbody">
+                @if (!categorias.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No hay categorías registradas.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var c in categorias)
+                    {
+                        var isActive = c.Estado == true;
+
+                        <tr class="cat-row"
+                            data-name="@(c.Nombre ?? "")"
+                            data-state="@(isActive ? "active" : "inactive")">
+
+                            <td>@c.IdCategoria</td>
+
+                            <td class="text-start">
+                                <strong>@c.Nombre</strong>
+                            </td>
+
+                            <td>
+                                @if (isActive)
+                                {
+                                    <span class="cat-pill cat-pill-ok">Activa</span>
+                                }
+                                else
+                                {
+                                    <span class="cat-pill cat-pill-danger">Inactiva</span>
+                                }
+                            </td>
+
+                            <!-- EDITAR -->
+                            <td>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-dark cat-mini-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEditarCategoria"
+                                        data-id="@c.IdCategoria"
+                                        data-nombre="@c.Nombre">
+                                    Editar
+                                </button>
+                            </td>
+
+                            <!-- TOGGLE -->
+                            <td>
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input cat-switch"
+                                           type="checkbox"
+                                           data-id="@c.IdCategoria"
+                                           data-name="@c.Nombre"
+                                           @(isActive ? "checked" : "") />
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>Id</th>
-            <th>Nombre</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var c in Model)
-        {
-            <tr>
-                <td>@c.IdCategoria</td>
-                <td>@c.Nombre</td>
-                <td>@(c.Estado == true ? "Activa" : "Inactiva")</td>
-                <td>
-                    @if (c.Estado == true)
-                    {
-                        <form asp-action="Desactivar" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@c.IdCategoria" />
-                            <button class="btn btn-sm btn-dark" type="submit">Desactivar</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form asp-action="Activar" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@c.IdCategoria" />
-                            <button class="btn btn-sm btn-danger" type="submit">Activar</button>
-                        </form>
-                    }
-                </td>
-            </tr>
+<!-- FORM ACTIVAR -->
+<form id="formActivar" asp-action="Activar" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="idActivar" />
+</form>
+
+<!-- FORM DESACTIVAR -->
+<form id="formDesactivar" asp-action="Desactivar" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="idDesactivar" />
+</form>
+
+<!-- MODAL CREAR -->
+<div class="modal fade" id="modalNuevaCategoria" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content cat-modal">
+            <div class="modal-header cat-modal-header">
+                <h5 class="modal-title">Nueva categoría</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input name="Nombre"
+                           class="form-control cat-input"
+                           placeholder="Ej: Frenos..."
+                           required />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal fade" id="modalEditarCategoria" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content cat-modal">
+            <div class="modal-header cat-modal-header">
+                <h5 class="modal-title">Editar categoría</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="IdCategoria" id="editIdCategoria" />
+
+                <div class="modal-body">
+                    <input name="Nombre"
+                           id="editNombre"
+                           class="form-control cat-input"
+                           required />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function applyCatFilters() {
+        const q = document.getElementById('catSearch').value.toLowerCase();
+        const estado = document.getElementById('estadoFilter').value;
+
+        document.querySelectorAll('#catTbody .cat-row').forEach(r => {
+            const name = r.dataset.name.toLowerCase();
+            const state = r.dataset.state;
+
+            const matchSearch = !q || name.includes(q);
+            const matchState =
+                estado === 'all' ||
+                (estado === 'active' && state === 'active') ||
+                (estado === 'inactive' && state === 'inactive');
+
+            r.style.display = (matchSearch && matchState) ? '' : 'none';
+        });
+    }
+
+    function clearCatFilters() {
+        document.getElementById('catSearch').value = '';
+        document.getElementById('estadoFilter').value = 'all';
+        applyCatFilters();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Rellenar modal editar
+        const editModal = document.getElementById('modalEditarCategoria');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('editIdCategoria').value = button.dataset.id;
+            document.getElementById('editNombre').value = button.dataset.nombre;
+        });
+
+        // Toggle
+        document.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('cat-switch')) return;
+
+            const id = e.target.dataset.id;
+            const nombre = e.target.dataset.name;
+            const checked = e.target.checked;
+
+            Swal.fire({
+                title: checked ? "Activar categoría" : "Desactivar categoría",
+                html: `¿Deseas ${checked ? "activar" : "desactivar"} <b>${nombre}</b>?`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#d32f2f",
+                cancelButtonColor: "#222",
+                confirmButtonText: "Sí",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    e.target.checked = !checked;
+                    return;
+                }
+
+                if (checked) {
+                    document.getElementById('idActivar').value = id;
+                    document.getElementById('formActivar').submit();
+                } else {
+                    document.getElementById('idDesactivar').value = id;
+                    document.getElementById('formDesactivar').submit();
+                }
+            });
+        });
+
+        // Alerts de TempData
+        const okCreate = '@(TempData["CatCreateOk"] ?? "")';
+        const okEdit = '@(TempData["CatEditOk"] ?? "")';
+
+        if (okCreate)
+            Swal.fire({ icon: 'success', title: okCreate, timer: 1400, showConfirmButton: false });
+
+        if (okEdit)
+            Swal.fire({ icon: 'success', title: okEdit, timer: 1400, showConfirmButton: false });
+    });
+</script>
+
+<style>
+    .cat-shell {
+        padding: 18px 18px 28px;
+    }
+
+    /* Header pro */
+    .cat-header {
+        position: sticky;
+        top: 64px;
+        z-index: 5;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .cat-title {
+        color: #d32f2f;
+        font-weight: 900;
+        font-size: 1.9rem;
+        line-height: 1.1;
+    }
+
+    .cat-header-right {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    /* Buttons */
+    .cat-btn {
+        border-radius: 12px;
+        font-weight: 900;
+        padding: .55rem 1rem;
+    }
+
+    .btn-danger {
+        background: #d32f2f !important;
+        border: none !important;
+    }
+
+        .btn-danger:hover {
+            background: #b71c1c !important;
         }
-    </tbody>
-</table>
+
+    .btn-dark {
+        background: #222 !important;
+        border: none !important;
+    }
+
+        .btn-dark:hover {
+            background: #444 !important;
+        }
+
+    .btn-outline-dark {
+        border-radius: 12px;
+        font-weight: 900;
+    }
+
+    /* Stats row pro */
+    .cat-stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    @@media (min-width: 768px) {
+        .cat-stats {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .cat-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
+        padding: 14px 16px;
+    }
+
+        .cat-card div {
+            color: #6c757d;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+
+        .cat-card strong {
+            display: block;
+            margin-top: 2px;
+            color: #111;
+            font-weight: 900;
+            font-size: 1.7rem;
+        }
+
+    /* Filters as card */
+    .cat-filters {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
+        padding: 14px 16px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        align-items: end;
+        margin-bottom: 14px;
+    }
+
+    @@media (min-width: 992px) {
+        .cat-filters {
+            grid-template-columns: 1.2fr .6fr auto;
+        }
+    }
+
+    .cat-input {
+        border-radius: 12px;
+        border-color: rgba(0,0,0,.15);
+        padding: .6rem .85rem;
+    }
+
+        .cat-input:focus {
+            border-color: rgba(211,47,47,.45);
+            box-shadow: 0 0 0 .2rem rgba(211,47,47,.12);
+        }
+
+    /* Table wrap pro */
+    .cat-table-wrap {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .cat-table thead th {
+        background: #111;
+        color: #fff;
+        border: none;
+        text-align: center;
+        padding: 14px 12px;
+        font-weight: 900;
+    }
+
+    .cat-table tbody td {
+        border-color: rgba(0,0,0,.06);
+        vertical-align: middle;
+        padding: 14px 12px;
+        text-align: center;
+    }
+
+    .cat-row:hover {
+        background: #fafafa;
+    }
+
+    /* Pills */
+    .cat-pill {
+        padding: .35rem .7rem;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: .8rem;
+        border: 1px solid transparent;
+        display: inline-block;
+        min-width: 92px;
+    }
+
+    .cat-pill-ok {
+        background: rgba(25,135,84,.12);
+        color: #146c43;
+        border-color: rgba(25,135,84,.25);
+    }
+
+    .cat-pill-danger {
+        background: rgba(211,47,47,.12);
+        color: #b71c1c;
+        border-color: rgba(211,47,47,.25);
+    }
+
+    /* Edit button */
+    .cat-mini-btn {
+        border-radius: 10px;
+        font-weight: 900;
+        padding: .35rem .7rem;
+    }
+
+    /* Switch */
+    .form-check-input.cat-switch {
+        width: 52px;
+        height: 26px;
+        cursor: pointer;
+    }
+
+        .form-check-input.cat-switch:checked {
+            background-color: #d32f2f;
+            border-color: #d32f2f;
+        }
+
+        .form-check-input.cat-switch:focus {
+            box-shadow: 0 0 0 .2rem rgba(211,47,47,.15);
+            border-color: rgba(211,47,47,.45);
+        }
+
+    /* Modal */
+    .cat-modal {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,.08);
+    }
+
+    .cat-modal-header {
+        background: #d32f2f;
+        color: #fff;
+        border: none;
+    }
+</style>
