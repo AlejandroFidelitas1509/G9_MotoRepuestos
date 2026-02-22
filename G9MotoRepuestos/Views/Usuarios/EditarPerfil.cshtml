@@ -1,99 +1,128 @@
 ﻿@model G9MotoRepuestos.Models.Usuario
 @{
-    ViewData["Title"] = "Editar Perfil";
-    var userRole = User.Claims.FirstOrDefault(c => c.Type == "Role" || c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
-    bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
+    ViewData["Title"] = "Editar Perfil | Moto Repuestos Rojas";
 }
 
+@* Importación de Oswald *@
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="~/css/usuarios/EditarPerfil.css" asp-append-version="true" />
 
-<div class="edit-page-wrapper">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow-lg card-editar-perfil">
+<div class="contenedor-perfil-full">
+    <div class="tarjeta-registro shadow-lg">
 
-                    <div class="profile-header-edit">
-                        <h4 class="mb-0 fw-bold text-white">CONFIGURACIÓN DE PERFIL</h4>
+        @* Encabezado Estilo Rojas *@
+        <div class="encabezado-estilo-rojas">
+            <h2 class="titulo-oswald">CONFIGURACIÓN DE PERFIL</h2>
+            <p class="subtitulo-oswald">MOTO REPUESTOS ROJAS</p>
+        </div>
+
+        <div class="cuerpo-tarjeta">
+            <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                @* Campos Ocultos Vitales *@
+                <input type="hidden" asp-for="IdUsuario" />
+                <input type="hidden" asp-for="IdRol" />
+                <input type="hidden" asp-for="Estado" />
+
+                @* Sección de Foto Editable *@
+                <div class="seccion-foto-perfil">
+                    <div class="marco-foto-circular shadow position-relative">
+                        <img id="imgPreview"
+                             src="@(string.IsNullOrEmpty(Model.ImagenURL) ? "/images/default-avatar.png" : Model.ImagenURL)"
+                             class="foto-renderizada" />
+
+                        <label for="fotoArchivo" class="btn-cambiar-foto" title="Cambiar Foto">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" name="fotoArchivo" id="fotoArchivo" hidden accept="image/*" onchange="previewImage(event)" />
+                        </label>
+                    </div>
+                    <p class="text-muted small fw-bold mt-2">TOQUE LA CÁMARA PARA SUBIR FOTO</p>
+                </div>
+
+                @* Grid de Campos de Usuario *@
+                <div class="grid-informacion">
+
+                    <div class="campo-dato">
+                        <label class="label-rojo">NOMBRE COMPLETO</label>
+                        <input asp-for="NombreCompleto" class="input-rojas" placeholder="Ej: Juan Pérez" required />
+                        <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
                     </div>
 
-                    <div class="card-body p-4 p-md-5">
-                        <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" asp-for="IdUsuario" />
+                    <div class="campo-dato">
+                        <label class="label-rojo">CORREO ELECTRÓNICO</label>
+                        <input asp-for="Correo" type="email" class="input-rojas" placeholder="correo@ejemplo.com" required />
+                        <span asp-validation-for="Correo" class="text-danger small"></span>
+                    </div>
 
-                            @if (!esAdmin)
-                            {
-                                <input type="hidden" asp-for="IdRol" />
-                                <input type="hidden" asp-for="Estado" />
-                            }
+                    <div class="campo-dato">
+                        <label class="label-rojo">TELÉFONO</label>
+                        <input asp-for="Telefono" class="input-rojas" placeholder="8888-8888" />
+                    </div>
 
-                            <div class="text-center mb-4">
-                                <div class="position-relative d-inline-block profile-avatar-container">
-                                    <img id="imgPreview" src="@(string.IsNullOrEmpty(Model.ImagenURL) ? "/images/default-avatar.png" : Model.ImagenURL)"
-                                         class="preview-img shadow" style="width: 130px; height: 130px; object-fit: cover;" />
-
-                                    <div class="drop-zone" id="dropZone">
-                                        <i class="fas fa-camera text-muted small"></i>
-                                        <p class="mb-0 small text-muted fw-bold">Cambiar foto</p>
-                                        <input type="file" name="fotoArchivo" id="fotoArchivo" hidden accept="image/*" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="label-small fw-bold text-muted">NOMBRE COMPLETO</label>
-                                    <input asp-for="NombreCompleto" class="form-control rounded-pill px-3" required />
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="label-small fw-bold text-muted">CORREO ELECTRÓNICO</label>
-                                    <input asp-for="Correo" type="email" class="form-control rounded-pill px-3" required />
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <label class="label-small fw-bold text-muted">TELÉFONO</label>
-                                    <input asp-for="Telefono" class="form-control rounded-pill px-3" />
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <label class="label-small fw-bold text-muted">NUEVA CONTRASEÑA</label>
-                                    <input name="NuevaPassword" type="password" class="form-control rounded-pill px-3" placeholder="Omitir para no cambiar" />
-                                </div>
-
-                                @if (esAdmin)
-                                {
-                                    <div class="col-sm-6">
-                                        <label class="label-small fw-bold text-muted">ROL</label>
-                                        <select asp-for="IdRol" class="form-select rounded-pill px-3" asp-items="ViewBag.Roles"></select>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <label class="label-small fw-bold text-muted">ESTADO</label>
-                                        <select asp-for="Estado" class="form-select rounded-pill px-3">
-                                            <option value="true">Activo</option>
-                                            <option value="false">Inactivo</option>
-                                        </select>
-                                    </div>
-                                }
-                            </div>
-
-                            <div class="d-grid gap-2 mt-5">
-                                <button type="submit" class="btn btn-danger text-white fw-bold py-2 rounded-pill shadow">
-                                    <i class="fas fa-save me-2"></i>GUARDAR CAMBIOS
-                                </button>
-                                <a asp-action="Perfil" class="btn btn-link text-muted text-decoration-none small">
-                                    Cancelar y volver
-                                </a>
-                            </div>
-                        </form>
+                    @* CAMPO DE NUEVA CONTRASEÑA CON OJITO *@
+                    <div class="campo-dato">
+                        <label class="label-rojo">NUEVA CONTRASEÑA (OPCIONAL)</label>
+                        <div class="posicion-relativa">
+                            <input name="NuevaPassword" id="inputPass" type="password"
+                                   class="input-rojas" placeholder="Dejar en blanco para no cambiar"
+                                   autocomplete="new-password" />
+                            <button type="button" onclick="toggleEditPass()" class="btn-ojo-edit">
+                                <i id="iconoOjo" class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            Solo rellene este campo si desea cambiar su clave actual.
+                        </small>
                     </div>
                 </div>
-            </div>
+
+                @* Botones de Acción *@
+                <div class="seccion-botones mt-4">
+                    <button type="submit" class="btn-rojo-rojas border-0 shadow-sm">
+                        <i class="fas fa-save me-2"></i>GUARDAR CAMBIOS
+                    </button>
+                    <a asp-action="VerPerfil" class="btn-negro-rojas shadow-sm">
+                        CANCELAR
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/usuarios/EditarPerfil.js" asp-append-version="true"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Función para mostrar/ocultar la contraseña
+        function toggleEditPass() {
+            const input = document.getElementById("inputPass");
+            const icono = document.getElementById("iconoOjo");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icono.classList.remove("fa-eye");
+                icono.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icono.classList.remove("fa-eye-slash");
+                icono.classList.add("fa-eye");
+            }
+        }
+
+        // Vista previa inmediata de la imagen seleccionada
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('imgPreview');
+                output.src = reader.result;
+            };
+            if(event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
 }

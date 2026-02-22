@@ -9,6 +9,7 @@ using MR.Abstracciones.AccesoADatos.Productos;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
 using MR.Abstracciones.AccesoADatos.Bitacora;
 using MR.Abstracciones.LogicaDeNegocio.Bitacora;
+using G9MotoRepuestos.Services; 
 using MR.AccesoDatos.Categorias;
 using MR.LogicaNegocio.Categorias;
 using MR.Abstracciones.AccesoADatos.Categorias;
@@ -21,7 +22,7 @@ using MR.AccesoDatos;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CONFIGURACI�N DE BASE DE DATOS ---
+// --- CONFIGURACIÓN DE BASE DE DATOS ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -30,8 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// --- SISTEMA DE AUTENTICACI�N (Tu Login con Cookies) ---
-// Quitamos el Identity por defecto para que no choque con tu l�gica
+// --- SISTEMA DE AUTENTICACIÓN (Tu Login con Cookies) ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -44,8 +44,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddControllersWithViews();
 
-// --- INYECCI�N DE DEPENDENCIAS (Arquitectura por capas) ---
-// Bit�cora
+// --- INYECCIÓN DE DEPENDENCIAS (Arquitectura por capas) ---
+
+// Servicio de Correo (Agregado para recuperación de contraseña)
+builder.Services.AddScoped<EmailService>();
+
+// Bitácora
 
 builder.Services.AddDbContext<Contexto>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -77,7 +81,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-// --- PIPELINE DE LA APLICACI�N ---
+// --- PIPELINE DE LA APLICACIÓN ---
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -89,11 +93,11 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // ? Fundamental para que se vean las fotos en wwwroot/perfiles
+app.UseStaticFiles();
 
 app.UseRouting();
 
-// ? El orden es Sagrado: Autenticaci�n antes que Autorizaci�n
+// El orden es Sagrado: Autenticación antes que Autorización
 app.UseAuthentication();
 app.UseAuthorization();
 

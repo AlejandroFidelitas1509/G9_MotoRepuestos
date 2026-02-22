@@ -1,4 +1,5 @@
-﻿<link rel="stylesheet" href="~/css/catalogo/Catalogo.css" asp-append-version="true" />
+﻿<link rel="stylesheet" href="~/css/Home/Catalogo.css" asp-append-version="true" />
+
 @{
     ViewData["Title"] = "Catalogo | Moto Repuestos Rojas";
     bool esPersonalTaller = User.HasClaim(c => c.Type == "Role" && (c.Value == "Admin" || c.Value == "Vendedor"));

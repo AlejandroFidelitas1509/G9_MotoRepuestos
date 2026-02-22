@@ -1,9 +1,8 @@
-/* CONTENEDOR PRINCIPAL */
+/* CONTENEDOR PRINCIPAL - FONDO FACHADA */
 .contenedor-perfil-full {
     background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('/images/FachadaLocal.jpeg');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -11,14 +10,17 @@
     padding: 40px 20px;
 }
 
+/* TARJETA PROFESIONAL */
 .tarjeta-registro {
     background: #ffffff;
     width: 100%;
-    max-width: 550px; /* Un poco más angosto para que se vea ordenado */
+    max-width: 550px;
     border-radius: 12px;
     overflow: hidden;
+    border: none;
 }
 
+/* ENCABEZADO ESTILO ROJAS */
 .encabezado-estilo-rojas {
     background: #212121;
     color: #ffffff;
@@ -33,24 +35,27 @@
     letter-spacing: 2px;
     font-weight: 700;
     margin: 0;
+    font-size: 1.6rem;
 }
 
 .subtitulo-oswald {
     font-family: 'Oswald', sans-serif;
     color: #d32f2f;
     font-size: 0.9rem;
+    margin: 5px 0 0 0;
+    letter-spacing: 1px;
 }
 
 .cuerpo-tarjeta {
     padding: 30px 40px;
 }
 
-/* FOTO EDITABLE */
+/* SECCIÓN FOTO CIRCULAR */
 .seccion-foto-perfil {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .marco-foto-circular {
@@ -58,66 +63,76 @@
     height: 130px;
     border-radius: 50%;
     border: 5px solid #f8f9fa;
+    overflow: hidden;
     background: #212121;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
 }
 
 .foto-renderizada {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     object-fit: cover;
 }
 
-.btn-cambiar-foto {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
+.badge-rol-rojas {
     background: #d32f2f;
-    color: white;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 3px solid white;
-    transition: 0.3s;
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    padding: 5px 20px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
-/* INPUTS ESTILO ROJAS */
+/* GRILLA DE DATOS */
+.grid-informacion {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .label-rojo {
     font-family: 'Oswald', sans-serif;
     color: #d32f2f;
     font-weight: 700;
     font-size: 0.8rem;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
 }
 
-.input-rojas {
-    width: 100%;
+.valor-dato {
+    background: #f8f9fa;
     padding: 12px 15px;
-    border: 1px solid #ddd;
     border-left: 5px solid #212121;
     border-radius: 4px;
-    background: #fdfdfd;
-    margin-bottom: 15px;
-    outline: none;
+    font-size: 1.05rem;
+    color: #333;
+    font-weight: 500;
 }
 
-.posicion-relativa {
-    position: relative;
+/* ESTILOS PARA CONTRASEÑA */
+.texto-password {
+    letter-spacing: 2px;
+    font-family: 'Roboto', Arial, sans-serif;
 }
 
-.btn-ojo-edit {
-    position: absolute;
-    right: 15px;
-    top: 12px;
-    background: none;
+.btn-ver-pass {
+    background: transparent;
     border: none;
-    color: #888;
+    color: #212121;
     cursor: pointer;
+    padding: 0;
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+
+.btn-ver-pass:hover {
+    color: #d32f2f;
 }
 
 /* BOTONES */
@@ -125,6 +140,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
+    margin-top: 30px;
 }
 
 .btn-rojo-rojas, .btn-negro-rojas {
@@ -136,22 +152,11 @@
     border-radius: 6px;
     color: #fff !important;
     text-transform: uppercase;
-    transition: 0.3s;
+    transition: all 0.3s ease;
 }
 
-.btn-rojo-rojas {
-    background: #d32f2f;
-    border: none;
-}
+.btn-rojo-rojas { background: #d32f2f; }
+.btn-negro-rojas { background: #212121; }
 
-.btn-negro-rojas {
-    background: #212121;
-}
-
-.btn-rojo-rojas:hover {
-    background: #212121;
-}
-
-.btn-negro-rojas:hover {
-    background: #d32f2f;
-}
+.btn-rojo-rojas:hover { background: #212121; transform: translateY(-2px); }
+.btn-negro-rojas:hover { background: #d32f2f; transform: translateY(-2px); }
