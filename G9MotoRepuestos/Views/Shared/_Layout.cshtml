@@ -59,6 +59,9 @@
                                 <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>
                             }
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
+                        </li>
                     </ul>
 
                     @if (!esPersonalAdmin)
@@ -140,6 +143,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
