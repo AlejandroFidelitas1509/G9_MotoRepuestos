@@ -13,17 +13,47 @@
                     </div>
                     <h2 class="fw-bold text-white">Bienvenido</h2>
                     <p class="text-light-muted small">Acceso para clientes y personal</p>
-                </div>               
+                </div>
+
+                @* --- BLOQUE DE ALERTAS PARA MENSAJES --- *@
+                @if (TempData["Mensaje"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show rounded-pill small py-2 mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> @TempData["Mensaje"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (ViewBag.Error != null || TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show rounded-pill small py-2 mb-4" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> @(ViewBag.Error ?? TempData["Error"])
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @* --------------------------------------- *@
 
                 <form asp-action="Login" asp-controller="Usuarios" method="post">
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-white">Correo Electrónico</label>
                         <input type="email" name="correo" class="form-control rounded-pill form-control-custom" placeholder="ejemplo@rojas.com" required>
                     </div>
+
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-white">Contraseña</label>
-                        <input type="password" name="password" class="form-control rounded-pill form-control-custom" placeholder="••••••••" required>
+                        <div class="position-relative">
+                            <input type="password" id="passInput" name="password" class="form-control rounded-pill form-control-custom pe-5" placeholder="••••••••" required>
+                            <button type="button" onclick="togglePassword()"
+                                    class="btn position-absolute end-0 top-50 translate-middle-y me-2 border-0 shadow-none"
+                                    style="background: none; color: #333; z-index: 10;">
+                                <i id="ojoIcono" class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
+
+                    <div class="text-end mb-3">
+                        <a asp-action="OlvidePassword" class="text-white-50 small text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    </div>
+
                     <button type="submit" class="btn btn-rojas-auth text-white w-100 rounded-pill py-2 fw-bold shadow">
                         INGRESAR
                     </button>
@@ -45,3 +75,22 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const passInput = document.getElementById("passInput");
+            const icono = document.getElementById("ojoIcono");
+
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                icono.classList.remove("fa-eye");
+                icono.classList.add("fa-eye-slash");
+            } else {
+                passInput.type = "password";
+                icono.classList.remove("fa-eye-slash");
+                icono.classList.add("fa-eye");
+            }
+        }
+    </script>
+}

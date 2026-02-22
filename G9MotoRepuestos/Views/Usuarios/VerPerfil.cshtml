@@ -1,0 +1,76 @@
+﻿@model G9MotoRepuestos.Models.Usuario
+@{
+    ViewData["Title"] = "Detalles del Perfil | Moto Repuestos Rojas";
+}
+
+@* Importación de Oswald para el estilo Racing *@
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="~/css/Usuarios/VerPerfil.css" asp-append-version="true" />
+
+<div class="contenedor-perfil-full">
+    <div class="tarjeta-registro shadow-lg">
+        @* Encabezado Negro y Rojo *@
+        <div class="encabezado-estilo-rojas">
+            <h2 class="titulo-oswald">DETALLE DE USUARIO</h2>
+            <p class="subtitulo-oswald">MOTO REPUESTOS ROJAS</p>
+        </div>
+
+        <div class="cuerpo-tarjeta">
+            @* Sección de Foto con el Badge de Rol *@
+            <div class="seccion-foto-perfil">
+                <div class="marco-foto-circular shadow">
+                    @if (!string.IsNullOrEmpty(Model.ImagenURL))
+                    {
+                        <img src="@Model.ImagenURL" alt="Foto de @Model.NombreCompleto" class="foto-renderizada" />
+                    }
+                    else
+                    {
+                        <div class="foto-placeholder">
+                            <i class="fas fa-user fa-4x text-white"></i>
+                        </div>
+                    }
+                </div>
+                <div class="badge-rol-rojas shadow-sm">@(Model.Rol?.Tipo ?? "Cliente")</div>
+            </div>
+
+            @* Información estructurada tipo Ficha Técnica *@
+            <div class="grid-informacion">
+                <div class="campo-dato">
+                    <label class="label-rojo">NOMBRE COMPLETO</label>
+                    <div class="valor-dato">@Model.NombreCompleto</div>
+                </div>
+
+                <div class="campo-dato">
+                    <label class="label-rojo">CORREO ELECTRÓNICO</label>
+                    <div class="valor-dato">@Model.Correo</div>
+                </div>
+
+                <div class="campo-dato">
+                    <label class="label-rojo">TELÉFONO / WHATSAPP</label>
+                    <div class="valor-dato">@(string.IsNullOrEmpty(Model.Telefono) ? "No registrado" : Model.Telefono)</div>
+                </div>
+
+                @* ESTADO DE SEGURIDAD (Reemplaza al campo de contraseña) *@
+                <div class="campo-dato">
+                    <label class="label-rojo">Contraseña</label>
+                    <div class="valor-dato d-flex align-items-center">
+                        <span class="text-success fw-bold">
+                            <i class="fas fa-shield-alt me-2"></i> Contraseña encriptada
+                        </span>
+                    </div>
+                    <small class="text-muted" style="font-size: 0.7rem;">Su clave está protegida por cifrado de alta seguridad.</small>
+                </div>
+            </div>
+
+            @* Botones con estilo de la paleta oficial *@
+            <div class="seccion-botones">
+                <a asp-action="EditarPerfil" asp-route-id="@Model.IdUsuario" class="btn-rojo-rojas">
+                    <i class="fas fa-user-edit me-2"></i>MODIFICAR PERFIL
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn-negro-rojas">
+                    <i class="fas fa-home me-2"></i>VOLVER AL INICIO
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,6 +9,7 @@ using MR.Abstracciones.AccesoADatos.Productos;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
 using MR.Abstracciones.AccesoADatos.Bitacora;
 using MR.Abstracciones.LogicaDeNegocio.Bitacora;
+using G9MotoRepuestos.Services; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // --- SISTEMA DE AUTENTICACIÓN (Tu Login con Cookies) ---
-// Quitamos el Identity por defecto para que no choque con tu lógica
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -36,6 +36,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddControllersWithViews();
 
 // --- INYECCIÓN DE DEPENDENCIAS (Arquitectura por capas) ---
+
+// Servicio de Correo (Agregado para recuperación de contraseña)
+builder.Services.AddScoped<EmailService>();
+
 // Bitácora
 builder.Services.AddScoped<IBitacoraProductosAD>(_ => new BitacoraProductosAD(connectionString));
 builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
@@ -58,11 +62,11 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // ? Fundamental para que se vean las fotos en wwwroot/perfiles
+app.UseStaticFiles();
 
 app.UseRouting();
 
-// ? El orden es Sagrado: Autenticación antes que Autorización
+// El orden es Sagrado: Autenticación antes que Autorización
 app.UseAuthentication();
 app.UseAuthorization();
 

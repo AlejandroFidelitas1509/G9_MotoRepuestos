@@ -16,34 +16,13 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @* ORDEN IMPORTANTE: 1. Paleta, 2. Estilos que usan la paleta *@
+    <link rel="stylesheet" href="~/css/paleta/Colores.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Layout.css" asp-append-version="true" />
-
-    <style>
-        .bg-rojas {
-            background-color: #CC0000 !important;
-        }
-
-        .font-main {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            z-index: 2000 !important;
-        }
-
-        .offcanvas {
-            z-index: 3000 !important;
-        }
-
-        /* Estilo para el botón de registro sin borde */
-        .btn-registro-fix {
-            border: none !important;
-            outline: none !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
+
 <body class="d-flex flex-column min-vh-100 font-main">
 
     <header>
