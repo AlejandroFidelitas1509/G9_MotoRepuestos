@@ -1,14 +1,16 @@
-/* ==========================================================================
-   LAYOUT.CSS - Estructura Global (Fuente Única: OSWALD)
-   ========================================================================== */
-
-/* IMPORTAR OSWALD (Pesos: 300, 400, 700) */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap');
 
+:root {
+    --rojo-rojas: #B01E1E;
+    --primary-red: #d32f2f;
+    --dark-black: #212121;
+    --light-white: #f5f5f5;
+    --font-main: 'Oswald', sans-serif;
+}
+
 html {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+    min-height: 100%;
+    position: relative;
 }
 
 body {
@@ -17,111 +19,118 @@ body {
     flex-direction: column;
     margin: 0;
     padding: 0;
-    background-color: var(--bg-main);
+    background-color: #f8f9fa;
     font-family: var(--font-main) !important;
-    font-weight: 400;
-    color: var(--text-header);
-    line-height: 1.5;
     overflow-x: hidden;
 }
 
-/* CONTENEDOR PRINCIPAL: Permite scroll y empuja al footer */
 main {
     flex: 1 0 auto;
-    background-color: var(--bg-main);
     width: 100%;
-    display: block; /* Evita conflictos de flexbox en el contenido */
 }
 
-/* TIPOGRAFÍA GLOBAL */
-h1, h2, h3, h4, h5, h6, .navbar-brand, .nav-link, .btn, input, span, p {
-    font-family: var(--font-main) !important;
-}
-
-h1, h2, h3, h4, h5, h6, .navbar-brand {
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* NAVEGACIÓN (NAVBAR) */
 .bg-rojas {
     background-color: var(--primary-red) !important;
 }
 
-.navbar-brand {
-    font-size: 1.4rem;
-    letter-spacing: 1.5px;
-}
-
 .nav-link {
-    font-weight: 400;
+    transition: all 0.3s ease !important;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: 0.3s;
 }
 
-    .nav-link:hover {
-        color: #ffca28 !important;
-    }
-
-/* MENÚ LATERAL (SIDEBAR) */
-.offcanvas {
-    background-color: var(--dark-black) !important;
+.nav-link:hover {
+    color: #ffca28 !important;
+    transform: scale(1.05);
+    text-shadow: 0 0 10px rgba(255, 202, 40, 0.5);
 }
 
-.sidebar-link {
-    text-transform: uppercase;
-    transition: all 0.3s;
+#menuCategorias {
+    background-color: #212121 !important;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.5);
 }
 
-    .sidebar-link:hover {
-        background-color: var(--primary-red) !important;
-        color: white !important;
-        padding-left: 1.5rem;
-    }
-
-.logo-navbar {
-    object-fit: contain;
-    border-radius: 50%;
-    background-color: white;
-    padding: 2px;
+#menuCategorias .list-group-item {
+    background-color: transparent !important;
+    color: white !important;
+    border-color: rgba(255,255,255,0.1) !important;
+    transition: all 0.3s ease-in-out !important;
+    position: relative;
 }
 
-/* FOOTER */
+#menuCategorias .list-group-item:hover {
+    background-color: var(--primary-red) !important;
+    color: white !important;
+    padding-left: 2rem !important;
+    box-shadow: inset 6px 0 0px #ffca28, 0 0 15px rgba(176, 30, 30, 0.5) !important;
+    border-color: transparent !important;
+    z-index: 10;
+}
+
+.product-card-hover, .product-card-client {
+    transition: all 0.3s ease-in-out !important;
+}
+
+.product-card-hover:hover, .product-card-client:hover {
+    transform: translateY(-10px) !important;
+    box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3) !important; 
+    border: 1px solid var(--primary-red) !important;
+}
+
 footer {
-    flex-shrink: 0;
-    background-color: var(--dark-black) !important;
+    background-color: #212121 !important;
     border-top: 4px solid var(--primary-red) !important;
     color: white;
     padding: 2rem 0;
-}
-
-.footer-link:hover {
-    color: var(--primary-red) !important;
-    padding-left: 5px;
-    transition: all 0.3s ease;
+    margin-top: auto;
 }
 
 .social-icon-sm {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
+    transition: all 0.3s ease !important;
     display: inline-flex;
+    text-decoration: none;
+}
+
+.social-icon-sm:hover {
+    transform: translateY(-5px) rotate(10deg) !important;
+    filter: drop-shadow(0 0 8px var(--primary-red)); 
+    color: white !important;
+}
+
+.btn-danger {
+    transition: all 0.3s ease !important;
+}
+
+.btn-danger:hover {
+    box-shadow: 0 0 15px rgba(211, 47, 47, 0.6) !important;
+    filter: brightness(1.2) !important;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.2) !important;
+    box-shadow: 0 0 20px #25d366 !important;
+}
+
+.chat-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 105px;
+    right: 30px;
+    background-color: var(--primary-red);
+    color: #FFF;
+    border-radius: 50px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    transition: 0.3s;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: white;
+    font-size: 30px;
+    z-index: 1000;
+    transition: all 0.3s ease !important;
+    border: none;
+    cursor: pointer;
 }
 
-    .social-icon-sm:hover {
-        transform: translateY(-5px);
-        background-color: var(--primary-red);
-        border-color: var(--primary-red);
+    .chat-float:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 0 20px rgba(211, 47, 47, 0.8) !important;
+        color: white;
     }
-
-/* UTILIDADES */
-.text-danger {
-    color: var(--primary-red) !important;
-}

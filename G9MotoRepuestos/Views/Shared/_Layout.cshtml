@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-    @* ORDEN IMPORTANTE: 1. Paleta, 2. Estilos que usan la paleta *@
     <link rel="stylesheet" href="~/css/paleta/Colores.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -81,23 +80,39 @@
         </nav>
     </header>
 
-    @* MENÚ LATERAL *@
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="menuCategorias"
+         style="background-color: #212121 !important; color: white !important;">
 
-    <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="menuCategorias">
         <div class="offcanvas-header border-bottom border-secondary py-3">
-            <h5 class="offcanvas-title fw-bold text-danger"><i class="fas fa-motorcycle me-2"></i> PRODUCTOS</h5>
+            <h5 class="offcanvas-title fw-bold text-danger" style="font-family: 'Oswald', sans-serif !important;">
+                <i class="fas fa-motorcycle me-2"></i> PRODUCTOS
+            </h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
+
         <div class="offcanvas-body p-0 d-flex flex-column">
             <div class="list-group list-group-flush flex-grow-1">
-                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Motor" class="list-group-item list-group-item-action bg-dark text-white py-3 sidebar-link border-secondary border-bottom">Repuestos de Motor</a>
-                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Accesorios" class="list-group-item list-group-item-action bg-dark text-white py-3 sidebar-link border-secondary border-bottom">Accesorios</a>
-                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Aceites" class="list-group-item list-group-item-action bg-dark text-white py-3 sidebar-link border-secondary">Aceites y Lubricantes</a>
+                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Motor"
+                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important; transition: 0.3s;">
+                    Repuestos de Motor
+                </a>
+                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Accesorios"
+                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important; transition: 0.3s;">
+                    Accesorios
+                </a>
+                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Aceites"
+                   class="list-group-item list-group-item-action py-3 border-secondary"
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important; transition: 0.3s;">
+                    Aceites y Lubricantes
+                </a>
             </div>
 
-            @* SECCIÓN SOBRE NOSOTROS RESTAURADA *@
-            <div class="sidebar-footer p-3 border-top border-secondary mt-auto">
-                <a asp-controller="Home" asp-action="Nosotros" class="list-group-item list-group-item-action bg-dark text-white sidebar-link border-0 rounded">
+            <div class="sidebar-footer p-3 border-top border-secondary mt-auto" style="background-color: rgba(0,0,0,0.3) !important;">
+                <a asp-controller="Home" asp-action="Nosotros"
+                   class="list-group-item list-group-item-action border-0 rounded"
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
                     <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
                 </a>
             </div>
@@ -108,7 +123,6 @@
         @RenderBody()
     </main>
 
-    @* FOOTER RESTAURADO CON TU DISEÑO ORIGINAL *@
     <footer class="bg-dark text-white pt-4 pb-2 border-top border-danger border-4 mt-auto">
         <div class="container">
             <div class="row align-items-center">
@@ -137,9 +151,43 @@
         </div>
     </footer>
 
+    <div class="offcanvas offcanvas-end border-0 shadow-lg rounded-start-4" tabindex="-1" id="offcanvasChat">
+        <div class="offcanvas-header bg-dark text-white py-4">
+            <h5 class="offcanvas-title fw-bold"><i class="fas fa-robot text-danger me-2"></i>Asistente Rojas</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column bg-light">
+            <div class="flex-grow-1 overflow-auto p-3" id="chatMessages">
+                <div class="text-center text-muted small mb-3">Hoy</div>
+                <div class="d-flex mb-3">
+                    <div class="bg-white p-3 rounded-3 shadow-sm border-start border-danger border-3" style="max-width: 85%;">
+                        <p class="mb-0 small">¡Hola! Bienvenido a Moto Repuestos Rojas. ¿En qué te puedo ayudar hoy?</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top pt-3 mt-auto">
+                <form id="chatForm" class="d-flex bg-white p-1 rounded-pill shadow-sm border">
+                    <input type="text" id="chatInput" class="form-control border-0 bg-transparent ms-2 shadow-none" placeholder="Escribe un mensaje...">
+                    <button type="submit" class="btn btn-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <button id="btnAbrirChat" class="chat-float shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat" aria-label="Abrir Chat">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/chatbox/ChatBox.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,8 +1,7 @@
 /* ================================================= */
-/* CATALOGO.CSS - Moto Repuestos Rojas               */
+/* CATALOGO.CSS - CORREGIDO                          */
 /* ================================================= */
 
-/* --- Animaciones --- */
 .fade-in {
     animation: fadeIn 0.8s ease-in-out;
 }
@@ -19,7 +18,6 @@
     }
 }
 
-/* --- Panel de Control (Admin/Vendedor) --- */
 .card-hover {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
@@ -40,7 +38,6 @@
     transform: scale(1.1);
 }
 
-/* Colores de soporte para el Panel */
 .bg-light-danger {
     background-color: #ffebee;
 }
@@ -57,19 +54,14 @@
     background-color: #fff8e1;
 }
 
-/* --- Filtros y Categorías --- */
-.list-group-item-action {
-    font-family: var(--font-body);
-    transition: all 0.2s ease;
+/* FILTROS LATERALES (Solo los que están en la página, no en el menú) */
+.col-lg-3 .list-group-item-action:hover {
+    color: var(--primary-red) !important;
+    background-color: #f8f9fa !important;
+    padding-left: 20px !important;
 }
 
-    .list-group-item-action:hover {
-        color: var(--primary-red) !important;
-        background-color: var(--bg-main) !important;
-        padding-left: 20px !important;
-    }
-
-/* --- Tarjetas de Producto (Cliente) --- */
+/* PRODUCTOS */
 .product-card-client {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(0,0,0,0.05) !important;
@@ -82,7 +74,6 @@
         border-color: var(--primary-red) !important;
     }
 
-    /* El contenedor del ícono/imagen */
     .product-card-client .bg-light {
         transition: all 0.4s ease;
         background-color: #f8f9fa !important;
@@ -98,63 +89,21 @@
         transform: rotate(-10deg) scale(1.2);
     }
 
-    /* Tipografía en Cards */
-    .product-card-client h6 {
-        font-family: var(--font-body);
-        font-weight: 500;
+/* CARRITO (Solo afecta al Offcanvas del Carrito) */
+#offcanvasCart .offcanvas-header {
+    background-color: #212121 !important;
+}
+
+#offcanvasCart .offcanvas-body {
+    background-color: #f8f9fa; /* Fondo claro para ver los productos del carrito */
+}
+
+/* AJUSTE FINAL PARA EL MENÚ LATERAL DE CATEGORÍAS */
+#menuCategorias {
+    background-color: #212121 !important;
+}
+
+    #menuCategorias .list-group-item {
+        background-color: transparent !important;
+        color: white !important;
     }
-
-    .product-card-client h5 {
-        font-family: var(--font-titles);
-        font-weight: 700;
-    }
-
-/* --- Botones y UI --- */
-.btn-outline-danger {
-    color: var(--primary-red);
-    border-color: var(--primary-red);
-    font-family: var(--font-titles);
-    text-transform: uppercase;
-}
-
-.product-card-client:hover .btn-outline-danger {
-    background-color: var(--primary-red);
-    border-color: var(--primary-red);
-    color: white;
-}
-
-.btn-danger {
-    background-color: var(--primary-red) !important;
-    border: none;
-    font-family: var(--font-titles);
-}
-
-/* --- Carrito (Offcanvas) --- */
-.offcanvas-header {
-    background-color: var(--dark-black) !important;
-}
-
-.offcanvas-body {
-    background-color: var(--bg-main);
-    font-family: var(--font-body);
-}
-
-    .offcanvas-body h3 {
-        font-family: var(--font-titles);
-    }
-
-/* --- Chatbox Assistant --- */
-#chatboxRojas {
-    z-index: 1050;
-    font-family: var(--font-body);
-}
-
-.chatbox-header {
-    background-color: var(--dark-black) !important;
-    border-radius: 10px 10px 0 0;
-}
-
-/* Ajustes de espaciado */
-.container-fluid.fade-in {
-    padding-top: 30px;
-}
