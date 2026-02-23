@@ -1,75 +1,46 @@
-﻿@{
+﻿@model List<G9MotoRepuestos.Models.Cierres>
+
+@{
     ViewData["Title"] = "Historial de Cierres Contables";
 }
 
 <div class="panel">
     <h2 class="titulo">Historial de Cierres Contables</h2>
 
-
     <div class="acciones-barra">
         <a asp-controller="Contabilidad" asp-action="Index" class="btn-volver">⮐ Volver al Menú</a>
-
         <a asp-controller="Contabilidad" asp-action="Cierres" class="btn-crear">+ Nuevo Cierre</a>
     </div>
 
     <table class="tabla">
         <thead>
             <tr>
-                <th>Fecha</th>
+                <th>Fecha Registro</th>
                 <th>Tipo</th>
-                <th>Ingresos</th>
-                <th>Egresos</th>
+                <th>Periodo</th>
                 <th>Balance</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+                <th>Acción</th>
             </tr>
         </thead>
 
         <tbody>
-            <tr>
-                <td>2025-11-30</td>
-                <td>Diario</td>
-                <td>₡125,000</td>
-                <td>₡32,000</td>
-                <td>₡93,000</td>
-                <td>Completado</td>
-                <td>
-                    <a class="accion-editar" href="#">Ver</a>
-                    <a class="accion-eliminar" href="#">Eliminar</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2025-11-29</td>
-                <td>Diario</td>
-                <td>₡110,500</td>
-                <td>₡25,000</td>
-                <td>₡85,500</td>
-                <td>Completado</td>
-                <td>
-                    <a class="accion-editar" href="#">Ver</a>
-                    <a class="accion-eliminar" href="#">Eliminar</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>2025-11-28</td>
-                <td>Semanal</td>
-                <td>₡780,000</td>
-                <td>₡220,000</td>
-                <td>₡560,000</td>
-                <td>Completado</td>
-                <td>
-                    <a class="accion-editar" href="#">Ver</a>
-                    <a class="accion-eliminar" href="#">Eliminar</a>
-                </td>
-            </tr>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.FechaRegistro.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@c.Tipo</td>
+                    <td>@c.FechaInicio.ToString("yyyy-MM-dd") - @c.FechaFin.ToString("yyyy-MM-dd")</td>
+                    <td style="font-weight:bold;">₡@c.BalanceTotal.ToString("N2")</td>
+                    <td>
+                        <a class="accion-editar" asp-controller="Contabilidad" asp-action="CierreResultado" asp-route-id="@c.IdCierres">Ver</a>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
 
 <style>
-
     body {
         background: #eef2f6;
     }
@@ -91,7 +62,6 @@
         font-weight: bold;
     }
 
-    /* Barra que contiene ambos botones */
     .acciones-barra {
         display: flex;
         justify-content: space-between;
@@ -99,7 +69,6 @@
         margin-bottom: 20px;
     }
 
-    /* Botón volver */
     .btn-volver {
         background: #a6a6a6;
         color: white;
@@ -109,11 +78,6 @@
         font-weight: bold;
     }
 
-        .btn-volver:hover {
-            background: #8e8e8e;
-        }
-
-    /* Botón nuevo cierre */
     .btn-crear {
         background: #d9534f;
         color: white;
@@ -123,11 +87,6 @@
         font-weight: bold;
     }
 
-        .btn-crear:hover {
-            background: #c64541;
-        }
-
-    /* TABLA */
     .tabla {
         width: 100%;
         border-collapse: collapse;
@@ -151,14 +110,6 @@
     .accion-editar {
         color: #d9534f;
         font-weight: bold;
-        margin-right: 10px;
         text-decoration: none;
     }
-
-    .accion-eliminar {
-        color: #d9534f;
-        font-weight: bold;
-        text-decoration: none;
-    }
-
 </style>

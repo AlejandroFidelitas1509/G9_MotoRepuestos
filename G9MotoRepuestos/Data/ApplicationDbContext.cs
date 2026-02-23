@@ -10,8 +10,11 @@ namespace G9MotoRepuestos.Data
         {
         }
 
-        public DbSet<G9MotoRepuestos.Models.Usuario> Usuarios { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Rol> Roles { get; set; }
 
-        public DbSet<G9MotoRepuestos.Models.Rol> Roles { get; set; }
+        // 
+        public DbSet<Finanzas> Finanzas { get; set; }
+        public DbSet<Cierres> Cierres { get; set; }
     }
-} 
+}
