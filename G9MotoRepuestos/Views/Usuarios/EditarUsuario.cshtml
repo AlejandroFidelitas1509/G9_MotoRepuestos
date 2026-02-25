@@ -1,0 +1,67 @@
+﻿@model G9MotoRepuestos.Models.Usuario
+@{
+    ViewData["Title"] = "Editar Usuario | Moto Repuestos Rojas";
+}
+
+<link rel="stylesheet" href="~/css/Usuarios/EditarUsuario.css" asp-append-version="true" />
+
+<div class="contenedor-crear">
+    <div class="tarjeta-formulario">
+        <div class="encabezado-form">
+            <h2 class="titulo-oswald">EDITAR USUARIO</h2>
+            <div class="linea-roja"></div>
+            <p class="subtitulo">Modificando perfil de: <strong>@Model.NombreCompleto</strong></p>
+        </div>
+
+        <form asp-action="EditarUsuario" asp-controller="Usuarios" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IdUsuario" />
+            @* Mantenemos el estado actual y la clave vieja por si no se cambia *@
+            <input type="hidden" asp-for="Estado" />
+            <input type="hidden" asp-for="PasswordHash" />
+            <input type="hidden" asp-for="ImagenURL" />
+
+            <div class="form-grid">
+
+                <div class="campo">
+                    <label>Nombre Completo</label>
+                    <input asp-for="NombreCompleto" type="text" required />
+                    <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+                </div>
+
+                <div class="campo">
+                    <label>Correo Electrónico</label>
+                    <input asp-for="Correo" type="email" required />
+                    <span asp-validation-for="Correo" class="text-danger"></span>
+                </div>
+
+                <div class="campo">
+                    <label>Teléfono</label>
+                    <input asp-for="Telefono" type="text" />
+                </div>
+
+                <div class="campo">
+                    <label>Nueva Contraseña (Opcional)</label>
+                    <input name="NuevaPassword" type="password" placeholder="Dejar en blanco para no cambiar" />
+                </div>
+
+                <div class="campo">
+                    <label>Rol de Usuario</label>
+                    <select asp-for="IdRol" asp-items="ViewBag.IdRol" required></select>
+                    <span asp-validation-for="IdRol" class="text-danger"></span>
+                </div>
+
+                <div class="botones-container">
+                    <button type="submit" class="btn-rojo">ACTUALIZAR DATOS</button>
+                    <a asp-action="GestionUsuarios" class="btn-negro">CANCELAR</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

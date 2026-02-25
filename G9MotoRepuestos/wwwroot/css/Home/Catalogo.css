@@ -1,0 +1,109 @@
+/* ================================================= */
+/* CATALOGO.CSS - CORREGIDO                          */
+/* ================================================= */
+
+.fade-in {
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+.icon-box {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.card-hover:hover .icon-box {
+    transform: scale(1.1);
+}
+
+.bg-light-danger {
+    background-color: #ffebee;
+}
+
+.bg-light-success {
+    background-color: #e8f5e9;
+}
+
+.bg-light-info {
+    background-color: #e1f5fe;
+}
+
+.bg-light-warning {
+    background-color: #fff8e1;
+}
+
+/* FILTROS LATERALES (Solo los que están en la página, no en el menú) */
+.col-lg-3 .list-group-item-action:hover {
+    color: var(--primary-red) !important;
+    background-color: #f8f9fa !important;
+    padding-left: 20px !important;
+}
+
+/* PRODUCTOS */
+.product-card-client {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    background-color: #fff;
+}
+
+    .product-card-client:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important;
+        border-color: var(--primary-red) !important;
+    }
+
+    .product-card-client .bg-light {
+        transition: all 0.4s ease;
+        background-color: #f8f9fa !important;
+    }
+
+    .product-card-client:hover .bg-light {
+        background-color: var(--primary-red) !important;
+    }
+
+    .product-card-client:hover .fa-motorcycle {
+        color: white !important;
+        opacity: 1 !important;
+        transform: rotate(-10deg) scale(1.2);
+    }
+
+/* CARRITO (Solo afecta al Offcanvas del Carrito) */
+#offcanvasCart .offcanvas-header {
+    background-color: #212121 !important;
+}
+
+#offcanvasCart .offcanvas-body {
+    background-color: #f8f9fa; /* Fondo claro para ver los productos del carrito */
+}
+
+/* AJUSTE FINAL PARA EL MENÚ LATERAL DE CATEGORÍAS */
+#menuCategorias {
+    background-color: #212121 !important;
+}
+
+    #menuCategorias .list-group-item {
+        background-color: transparent !important;
+        color: white !important;
+    }

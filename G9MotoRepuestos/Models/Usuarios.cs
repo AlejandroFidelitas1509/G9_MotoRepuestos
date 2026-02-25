@@ -19,5 +19,7 @@ namespace G9MotoRepuestos.Models
 
         [ForeignKey("IdRol")]
         public virtual Rol? Rol { get; set; }
+
+        public string? TokenRecuperacion { get; set; }
     }
 }
