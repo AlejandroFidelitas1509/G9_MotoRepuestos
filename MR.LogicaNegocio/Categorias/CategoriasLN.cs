@@ -31,5 +31,12 @@ namespace MR.LogicaNegocio.Categorias
 
         public Task<bool> DesactivarAsync(int idCategoria)
             => _ad.CambiarEstadoAsync(idCategoria, false);
+        public Task<bool> ActualizarAsync(CategoriaDto c)
+        {
+            if (c.IdCategoria <= 0) throw new ArgumentException("Id inválido.");
+            if (string.IsNullOrWhiteSpace(c.Nombre)) throw new ArgumentException("Nombre requerido.");
+            return _ad.ActualizarAsync(c);
+        }
+
     }
 }

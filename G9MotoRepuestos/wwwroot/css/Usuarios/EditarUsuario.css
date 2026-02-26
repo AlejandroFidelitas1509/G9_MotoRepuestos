@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&display=swap');
+
+/* Fondo general de la página */
+.contenedor-crear {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/FachadaLocal.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Oswald', sans-serif;
+}
+
+.tarjeta-formulario {
+    background: rgba(255, 255, 255, 0.95);
+    width: 100%;
+    max-width: 500px;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    border-top: 8px solid #d32f2f;
+    backdrop-filter: blur(5px);
+}
+
+.encabezado-form {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.titulo-oswald {
+    color: #212121;
+    font-size: 2.2rem;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.linea-roja {
+    width: 60px;
+    height: 4px;
+    background: #d32f2f;
+    margin: 12px auto;
+}
+
+.subtitulo {
+    color: #888;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+}
+
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+}
+
+    .campo label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        color: #d32f2f;
+        letter-spacing: 1px;
+    }
+
+    .campo input, .campo select {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f9f9f9;
+    }
+
+        .campo input:focus, .campo select:focus {
+            outline: none;
+            border-color: #212121;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+
+.botones-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-rojo {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Oswald';
+    font-size: 1.2rem;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+    .btn-rojo:hover {
+        background: #212121;
+        transform: translateY(-2px);
+    }
+
+.btn-negro {
+    background: transparent;
+    color: #999;
+    text-decoration: none;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    font-family: 'Roboto', sans-serif;
+    transition: 0.3s;
+}
+
+    .btn-negro:hover {
+        color: #d32f2f;
+    }
+
+.text-danger {
+    color: #d32f2f;
+    font-size: 0.75rem;
+    font-family: 'Roboto', sans-serif;
+    margin-top: 3px;
+}

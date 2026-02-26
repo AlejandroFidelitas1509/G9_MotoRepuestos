@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+
     <Content Remove="Views\Finanzas\Create.cshtml" />
   </ItemGroup>
 
@@ -16,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.22" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.22" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.22" />

@@ -1,3 +1,7 @@
+/* ================================================= */
+/* REGISTRO.CSS - Moto Repuestos Rojas (Oswald Only) */
+/* ================================================= */
+
 .auth-wrapper {
     background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/FachadaLocal.jpeg');
     background-size: cover;
@@ -8,6 +12,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+    font-family: var(--font-main) !important; /* Oswald */
 }
 
 .glass-card {
@@ -17,12 +22,19 @@
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-.auth-wrapper h2,
-.auth-wrapper label,
-.auth-wrapper p,
-.auth-wrapper span {
+/* --- Títulos y Textos --- */
+.auth-wrapper h2 {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     color: #ffffff !important;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.auth-wrapper label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    color: #ffffff !important;
 }
 
 .text-light-muted {
@@ -30,28 +42,63 @@
 }
 
 .text-warning {
-    color: #FFC107 !important; 
-    font-weight: bold;
+    color: #ffca28 !important; /* Amarillo Material */
+    transition: 0.3s;
 }
 
-.auth-wrapper a.text-light-muted {
-    color: rgba(255, 255, 255, 0.9) !important;
-}
+    .text-warning:hover {
+        color: #ffd54f !important;
+        text-decoration: underline !important;
+    }
 
+/* --- Campos de Entrada (Inputs) --- */
 .form-control-custom {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: none !important;
-    color: #000 !important; 
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid transparent !important;
+    color: var(--dark-black) !important;
+    font-family: var(--font-main) !important;
+    transition: all 0.3s ease;
 }
 
+    .form-control-custom:focus {
+        background: #ffffff !important;
+        border-color: var(--primary-red) !important;
+        box-shadow: 0 0 12px rgba(211, 47, 47, 0.4);
+    }
+
+/* --- Botón de Registro --- */
 .btn-rojas-auth {
-    background-color: #B01E1E !important;
+    background-color: var(--primary-red) !important; /* Rojo #d32f2f */
+    color: white !important;
     border: none;
-    font-weight: bold;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     transition: 0.3s;
 }
 
     .btn-rojas-auth:hover {
         filter: brightness(1.2);
         transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4);
     }
+
+/* --- Validación y Detalles --- */
+.text-danger.small {
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 15px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.fa-user-plus.text-danger {
+    color: var(--primary-red) !important;
+}
+
+.border-light {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+
+

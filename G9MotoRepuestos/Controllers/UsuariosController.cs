@@ -1,5 +1,6 @@
 ﻿using G9MotoRepuestos.Data;
 using G9MotoRepuestos.Models;
+using G9MotoRepuestos.Services; 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +14,12 @@ namespace G9MotoRepuestos.Controllers
     public class UsuariosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService; 
 
-        public UsuariosController(ApplicationDbContext context)
+        public UsuariosController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -27,15 +30,26 @@ namespace G9MotoRepuestos.Controllers
         public async Task<IActionResult> Login(string correo, string password)
         {
             var usuario = await _context.Usuarios.Include(u => u.Rol)
-                .FirstOrDefaultAsync(u => u.Correo == correo && u.PasswordHash == password);
+                .FirstOrDefaultAsync(u => u.Correo == correo);
 
-            if (usuario != null)
+            if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.PasswordHash))
             {
                 if (usuario.Estado == false)
                 {
                     ViewBag.Error = "Tu cuenta ha sido desactivada. Contacta al administrador.";
                     return View();
                 }
+
+                Response.Cookies.Delete("IdUsuario");
+
+                // Guardar el IdUsuario en la cookie
+                Response.Cookies.Append("IdUsuario", usuario.IdUsuario.ToString(), new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // si usas HTTPS
+                    SameSite = SameSiteMode.Strict
+                });
+                Console.WriteLine($"Usuario logueado con IdUsuario: {usuario.IdUsuario}");
 
                 var claims = new List<Claim>
                 {
@@ -54,6 +68,9 @@ namespace G9MotoRepuestos.Controllers
                     return RedirectToAction("PanelControl", "Home");
                 }
 
+
+
+
                 return RedirectToAction("Index", "Home");
             }
 
@@ -62,23 +79,172 @@ namespace G9MotoRepuestos.Controllers
         }
 
         [HttpGet]
+        public IActionResult OlvidePassword() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OlvidePassword(string correo)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Correo == correo);
+            if (usuario != null)
+            {
+                try
+                {
+                    string token = Guid.NewGuid().ToString();
+                    usuario.TokenRecuperacion = token;
+                    _context.Update(usuario);
+                    await _context.SaveChangesAsync();
+
+                    var enlace = Url.Action("RestablecerPassword", "Usuarios", new { token = token }, Request.Scheme);
+                    string mensajeHtml = $@"
+                        <div style='font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;'>
+                            <h2 style='color: #d9534f;'>Recuperación de Contraseña - Moto Repuestos Rojas</h2>
+                            <p>Hola {usuario.NombreCompleto},</p>
+                            <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente botón para continuar:</p>
+                            <div style='text-align: center; margin: 30px 0;'>
+                                <a href='{enlace}' style='background-color: #d9534f; color: white; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold;'>Restablecer Contraseña</a>
+                            </div>
+                            <p style='font-size: 0.8em; color: #777;'>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+                        </div>";
+
+                    await _emailService.EnviarCorreo(correo, "Recuperar Contraseña - Moto Repuestos Rojas", mensajeHtml);
+
+                    TempData["Mensaje"] = "Se ha enviado un enlace de recuperación a tu correo electrónico.";
+                    return RedirectToAction("Login");
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Error = "Ocurrió un error al enviar el correo: " + ex.Message;
+                    return View();
+                }
+            }
+
+            ViewBag.Error = "El correo electrónico no está registrado.";
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RestablecerPassword(string token)
+        {
+            if (string.IsNullOrEmpty(token)) return RedirectToAction("Login");
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.TokenRecuperacion == token);
+            if (usuario == null)
+            {
+                TempData["Error"] = "El enlace es inválido o ha expirado.";
+                return RedirectToAction("Login");
+            }
+
+            ViewBag.Token = token;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestablecerPassword(string token, string nuevaPassword)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.TokenRecuperacion == token);
+            if (usuario == null) return RedirectToAction("Login");
+
+            if (!string.IsNullOrWhiteSpace(nuevaPassword))
+            {
+                usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(nuevaPassword);
+                usuario.TokenRecuperacion = null;
+
+                _context.Update(usuario);
+                await _context.SaveChangesAsync();
+
+                TempData["Mensaje"] = "Contraseña actualizada correctamente. Ya puedes iniciar sesión.";
+                return RedirectToAction("Login");
+            }
+
+            ViewBag.Error = "La contraseña no puede estar vacía.";
+            ViewBag.Token = token;
+            return View();
+        }
+
+
+        [HttpGet]
         [Authorize(Roles = "Admin,Administrador")]
         public async Task<IActionResult> GestionUsuarios()
         {
             var listaUsuarios = await _context.Usuarios
                 .Include(u => u.Rol)
-                .Select(u => new Usuario
-                {
-                    IdUsuario = u.IdUsuario,
-                    NombreCompleto = u.NombreCompleto,
-                    Correo = u.Correo,
-                    Estado = u.Estado,
-                    IdRol = u.IdRol,
-                    Rol = u.Rol
-                })
                 .ToListAsync();
-
             return View(listaUsuarios);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Administrador")]
+        public async Task<IActionResult> CrearUsuario()
+        {
+            ViewBag.IdRol = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Administrador")]
+        public async Task<IActionResult> CrearUsuario(Usuario usuario)
+        {
+            ModelState.Remove("Rol");
+            if (ModelState.IsValid)
+            {
+                usuario.Estado = true;
+                usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
+
+                _context.Add(usuario);
+                await _context.SaveChangesAsync();
+                TempData["Mensaje"] = "Usuario creado exitosamente.";
+                return RedirectToAction(nameof(GestionUsuarios));
+            }
+
+            ViewBag.IdRol = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo", usuario.IdRol);
+            return View(usuario);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Administrador")]
+        public async Task<IActionResult> EditarUsuario(int? id)
+        {
+            if (id == null) return NotFound();
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario == null) return NotFound();
+
+            ViewBag.IdRol = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo", usuario.IdRol);
+            return View(usuario);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Administrador")]
+        public async Task<IActionResult> EditarUsuario(int id, Usuario model, string? NuevaPassword)
+        {
+            if (id != model.IdUsuario) return NotFound();
+
+            var original = await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.IdUsuario == id);
+            if (original == null) return NotFound();
+
+            if (!string.IsNullOrWhiteSpace(NuevaPassword))
+                model.PasswordHash = BCrypt.Net.BCrypt.HashPassword(NuevaPassword);
+            else
+                model.PasswordHash = original.PasswordHash;
+
+            model.ImagenURL = original.ImagenURL;
+
+            ModelState.Remove("Rol");
+            ModelState.Remove("PasswordHash");
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(model);
+                await _context.SaveChangesAsync();
+                TempData["Mensaje"] = "Usuario actualizado correctamente.";
+                return RedirectToAction(nameof(GestionUsuarios));
+            }
+
+            ViewBag.IdRol = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo", model.IdRol);
+            return View(model);
         }
 
         [HttpPost]
@@ -86,22 +252,27 @@ namespace G9MotoRepuestos.Controllers
         [Authorize(Roles = "Admin,Administrador")]
         public async Task<IActionResult> CambiarEstado(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuario = await _context.Usuarios.Include(u => u.Rol).FirstOrDefaultAsync(u => u.IdUsuario == id);
             if (usuario == null) return NotFound();
 
-            if (usuario.IdRol == 1 || usuario.Rol?.Tipo == "Admin")
-                return BadRequest("No se pueden bloquear cuentas administrativas.");
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id.ToString() == currentUserId)
+            {
+                TempData["Error"] = "No puedes bloquear tu propia cuenta.";
+                return RedirectToAction(nameof(GestionUsuarios));
+            }
 
             usuario.Estado = !(usuario.Estado ?? false);
             _context.Update(usuario);
             await _context.SaveChangesAsync();
 
+            TempData["Mensaje"] = $"Usuario {(usuario.Estado == true ? "activado" : "bloqueado")} correctamente.";
             return RedirectToAction(nameof(GestionUsuarios));
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Perfil()
+        public async Task<IActionResult> VerPerfil()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return RedirectToAction("Logout");
@@ -110,7 +281,6 @@ namespace G9MotoRepuestos.Controllers
                 .FirstOrDefaultAsync(u => u.IdUsuario == int.Parse(userId));
 
             if (usuario == null) return NotFound();
-
             return View(usuario);
         }
 
@@ -119,7 +289,6 @@ namespace G9MotoRepuestos.Controllers
         public async Task<IActionResult> EditarPerfil(int? id)
         {
             var userIdString = id?.ToString() ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Logout");
 
             var usuario = await _context.Usuarios.Include(u => u.Rol)
@@ -140,26 +309,17 @@ namespace G9MotoRepuestos.Controllers
             if (original == null) return NotFound();
 
             if (!string.IsNullOrWhiteSpace(NuevaPassword))
-            {
-                model.PasswordHash = NuevaPassword;
-            }
+                model.PasswordHash = BCrypt.Net.BCrypt.HashPassword(NuevaPassword);
             else
-            {
                 model.PasswordHash = original.PasswordHash;
-            }
 
             if (fotoArchivo != null && fotoArchivo.Length > 0)
             {
                 string carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/perfiles");
                 if (!Directory.Exists(carpeta)) Directory.CreateDirectory(carpeta);
-
                 string nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(fotoArchivo.FileName);
                 string rutaFisica = Path.Combine(carpeta, nombreArchivo);
-
-                using (var stream = new FileStream(rutaFisica, FileMode.Create))
-                {
-                    await fotoArchivo.CopyToAsync(stream);
-                }
+                using (var stream = new FileStream(rutaFisica, FileMode.Create)) { await fotoArchivo.CopyToAsync(stream); }
                 model.ImagenURL = "/perfiles/" + nombreArchivo;
             }
             else
@@ -181,16 +341,12 @@ namespace G9MotoRepuestos.Controllers
             {
                 _context.Update(model);
                 await _context.SaveChangesAsync();
-
                 TempData["Mensaje"] = "Perfil actualizado con éxito.";
 
-
                 if (User.IsInRole("Admin") || User.IsInRole("Administrador"))
-                {
                     return RedirectToAction("GestionUsuarios");
-                }
 
-                return RedirectToAction("Perfil");
+                return RedirectToAction("VerPerfil");
             }
 
             ViewBag.Roles = new SelectList(await _context.Roles.ToListAsync(), "IdRol", "Tipo", model.IdRol);
@@ -207,27 +363,22 @@ namespace G9MotoRepuestos.Controllers
             ModelState.Remove("Rol");
             if (ModelState.IsValid)
             {
-                if (!User.IsInRole("Admin") && !User.IsInRole("Administrador"))
-                {
-                    usuario.IdRol = 2; 
-                }
-
+                usuario.IdRol = 2;
                 usuario.Estado = true;
+                usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
+
                 _context.Add(usuario);
                 await _context.SaveChangesAsync();
-
-                if (User.IsInRole("Admin") || User.IsInRole("Administrador"))
-                    return RedirectToAction("GestionUsuarios");
-
                 return RedirectToAction("Login");
             }
             return View(usuario);
         }
 
-
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response.Cookies.Delete("IdUsuario");
+
             return RedirectToAction("Index", "Home");
         }
     }

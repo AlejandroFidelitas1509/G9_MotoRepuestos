@@ -1,0 +1,134 @@
+:root {
+    --primary-red: #B01E1E;
+    --dark-black: #212121;
+}
+
+/* --- CAROUSEL HERO --- */
+#heroCarousel .carousel-indicators [data-bs-target] {
+    height: 4px;
+    background-color: #ffffff;
+}
+
+#heroCarousel .carousel-indicators .active {
+    background-color: var(--primary-red);
+}
+
+/* --- CATEGORÍAS MODERNAS --- */
+.cat-card-modern {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    height: 180px !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    padding: 15px !important;
+    position: relative;
+    overflow: hidden !important;
+}
+
+.cat-card-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.cat-card-modern img {
+    height: 80px !important;
+    width: auto !important;
+    max-width: 90% !important;
+    object-fit: contain !important;
+    transition: transform 0.4s ease;
+    margin-bottom: 15px !important;
+}
+
+.cat-card-info span {
+    color: var(--dark-black);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.cat-card-modern:hover {
+    border-color: var(--primary-red) !important;
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+.cat-card-modern:hover img {
+    transform: scale(1.1);
+}
+
+/* Línea roja animada inferior */
+.cat-card-modern::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: var(--primary-red);
+    transition: width 0.3s ease;
+}
+
+.cat-card-modern:hover::after {
+    width: 100%;
+}
+
+/* --- PRODUCTOS Y NOVEDADES --- */
+.product-card {
+    background-color: white;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 0px !important;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    border-color: var(--primary-red) !important;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* --- SECCIÓN MANTENIMIENTO --- */
+.appointment-section {
+    background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('/images/taller-bg.jpg') center/cover fixed !important;
+}
+
+.appointment-section .form-control {
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white !important;
+}
+
+.appointment-section .form-control::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+/* --- SLIDER MARCAS --- */
+.slider-container { width: 100%; overflow: hidden; padding: 20px 0; }
+.slider-track { display: flex; width: max-content; animation: scrollInfinite 25s linear infinite; }
+.slide { width: 200px; padding: 0 40px; }
+.slide img { max-height: 50px; filter: grayscale(100%); opacity: 0.5; transition: 0.3s; }
+.slide img:hover { filter: grayscale(0%); opacity: 1; }
+
+@keyframes scrollInfinite {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* --- WHATSAPP --- */
+.whatsapp-float {
+    position: fixed; bottom: 25px; right: 25px; background-color: #25d366; color: white;
+    width: 60px; height: 60px; border-radius: 50px; display: flex; align-items: center;
+    justify-content: center; font-size: 30px; z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .cat-card-modern { height: 150px !important; }
+    .cat-card-modern img { height: 60px !important; }
+}

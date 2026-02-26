@@ -11,6 +11,8 @@ namespace MR.Abstracciones.LogicaDeNegocio.Categorias
     {
         Task<IEnumerable<CategoriaDto>> ListarAsync(bool soloActivas = true);
         Task<int> CrearAsync(CategoriaDto categoria);
+        Task<bool> ActualizarAsync(CategoriaDto c);
+
         Task<bool> ActivarAsync(int idCategoria);
         Task<bool> DesactivarAsync(int idCategoria);
     }
