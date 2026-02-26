@@ -44,18 +44,27 @@ namespace G9MotoRepuestos.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Leer el IdUsuario desde la cookie
+                if (Request.Cookies.TryGetValue("IdUsuario", out string idUsuarioStr))
+                {
+                    if (int.TryParse(idUsuarioStr, out int idUsuario))
+                    {
+                        citaDto.IdUsuario = idUsuario;
+                    }
+                }
+
                 var respuesta = await _citasServicio.AgregarCitaAsync(citaDto);
                 if (!respuesta.EsError)
                 {
                     return RedirectToAction(nameof(Index));
                 }
+
                 ModelState.AddModelError(string.Empty, respuesta.Mensaje);
             }
+
             return View(citaDto);
-
-
-
         }
+
 
 
         public async Task<IActionResult> Edit(int id)

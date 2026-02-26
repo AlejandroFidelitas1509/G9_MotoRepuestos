@@ -40,6 +40,17 @@ namespace G9MotoRepuestos.Controllers
                     return View();
                 }
 
+                Response.Cookies.Delete("IdUsuario");
+
+                // Guardar el IdUsuario en la cookie
+                Response.Cookies.Append("IdUsuario", usuario.IdUsuario.ToString(), new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // si usas HTTPS
+                    SameSite = SameSiteMode.Strict
+                });
+                Console.WriteLine($"Usuario logueado con IdUsuario: {usuario.IdUsuario}");
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, usuario.NombreCompleto ?? "Usuario"),
@@ -56,6 +67,9 @@ namespace G9MotoRepuestos.Controllers
                 {
                     return RedirectToAction("PanelControl", "Home");
                 }
+
+
+
 
                 return RedirectToAction("Index", "Home");
             }
