@@ -1,10 +1,11 @@
-﻿<link rel="stylesheet" href="~/css/catalogo/Catalogo.css" asp-append-version="true" />
+﻿<link rel="stylesheet" href="~/css/Home/Catalogo.css" asp-append-version="true" />
+
 @{
     ViewData["Title"] = "Catalogo | Moto Repuestos Rojas";
     bool esPersonalTaller = User.HasClaim(c => c.Type == "Role" && (c.Value == "Admin" || c.Value == "Vendedor"));
 }
 
-<div class="container-fluid fade-in pb-5">
+<div class="container-fluid fade-in pb-5 pt-4">
 
     @if (esPersonalTaller)
     {
@@ -121,26 +122,6 @@
     </div>
 </div>
 
-<div class="chatbox-wrapper shadow-lg d-none d-md-block" id="chatboxRojas">
-    <div class="chatbox-header bg-dark text-white p-2 d-flex justify-content-between align-items-center" onclick="toggleChat()" style="cursor: pointer;">
-        <small class="fw-bold text-danger"><i class="fas fa-robot me-2"></i>Asistente Rojas</small>
-        <i class="fas fa-plus small" id="chatIcon"></i>
-    </div>
-
-    <div id="chatContent" style="display: none;">
-        <div class="chatbox-body bg-light p-3" style="height: 200px; overflow-y: auto;">
-            <div class="chat-msg mb-2 text-center">
-                <p class="small bg-white p-2 rounded shadow-sm mb-0">¡Hola Sebas! ¿En qué puedo ayudarte hoy?</p>
-            </div>
-        </div>
-        <div class="chatbox-footer p-2 bg-white border-top">
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control" placeholder="Escribe...">
-                <button class="btn btn-danger"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
     <i class="fab fa-whatsapp"></i>
