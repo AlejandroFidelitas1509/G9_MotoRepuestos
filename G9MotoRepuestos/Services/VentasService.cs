@@ -9,10 +9,18 @@ namespace G9MotoRepuestos.Services
     {
         Task<CartItemVm?> BuscarProductoAsync(string query);
         Task<(bool ok, string? error)> ValidarStockAsync(int idProducto, int cantidad);
-        Task<int> CrearVentaAsync(int? idUsuario, string formaPago, decimal subtotal, decimal impuesto, decimal descuento, decimal total, IEnumerable<CartItemVm> items);
+
+        Task<int> CrearVentaAsync(
+            int? idUsuario,
+            string formaPago,
+            decimal subtotal,
+            decimal impuesto,
+            decimal descuento,
+            decimal total,
+            IEnumerable<CartItemVm> items);
+
         Task<FacturaVm?> ObtenerFacturaAsync(int idVenta);
-        Task<(bool ok, string? error)> AnularVentaAsync(int idVenta, int? idUsuario, string motivo);
-        Task<List<AuditoriaVentasVm>> AuditoriaAsync(DateTime? desde, DateTime? hasta, string? accion);
+
         Task<Dictionary<DateTime, decimal>> TotalesDiariosAsync(DateTime desde, DateTime hasta);
     }
 
@@ -20,13 +28,11 @@ namespace G9MotoRepuestos.Services
     {
         private readonly string _cn;
         public VentasService(IConfiguration config) => _cn = config.GetConnectionString("DefaultConnection")!;
-
         private IDbConnection Conn() => new SqlConnection(_cn);
 
-        // ✅ Buscar por nombre o código (stock real desde Inventario)
+        // ✅ Buscar por código o nombre (usa Inventario para stock)
         public async Task<CartItemVm?> BuscarProductoAsync(string query)
         {
-
             const string sql = @"
 SELECT TOP 1
     p.IdProducto      AS Id,
@@ -41,202 +47,156 @@ WHERE (p.CodigoBarras = @q OR p.Nombre LIKE '%' + @q + '%')
 ORDER BY p.IdProducto DESC;";
 
             using var db = Conn();
-            var item = await db.QueryFirstOrDefaultAsync<CartItemVm>(sql, new { q = query.Trim() });
+            var item = await db.QueryFirstOrDefaultAsync<CartItemVm>(sql, new { q = (query ?? "").Trim() });
             if (item == null) return null;
 
             item.Cantidad = 1;
             return item;
         }
 
-        // ✅ Stock real (Inventario)
         public async Task<(bool ok, string? error)> ValidarStockAsync(int idProducto, int cantidad)
         {
-            const string sql = @"SELECT ISNULL(StockActual,0) FROM dbo.Inventario WHERE IdProducto=@id;";
+            const string sql = @"SELECT ISNULL(StockActual,0) FROM dbo.Inventario WHERE IdProducto = @id;";
             using var db = Conn();
 
-            var stock = await db.ExecuteScalarAsync<int?>(sql, new { id = idProducto });
-            var s = stock ?? 0;
+            var stock = await db.ExecuteScalarAsync<int?>(sql, new { id = idProducto }) ?? 0;
 
-            if (s <= 0) return (false, "Producto no disponible en inventario");
-            if (cantidad > s) return (false, $"Stock insuficiente. Máximo disponible: {s}");
+            if (stock <= 0) return (false, "Producto no disponible en inventario");
+            if (cantidad > stock) return (false, $"Stock insuficiente. Máximo disponible: {stock}");
+
             return (true, null);
         }
 
-        // ✅ Crear venta + detalle + rebaja inventario + finanzas + auditoría
-        public async Task<int> CrearVentaAsync(int? idUsuario, string formaPago, decimal subtotal, decimal impuesto, decimal descuento, decimal total, IEnumerable<CartItemVm> items)
+        // ✅ Crear venta + detalle + rebajar inventario + registrar finanzas (si existe tabla Finanzas)
+        public async Task<int> CrearVentaAsync(
+    int? idUsuario,
+    string formaPago,
+    decimal subtotal,
+    decimal impuesto,
+    decimal descuento,
+    decimal total,
+    IEnumerable<CartItemVm> items)
         {
-            using var db = Conn();
-            using var tx = db.BeginTransaction();
+            await using var conn = new SqlConnection(_cn);
+            await conn.OpenAsync();                 // ✅ IMPORTANTE
+            await using var tx = await conn.BeginTransactionAsync();
 
             try
             {
-                var idVenta = await db.ExecuteScalarAsync<int>(@"
-INSERT INTO dbo.Ventas (Fecha, IdUsuario, FormaPago, Subtotal, Impuesto, Descuento, Total, Estado)
-VALUES (SYSUTCDATETIME(), @IdUsuario, @FormaPago, @Subtotal, @Impuesto, @Descuento, @Total, 'Activa');
+                // 1) Crear venta
+                var idVenta = await conn.ExecuteScalarAsync<int>(@"
+INSERT INTO dbo.Ventas (Fecha, IdUsuario, MetodoPago, SubTotal, IVA, Total)
+VALUES (GETDATE(), @IdUsuario, @MetodoPago, @SubTotal, @IVA, @Total);
 SELECT CAST(SCOPE_IDENTITY() AS int);",
-                    new { IdUsuario = idUsuario, FormaPago = formaPago, Subtotal = subtotal, Impuesto = impuesto, Descuento = descuento, Total = total }, tx);
+                    new
+                    {
+                        IdUsuario = idUsuario,
+                        MetodoPago = formaPago,
+                        SubTotal = subtotal,
+                        IVA = impuesto,
+                        Total = total
+                    },
+                    tx);
 
+                // 2) Insertar detalle + rebajar stock
                 foreach (var it in items)
                 {
-                    var stockOk = await ValidarStockAsync(it.Id, it.Cantidad);
-                    if (!stockOk.ok) throw new InvalidOperationException(stockOk.error);
+                    // ✅ Traer stock dentro de la MISMA transacción (con lock)
+                    var stock = await conn.ExecuteScalarAsync<int?>(@"
+SELECT ISNULL(StockActual,0)
+FROM dbo.Inventario WITH (UPDLOCK, ROWLOCK)
+WHERE IdProducto = @IdProducto;",
+                        new { IdProducto = it.Id }, tx) ?? 0;
 
-                    await db.ExecuteAsync(@"
-INSERT INTO dbo.VentaDetalle (IdVenta, IdProducto, Codigo, NombreProducto, Cantidad, PrecioUnitario, SubtotalLinea)
-VALUES (@IdVenta, @IdProducto, @Codigo, @Nombre, @Cantidad, @Precio, @SubtotalLinea);",
-                        new
-                        {
-                            IdVenta = idVenta,
-                            IdProducto = it.Id,
-                            Codigo = it.Codigo,
-                            Nombre = it.Nombre,
-                            Cantidad = it.Cantidad,
-                            Precio = it.Precio,
-                            SubtotalLinea = it.Precio * it.Cantidad
-                        }, tx);
+                    if (stock <= 0)
+                        throw new InvalidOperationException("Producto no disponible en inventario");
 
-                    // ✅ Rebaja segura en Inventario (evita carreras)
-                    var filas = await db.ExecuteAsync(@"
+                    if (it.Cantidad > stock)
+                        throw new InvalidOperationException($"Stock insuficiente. Máximo disponible: {stock}");
+
+                    // Detalle
+                    await conn.ExecuteAsync(@"
+                    INSERT INTO dbo.VentaDetalle
+                    (IdVenta, IdProducto, NombreProducto, Cantidad, PrecioUnitario, SubTotalLinea)
+                    VALUES
+                    (@IdVenta, @IdProducto, @NombreProducto, @Cantidad, @PrecioUnitario, @SubTotalLinea);",
+                    new
+                    {
+                        IdVenta = idVenta,
+                        IdProducto = it.Id,
+                        NombreProducto = it.Nombre,   // ✅ AQUÍ
+                        Cantidad = it.Cantidad,
+                        PrecioUnitario = it.Precio,
+                        SubTotalLinea = it.Precio * it.Cantidad
+                    }, tx);
+
+                    // ✅ Rebajar inventario
+                    var rows = await conn.ExecuteAsync(@"
 UPDATE dbo.Inventario
 SET StockActual = StockActual - @Cant
-WHERE IdProducto = @IdProducto
-  AND StockActual >= @Cant;",
+WHERE IdProducto = @IdProducto;",
                         new { Cant = it.Cantidad, IdProducto = it.Id }, tx);
 
-                    if (filas == 0)
-                        throw new InvalidOperationException("Stock insuficiente al confirmar la venta (inventario cambió).");
+                    if (rows == 0)
+                        throw new InvalidOperationException("No existe registro de inventario para este producto (Inventario.IdProducto).");
                 }
 
-                // ✅ Finanzas: ingreso para cierres contables
-                await db.ExecuteAsync(@"
-INSERT INTO dbo.Finanzas (Tipo, Monto, Fecha, Categoria, Descripcion)
-VALUES ('Ingreso', @Monto, CAST(GETDATE() AS date), 'Ventas', CONCAT('Venta #', @IdVenta));",
+                // 3) Registrar finanzas si existe
+                await conn.ExecuteAsync(@"
+IF OBJECT_ID('dbo.Finanzas', 'U') IS NOT NULL
+BEGIN
+    INSERT INTO dbo.Finanzas (Tipo, Monto, Fecha, Descripcion)
+    VALUES ('Ingreso', @Monto, GETDATE(), CONCAT('Venta #', @IdVenta));
+END",
                     new { Monto = total, IdVenta = idVenta }, tx);
 
-                // ✅ Auditoría
-                await db.ExecuteAsync(@"
-INSERT INTO dbo.AuditoriaVentas (Accion, IdVenta, IdUsuario, Descripcion)
-VALUES ('CREAR', @IdVenta, @IdUsuario, CONCAT('Venta creada. Total: ', @Total));",
-                    new { IdVenta = idVenta, IdUsuario = idUsuario, Total = total }, tx);
-
-                tx.Commit();
+                await tx.CommitAsync();
                 return idVenta;
             }
             catch
             {
-                tx.Rollback();
+                await tx.RollbackAsync();
                 throw;
             }
         }
 
-        // ✅ Obtener factura + detalle
+        // ✅ Obtener factura (encabezado + detalle)
         public async Task<FacturaVm?> ObtenerFacturaAsync(int idVenta)
         {
             using var db = Conn();
 
-            var venta = await db.QueryFirstOrDefaultAsync<FacturaVm>(@"
-SELECT IdVenta, Fecha, FormaPago, Subtotal, Impuesto, Descuento, Total, Estado
-FROM dbo.Ventas
-WHERE IdVenta = @id;", new { id = idVenta });
+            // Encabezado
+            var header = await db.QueryFirstOrDefaultAsync<FacturaVm>(@"
+SELECT
+    v.IdVenta,
+    v.Fecha,
+    v.MetodoPago AS FormaPago,
+    v.SubTotal,
+    v.IVA AS Impuesto,
+    CAST(0 AS decimal(18,2)) AS Descuento,
+    v.Total
+FROM dbo.Ventas v
+WHERE v.IdVenta = @id;", new { id = idVenta });
 
-            if (venta == null) return null;
+            if (header == null) return null;
 
+            // Detalle
             var detalle = (await db.QueryAsync<FacturaLineaVm>(@"
-SELECT ISNULL(Codigo,'') AS Codigo, NombreProducto, Cantidad, PrecioUnitario, SubtotalLinea
-FROM dbo.VentaDetalle
-WHERE IdVenta = @id
-ORDER BY IdDetalle;", new { id = idVenta })).ToList();
+SELECT
+    p.CodigoBarras AS Codigo,
+    p.Nombre AS NombreProducto,
+    d.Cantidad,
+    d.PrecioUnitario,
+    d.SubTotalLinea
+FROM dbo.VentaDetalle d
+LEFT JOIN dbo.Productos p ON p.IdProducto = d.IdProducto
+WHERE d.IdVenta = @id;", new { id = idVenta })).ToList();
 
-            venta.Detalle = detalle;
-            return venta;
+            header.Detalle = detalle;
+            return header;
         }
 
-        // ✅ Anular venta: repone inventario + reversa finanzas + auditoría
-        public async Task<(bool ok, string? error)> AnularVentaAsync(int idVenta, int? idUsuario, string motivo)
-        {
-            if (string.IsNullOrWhiteSpace(motivo))
-                return (false, "Datos incompletos para hacer la devolución");
-
-            using var db = Conn();
-            using var tx = db.BeginTransaction();
-
-            try
-            {
-                var venta = await db.QueryFirstOrDefaultAsync<(string Estado, decimal Total)>(
-                    @"SELECT Estado, Total FROM dbo.Ventas WHERE IdVenta=@id;",
-                    new { id = idVenta }, tx);
-
-                if (string.IsNullOrEmpty(venta.Estado))
-                    return (false, "La factura no existe");
-
-                if (venta.Estado == "Anulada")
-                    return (false, "La factura ya fue anulada");
-
-                var detalle = (await db.QueryAsync<(int IdProducto, int Cantidad)>(@"
-SELECT ISNULL(IdProducto,0) AS IdProducto, Cantidad
-FROM dbo.VentaDetalle
-WHERE IdVenta=@id;", new { id = idVenta }, tx)).ToList();
-
-                foreach (var d in detalle.Where(x => x.IdProducto != 0))
-                {
-                    // ✅ Reponer stock en Inventario
-                    await db.ExecuteAsync(@"
-UPDATE dbo.Inventario
-SET StockActual = StockActual + @Cant
-WHERE IdProducto = @IdProducto;",
-                        new { Cant = d.Cantidad, IdProducto = d.IdProducto }, tx);
-                }
-
-                await db.ExecuteAsync(@"UPDATE dbo.Ventas SET Estado='Anulada' WHERE IdVenta=@id;", new { id = idVenta }, tx);
-
-                await db.ExecuteAsync(@"INSERT INTO dbo.AnulacionesVenta (IdVenta, Motivo) VALUES (@IdVenta, @Motivo);",
-                    new { IdVenta = idVenta, Motivo = motivo }, tx);
-
-                // ✅ Finanzas: reverso
-                await db.ExecuteAsync(@"
-INSERT INTO dbo.Finanzas (Tipo, Monto, Fecha, Categoria, Descripcion)
-VALUES ('Egreso', @Monto, CAST(GETDATE() AS date), 'Anulaciones', CONCAT('Anulación venta #', @IdVenta));",
-                    new { Monto = venta.Total, IdVenta = idVenta }, tx);
-
-                // ✅ Auditoría
-                await db.ExecuteAsync(@"
-INSERT INTO dbo.AuditoriaVentas (Accion, IdVenta, IdUsuario, Descripcion)
-VALUES ('ANULAR', @IdVenta, @IdUsuario, @Desc);",
-                    new { IdVenta = idVenta, IdUsuario = idUsuario, Desc = "Factura anulada. Motivo: " + motivo }, tx);
-
-                tx.Commit();
-                return (true, null);
-            }
-            catch (Exception ex)
-            {
-                tx.Rollback();
-                return (false, ex.Message);
-            }
-        }
-
-        // ✅ Auditoría con filtros
-        public async Task<List<AuditoriaVentasVm>> AuditoriaAsync(DateTime? desde, DateTime? hasta, string? accion)
-        {
-            using var db = Conn();
-
-            var sql = @"
-SELECT IdAuditoria, Accion, IdVenta, Fecha, IdUsuario, Descripcion
-FROM dbo.AuditoriaVentas
-WHERE 1=1
-  AND (@accion IS NULL OR Accion = @accion)
-  AND (@desde IS NULL OR Fecha >= @desde)
-  AND (@hasta IS NULL OR Fecha < DATEADD(day,1,@hasta))
-ORDER BY Fecha DESC;";
-
-            return (await db.QueryAsync<AuditoriaVentasVm>(sql, new
-            {
-                accion = string.IsNullOrWhiteSpace(accion) ? null : accion,
-                desde,
-                hasta
-            })).ToList();
-        }
-
-        // ✅ Totales diarios (ventas activas)
+        // ✅ Totales de ventas por día
         public async Task<Dictionary<DateTime, decimal>> TotalesDiariosAsync(DateTime desde, DateTime hasta)
         {
             using var db = Conn();
@@ -244,9 +204,7 @@ ORDER BY Fecha DESC;";
             var rows = await db.QueryAsync<(DateTime Dia, decimal Total)>(@"
 SELECT CAST(Fecha AS date) AS Dia, SUM(Total) AS Total
 FROM dbo.Ventas
-WHERE Estado='Activa'
-  AND Fecha >= @d
-  AND Fecha < DATEADD(day,1,@h)
+WHERE Fecha >= @d AND Fecha < DATEADD(day,1,@h)
 GROUP BY CAST(Fecha AS date)
 ORDER BY Dia;",
                 new { d = desde.Date, h = hasta.Date });
