@@ -18,6 +18,7 @@ using MR.AccesoDatos.Repositorios;
 using MR.LogicaNegocio.Servicios;
 using MR.LogicaNegocio.Mapeos;
 using MR.AccesoDatos;
+using G9MotoRepuestos.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "MotoRepuestosRojas.Session";
     });
 
+builder.Services.AddScoped<IPuntoVentaService, PuntoVentaService>();
+
 // --- SESSION (Para carrito de Punto de Venta) ---
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -58,6 +61,8 @@ builder.Services.AddControllersWithViews();
 
 // Servicio de Correo (Agregado para recuperación de contraseña)
 builder.Services.AddScoped<EmailService>();
+
+builder.Services.AddScoped<IVentasService, VentasService>();
 
 // Bitácora
 

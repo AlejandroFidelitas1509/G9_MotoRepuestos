@@ -1,0 +1,181 @@
+﻿@model G9MotoRepuestos.Models.ViewModels.FacturaVm
+@{
+    ViewData["Title"] = "Factura";
+}
+
+<div class="panel">
+    <h2 class="titulo">Factura #@Model.IdVenta</h2>
+
+    @if (TempData["Ok"] != null)
+    {
+        <div class="msg msg-ok">@TempData["Ok"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="msg msg-error">@TempData["Error"]</div>
+    }
+
+    <div class="info">
+        <div><b>Fecha:</b> @Model.Fecha.ToString("yyyy-MM-dd HH:mm")</div>
+        <div><b>Forma de pago:</b> @Model.FormaPago</div>
+        <div><b>Estado:</b> @Model.Estado</div>
+    </div>
+
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Cant</th>
+                <th>Precio</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.Detalle)
+            {
+                <tr>
+                    <td>@d.Codigo</td>
+                    <td>@d.NombreProducto</td>
+                    <td>@d.Cantidad</td>
+                    <td>₡@d.PrecioUnitario.ToString("N2")</td>
+                    <td><b>₡@d.SubtotalLinea.ToString("N2")</b></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="totales">
+        <div><b>Total:</b> ₡@Model.Total.ToString("N2")</div>
+    </div>
+
+    @if (Model.Estado != "Anulada")
+    {
+        <form asp-controller="PuntoVenta" asp-action="AnularFactura" method="post" class="anular-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="idVenta" value="@Model.IdVenta" />
+            <input type="text" name="motivo" placeholder="Motivo de anulación" class="input-motivo" required />
+            <button type="submit" class="btn-anular">Anular</button>
+        </form>
+    }
+
+    <div class="acciones-barra">
+        <a asp-controller="PuntoVenta" asp-action="Index" class="btn-volver">⮐ Volver</a>
+        <a asp-controller="PuntoVenta" asp-action="Auditoria" class="btn-sec">Ver Auditoría</a>
+    </div>
+</div>
+
+<style>
+    body {
+        background: #eef2f6;
+    }
+
+    .panel {
+        max-width: 900px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .titulo {
+        text-align: center;
+        font-size: 28px;
+        color: #d9534f;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .tabla {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .tabla thead th {
+            background: #000;
+            color: white;
+            padding: 10px;
+        }
+
+        .tabla tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+    .totales {
+        margin-top: 15px;
+        font-size: 18px;
+        text-align: right;
+    }
+
+    .acciones-barra {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-volver {
+        background: #a6a6a6;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn-sec {
+        background: #000;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .anular-form {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .input-motivo {
+        flex: 1;
+        min-width: 220px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #cfcfcf;
+    }
+
+    .btn-anular {
+        background: #d9534f;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .msg {
+        padding: 10px 12px;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        font-weight: bold;
+    }
+
+    .msg-ok {
+        background: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #c3e6cb;
+    }
+
+    .msg-error {
+        background: #f2dede;
+        color: #a94442;
+        border: 1px solid #ebccd1;
+    }
+</style>

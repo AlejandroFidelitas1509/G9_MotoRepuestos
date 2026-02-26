@@ -1,72 +1,85 @@
-﻿<div class="punto-venta-container">
+﻿@model G9MotoRepuestos.Models.ViewModels.PuntoVentaVm
+
+<div class="punto-venta-container">
     <h2 class="titulo">Finalizar Venta</h2>
 
-    <div class="layout-cobro">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mb-3">@TempData["Error"]</div>
+    }
 
-        <div class="columna-formas-pago">
-            <h3 class="subtitulo">Forma de Pago</h3>
+    <form asp-controller="PuntoVenta" asp-action="Finalizar" method="post">
+        @Html.AntiForgeryToken()
 
-            <div class="selector-pago">
+        <div class="layout-cobro">
+            <div class="columna-formas-pago">
+                <h3 class="subtitulo">Forma de Pago</h3>
 
-                <label class="opcion-pago seleccionado">
-                    <input type="radio" name="formaPago" checked>
-                    <i class="fas fa-money-bill-wave"></i>
-                    <span>Efectivo</span>
-                </label>
+                <div class="selector-pago">
+                    <label class="opcion-pago seleccionado">
+                        <input type="radio" name="formaPago" value="Efectivo" checked>
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Efectivo</span>
+                    </label>
 
-                <label class="opcion-pago">
-                    <input type="radio" name="formaPago">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Tarjeta</span>
-                </label>
+                    <label class="opcion-pago">
+                        <input type="radio" name="formaPago" value="Tarjeta">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Tarjeta</span>
+                    </label>
 
-                <label class="opcion-pago">
-                    <input type="radio" name="formaPago">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>Sinpe / Transf.</span>
-                </label>
-
-            </div>
-
-            <div class="notas-venta">
-                <label class="subtitulo-sm">Notas de la venta (Opcional):</label>
-                <textarea rows="3" class="input-notas" placeholder="Ej: Cliente retira mañana..."></textarea>
-            </div>
-        </div>
-
-
-        <div class="columna-calculos">
-
-            <div class="caja-total-final">
-                <span class="etiqueta-total">TOTAL A PAGAR:</span>
-                <span class="monto-total">₡23730</span>
-            </div>
-
-            <div class="caja-interaccion-pago">
-                <div class="fila-calculo">
-                    <label>PAGÓ CON:</label>
-                    <input type="number" class="input-gigante" placeholder="₡0.00" autofocus>
-                </div>
-
-                <div class="fila-calculo cambio-zona">
-                    <label>CAMBIO:</label>
-                    <span class="valor-cambio">₡0.00</span>
+                    <label class="opcion-pago">
+                        <input type="radio" name="formaPago" value="Sinpe">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Sinpe / Transf.</span>
+                    </label>
                 </div>
             </div>
 
-            <div class="acciones-finales">
-                <button class="btn-cobrar-final">
-                    <i class="fas fa-check-circle"></i> Cobrar e Imprimir
-                </button>
+            <div class="columna-calculos">
+                <div class="caja-total-final">
+                    <span class="etiqueta-total">TOTAL A PAGAR:</span>
+                    <span class="monto-total" id="totalPagar">₡@Model.Total.ToString("N2")</span>
+                </div>
 
-                <a asp-action="Index" class="btn-regresar">
-                    Cancelar
-                </a>
+                <div class="caja-interaccion-pago">
+                    <div class="fila-calculo">
+                        <label>PAGÓ CON:</label>
+                        <input type="number" name="montoRecibido" id="montoRecibido" class="input-gigante" placeholder="₡0.00" autofocus step="0.01" min="0">
+                    </div>
+
+                    <div class="fila-calculo cambio-zona">
+                        <label>CAMBIO:</label>
+                        <span class="valor-cambio" id="cambio">₡0.00</span>
+                    </div>
+                </div>
+
+                <div class="acciones-finales">
+                    <button class="btn-cobrar-final" type="submit">
+                        <i class="fas fa-check-circle"></i> Cobrar e Imprimir
+                    </button>
+
+                    <a asp-action="Index" class="btn-regresar">Cancelar</a>
+                </div>
             </div>
-
         </div>
-    </div>
+    </form>
 </div>
+
+<script>
+    (function () {
+        const total = @Model.Total.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        const input = document.getElementById('montoRecibido');
+        const cambio = document.getElementById('cambio');
+
+        function calc() {
+            const val = parseFloat(input.value || "0");
+            const c = Math.max(0, val - total);
+            cambio.textContent = "₡" + c.toFixed(2);
+        }
+        input.addEventListener('input', calc);
+    })();
+</script>
 
 <style>
 

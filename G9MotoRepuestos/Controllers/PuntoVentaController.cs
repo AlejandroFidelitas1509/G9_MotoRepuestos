@@ -1,25 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using G9MotoRepuestos.Models.ViewModels;
 using G9MotoRepuestos.Helpers;
+using G9MotoRepuestos.Services;
+using System.Security.Claims;
+using G9MotoRepuestos.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace G9MotoRepuestos.Controllers
 {
     public class PuntoVentaController : Controller
     {
         private const string CART_KEY = "PV_CART";
+        private readonly IVentasService _ventas;
+        private readonly ApplicationDbContext _db;
 
-        // ✅ POS principal
+        public PuntoVentaController(IVentasService ventas, ApplicationDbContext db)
+        {
+            _ventas = ventas;
+            _db = db;
+        }
+
         public IActionResult Index()
         {
             var cart = GetCart();
-            var vm = new PuntoVentaVm { Carrito = cart };
-            return View(vm);
+            return View(new PuntoVentaVm { Carrito = cart });
         }
 
-        // ✅ Agregar producto por código o nombre (PV-001 / PV-005 parte 1)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddItem(string query)
+        public async Task<IActionResult> AddItem(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
@@ -27,10 +36,7 @@ namespace G9MotoRepuestos.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // TODO: aquí conectamos con tu capa MR para buscar por código/nombre.
-            // Por ahora, un ejemplo funcional:
-            var found = FakeFindProducto(query);
-
+            var found = await _ventas.BuscarProductoAsync(query);
             if (found == null)
             {
                 TempData["Error"] = "Productos o servicios fueron ingresados incorrectamente";
@@ -40,30 +46,25 @@ namespace G9MotoRepuestos.Controllers
             var cart = GetCart();
             var existing = cart.FirstOrDefault(x => x.Id == found.Id);
 
-            if (existing != null)
+            var nuevaCantidad = (existing?.Cantidad ?? 0) + 1;
+            var stockOk = await _ventas.ValidarStockAsync(found.Id, nuevaCantidad);
+            if (!stockOk.ok)
             {
-                // aumenta cantidad con límite stock
-                if (found.Stock > 0 && existing.Cantidad + 1 > found.Stock)
-                {
-                    TempData["Error"] = "Stock insuficiente";
-                    return RedirectToAction(nameof(Index));
-                }
-                existing.Cantidad += 1;
+                TempData["Error"] = stockOk.error;
+                return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                cart.Add(found);
-            }
+
+            if (existing != null) existing.Cantidad++;
+            else cart.Add(found);
 
             SaveCart(cart);
             TempData["Ok"] = "Producto/servicio agregado correctamente";
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ Actualizar cantidad (PV-003 / validaciones PV-006)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateQty(int id, int qty)
+        public async Task<IActionResult> UpdateQty(int id, int qty)
         {
             var cart = GetCart();
             var item = cart.FirstOrDefault(x => x.Id == id);
@@ -79,9 +80,10 @@ namespace G9MotoRepuestos.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (item.Stock > 0 && qty > item.Stock)
+            var stockOk = await _ventas.ValidarStockAsync(id, qty);
+            if (!stockOk.ok)
             {
-                TempData["Error"] = "Stock insuficiente";
+                TempData["Error"] = stockOk.error;
                 return RedirectToAction(nameof(Index));
             }
 
@@ -91,7 +93,6 @@ namespace G9MotoRepuestos.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ Eliminar item (PV-004)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RemoveItem(int id)
@@ -110,7 +111,6 @@ namespace G9MotoRepuestos.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ Cancelar operación (PV-005 escenario 2)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ClearCart()
@@ -120,7 +120,6 @@ namespace G9MotoRepuestos.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ Ir a Cobrar (F10)
         public IActionResult Cobrar()
         {
             var cart = GetCart();
@@ -135,10 +134,9 @@ namespace G9MotoRepuestos.Controllers
             return View(vm);
         }
 
-        // ✅ Finalizar (PV-006 + PV-005 éxito + PV-008 bitácora después)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Finalizar(string formaPago, decimal montoRecibido)
+        public async Task<IActionResult> Finalizar(string formaPago, decimal montoRecibido)
         {
             var cart = GetCart();
             var vm = new PuntoVentaVm { Carrito = cart, FormaPago = formaPago, MontoRecibido = montoRecibido };
@@ -147,6 +145,12 @@ namespace G9MotoRepuestos.Controllers
             {
                 TempData["Error"] = "No se puede generar una factura sin productos";
                 return RedirectToAction(nameof(Index));
+            }
+
+            if (string.IsNullOrWhiteSpace(formaPago))
+            {
+                TempData["Error"] = "Debe seleccionar una forma de pago";
+                return RedirectToAction(nameof(Cobrar));
             }
 
             if (vm.Total <= 0)
@@ -161,44 +165,78 @@ namespace G9MotoRepuestos.Controllers
                 return RedirectToAction(nameof(Cobrar));
             }
 
-            // TODO: aquí insertamos Venta + Factura + Bitácora en BD (PV-006 y PV-008).
-            // Por ahora: simulación exitosa.
-            SaveCart(new List<CartItemVm>());
+            // ✅ Bloqueo por cierre contable
+            if (await _db.Cierres.AnyAsync(c => DateTime.Today >= c.FechaInicio && DateTime.Today <= c.FechaFin))
+            {
+                TempData["Error"] = "No se puede registrar la venta: el período ya cuenta con un cierre contable.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            TempData["Ok"] = "Factura generada exitosamente (venta exitosa)";
-            return RedirectToAction(nameof(Index));
+            // Usuario (si existe autenticación)
+            var idUsuarioStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int? idUsuario = int.TryParse(idUsuarioStr, out var n) ? n : (int?)null;
+
+            try
+            {
+                var idVenta = await _ventas.CrearVentaAsync(idUsuario, formaPago, vm.Subtotal, 0m, 0m, vm.Total, vm.Carrito);
+
+                SaveCart(new List<CartItemVm>());
+                TempData["Ok"] = "Factura generada exitosamente (venta exitosa)";
+                return RedirectToAction(nameof(Factura), new { id = idVenta });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Cobrar));
+            }
         }
 
-        // -------------------------
-        // Session helpers
-        // -------------------------
+        [HttpGet]
+        public async Task<IActionResult> Factura(int id)
+        {
+            var factura = await _ventas.ObtenerFacturaAsync(id);
+            if (factura == null)
+            {
+                TempData["Error"] = "Factura no encontrada";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(factura);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AnularFactura(int idVenta, string motivo)
+        {
+            var idUsuarioStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int? idUsuario = int.TryParse(idUsuarioStr, out var n) ? n : (int?)null;
+
+            var res = await _ventas.AnularVentaAsync(idVenta, idUsuario, motivo);
+            if (!res.ok)
+            {
+                TempData["Error"] = res.error;
+                return RedirectToAction(nameof(Factura), new { id = idVenta });
+            }
+
+            TempData["Ok"] = "Factura anulada correctamente";
+            return RedirectToAction(nameof(Factura), new { id = idVenta });
+        }
+
+        // ✅ Vista auditoría (Issue 169)
+        [HttpGet]
+        public async Task<IActionResult> Auditoria(DateTime? desde, DateTime? hasta, string? accion)
+        {
+            ViewBag.Desde = desde?.ToString("yyyy-MM-dd") ?? "";
+            ViewBag.Hasta = hasta?.ToString("yyyy-MM-dd") ?? "";
+            ViewBag.Accion = accion ?? "";
+
+            var data = await _ventas.AuditoriaAsync(desde, hasta, accion);
+            return View(data);
+        }
+
         private List<CartItemVm> GetCart()
             => HttpContext.Session.GetObject<List<CartItemVm>>(CART_KEY) ?? new List<CartItemVm>();
 
         private void SaveCart(List<CartItemVm> cart)
             => HttpContext.Session.SetObject(CART_KEY, cart);
-
-        // -------------------------
-        // MOCK (reemplazar por tu BD/MR)
-        // -------------------------
-        private CartItemVm? FakeFindProducto(string query)
-        {
-            // Simula buscar por código o nombre
-            // Cambiá esto por tu lógica real
-            if (query.Trim() == "744102" || query.ToLower().Contains("kit"))
-            {
-                return new CartItemVm
-                {
-                    Id = 1,
-                    Codigo = "744102",
-                    Nombre = "Kit de Arrastre Racing",
-                    Precio = 25500m,
-                    Stock = 12,
-                    Cantidad = 1
-                };
-            }
-            return null;
-        }
     }
 }
-

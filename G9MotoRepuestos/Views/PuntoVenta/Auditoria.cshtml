@@ -1,0 +1,96 @@
+﻿@model List<G9MotoRepuestos.Models.ViewModels.AuditoriaVentasVm>
+@{
+    ViewData["Title"] = "Auditoría de Ventas";
+}
+
+< div class= "panel" >
+    < h2 class= "titulo" > Auditoría de Ventas</h2>
+
+    <form method = "get" asp-action= "Auditoria" class= "filtro" >
+        < div class= "filtro-grupo" >
+            < label class= "filtro-label" > Desde </ label >
+            < input type = "date" name = "desde" class= "filtro-input" value = "@ViewBag.Desde" />
+        </ div >
+        < div class= "filtro-grupo" >
+            < label class= "filtro-label" > Hasta </ label >
+            < input type = "date" name = "hasta" class= "filtro-input" value = "@ViewBag.Hasta" />
+        </ div >
+        < div class= "filtro-grupo" >
+            < label class= "filtro-label" > Acción </ label >
+            < select name = "accion" class= "filtro-input" >
+                < option value = "" selected = "@(string.IsNullOrWhiteSpace(ViewBag.Accion))" > Todas </ option >
+                < option value = "CREAR" selected = "@(ViewBag.Accion=="CREAR")">CREAR</option>
+                <option value="ANULAR" selected="@(ViewBag.Accion=="ANULAR")">ANULAR</option>
+            </select>
+        </div>
+
+        <div class= "filtro-botones" >
+            < button class= "btn-filtrar" type = "submit" > Filtrar </ button >
+            < a asp - action = "Auditoria" class= "btn-limpiar" > Limpiar </ a >
+        </ div >
+    </ form >
+
+    < table class= "tabla" >
+        < thead >
+            < tr >
+                < th > Fecha </ th >
+                < th > Acción </ th >
+                < th > Venta </ th >
+                < th > Usuario </ th >
+                < th > Descripción </ th >
+            </ tr >
+        </ thead >
+        < tbody >
+        @if(Model == null || !Model.Any())
+        {
+            < tr >< td colspan = "5" style = "text-align:center;padding:15px;" > No existen registros.</ td ></ tr >
+        }
+        else
+{
+    foreach (var a in Model)
+    {
+                < tr >
+                    < td > @a.Fecha.ToString("yyyy-MM-dd HH:mm") </ td >
+                    < td >< b > @a.Accion </ b ></ td >
+                    < td >@(a.IdVenta?.ToString() ?? "-") </ td >
+                    < td >@(a.IdUsuario?.ToString() ?? "-") </ td >
+                    < td > @a.Descripcion </ td >
+                </ tr >
+            }
+}
+        </ tbody >
+    </ table >
+
+    < div class= "acciones-barra" >
+        < a asp - controller = "PuntoVenta" asp - action = "Index" class= "btn-volver" >⮐ Volver </ a >
+    </ div >
+</ div >
+
+< style >
+    body {
+background: #eef2f6; }
+    .panel { max - width: 900px; margin: 40px auto; background: white; padding: 25px; border - radius: 15px; box - shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .titulo {
+        text - align: center; font - size: 28px; color: #d9534f; margin-bottom: 20px; font-weight: bold; }
+    .tabla { width: 100 %; border - collapse: collapse; }
+    .tabla thead th {
+        background: #000; color: white; padding: 10px; }
+    .tabla tbody td {
+            padding: 10px; border - bottom: 1px solid #e0e0e0; }
+    .acciones - barra { margin - top: 20px; display: flex; justify - content:flex - start; }
+    .btn - volver {
+                background: #a6a6a6; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+
+    .filtro {
+                    display: flex; gap: 12px; align - items:end; flex - wrap:wrap; background:#f7f7f7; border:1px solid #e0e0e0; padding:12px; border-radius:10px; margin-bottom:15px; }
+    .filtro - grupo { display: flex; flex - direction:column; gap: 6px; }
+    .filtro - label {
+                            font - weight:bold; color:#333; font-size:14px; }
+    .filtro - input {
+                            padding: 8px 10px; border - radius:8px; border: 1px solid #cfcfcf; min-width:160px; }
+    .filtro - botones { display: flex; gap: 10px; margin - left:auto; }
+    .btn - filtrar {
+                                background:#000; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer; }
+    .btn - limpiar {
+                                    background:#a6a6a6; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-weight:bold; }
+</ style >
