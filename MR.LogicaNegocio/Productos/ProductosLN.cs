@@ -20,9 +20,8 @@ namespace MR.LogicaNegocio.Productos
             _ad = ad;
         }
 
-        //  Implementado
         public Task<int> CrearAsync(ProductoDto producto)
-            => new CrearProductoLN(_ad).EjecutarAsync(producto);
+            => _ad.CrearAsync(producto);
 
         public Task<IEnumerable<ProductoDto>> ListarAsync(bool soloActivos = true)
             => _ad.ListarAsync(soloActivos);
@@ -30,22 +29,11 @@ namespace MR.LogicaNegocio.Productos
         public Task<ProductoDto?> ObtenerPorIdAsync(int id)
             => _ad.ObtenerPorIdAsync(id);
 
-        public async Task<bool> ActualizarAsync(ProductoDto p)
-        {
-            if (p.IdProducto <= 0) throw new ArgumentException("Id inválido.");
-            if (string.IsNullOrWhiteSpace(p.Nombre)) throw new ArgumentException("Nombre es requerido.");
-            if (string.IsNullOrWhiteSpace(p.Marca)) throw new ArgumentException("Marca es requerida.");
-            if (!p.PrecioVenta.HasValue || p.PrecioVenta.Value <= 0) throw new ArgumentException("PrecioVenta debe ser mayor a 0.");
-            if (!p.StockActual.HasValue || p.StockActual.Value < 0) throw new ArgumentException("Stock inválido.");
+        public Task<bool> ActualizarAsync(ProductoDto producto)
+            => _ad.ActualizarAsync(producto);
 
-            return await _ad.ActualizarAsync(p);
-        }
-        
-        public Task<bool> DesactivarAsync(int id)
-            => _ad.CambiarEstadoAsync(id, false);
-
-        public Task<bool> ActivarAsync(int id)
-            => _ad.CambiarEstadoAsync(id, true);
+        public Task<bool> CambiarEstadoAsync(int id, bool estado)
+            => _ad.CambiarEstadoAsync(id, estado);
     }
 
 }
