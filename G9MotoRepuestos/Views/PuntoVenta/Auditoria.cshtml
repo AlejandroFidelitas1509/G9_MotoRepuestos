@@ -1,59 +1,74 @@
-﻿@model Dictionary<DateTime, decimal>
+﻿@model List<G9MotoRepuestos.Models.ViewModels.AuditoriaVentasVm>
+
 @{
-    ViewData["Title"] = "Reporte de Ventas";
+    ViewData["Title"] = "Auditoría de Ventas";
 }
 
 <div class="panel">
-    <h2 class="titulo">Reporte de Ventas Diarias</h2>
+    <h2 class="titulo">Auditoría de Ventas</h2>
 
-    @if (TempData["Warning"] != null)
-    {
-        <div class="msg msg-warning">@TempData["Warning"]</div>
-    }
-
-    <form method="get" asp-action="RepVentas" class="filtro">
+    <form method="get" asp-action="Auditoria" class="filtro">
         <div class="filtro-grupo">
             <label class="filtro-label">Desde</label>
             <input type="date" name="desde" class="filtro-input" value="@ViewBag.Desde" />
         </div>
+
         <div class="filtro-grupo">
             <label class="filtro-label">Hasta</label>
             <input type="date" name="hasta" class="filtro-input" value="@ViewBag.Hasta" />
         </div>
 
+        <div class="filtro-grupo">
+            <label class="filtro-label">Acción</label>
+            <select name="accion" class="filtro-input">
+                <option value="" selected="@(string.IsNullOrWhiteSpace((string?)ViewBag.Accion))">Todas</option>
+                <option value="CREAR" selected="@(((string?)ViewBag.Accion) == "CREAR")">CREAR</option>
+                <option value="ANULAR" selected="@(((string?)ViewBag.Accion) == "ANULAR")">ANULAR</option>
+            </select>
+        </div>
+
         <div class="filtro-botones">
             <button class="btn-filtrar" type="submit">Filtrar</button>
-            <a class="btn-limpiar" asp-action="RepVentas">Últimos 7 días</a>
+            <a asp-action="Auditoria" class="btn-limpiar">Limpiar</a>
         </div>
     </form>
 
-    <div style="margin-bottom:15px;">
-        <a class="btn-sec" asp-action="RepVentasPdf" asp-route-desde="@ViewBag.Desde" asp-route-hasta="@ViewBag.Hasta">
-            Exportar PDF
-        </a>
-    </div>
-
     <table class="tabla">
         <thead>
-            <tr><th>Día</th><th>Total</th></tr>
+            <tr>
+                <th>Fecha</th>
+                <th>Acción</th>
+                <th>Venta</th>
+                <th>Usuario</th>
+                <th>Descripción</th>
+            </tr>
         </thead>
         <tbody>
-            @if (Model == null || Model.Count == 0)
+            @if (Model == null || !Model.Any())
             {
-                <tr><td colspan="2" style="text-align:center;padding:15px;">No existen registros.</td></tr>
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:15px;">No existen registros.</td>
+                </tr>
             }
             else
             {
-                foreach (var r in Model)
+                foreach (var a in Model)
                 {
                     <tr>
-                        <td>@r.Key.ToString("yyyy-MM-dd")</td>
-                        <td><b>₡@r.Value.ToString("N2")</b></td>
+                        <td>@a.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td><b>@a.Accion</b></td>
+                        <td>@(a.IdVenta?.ToString() ?? "-")</td>
+                        <td>@(a.IdUsuario?.ToString() ?? "-")</td>
+                        <td>@a.Descripcion</td>
                     </tr>
                 }
             }
         </tbody>
     </table>
+
+    <div class="acciones-barra">
+        <a asp-controller="PuntoVenta" asp-action="Index" class="btn-volver">⮐ Volver</a>
+    </div>
 </div>
 
 <style>
@@ -94,23 +109,19 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-    .btn-sec {
-        background: #000;
+    .acciones-barra {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .btn-volver {
+        background: #a6a6a6;
         color: white;
         padding: 8px 15px;
         border-radius: 8px;
         text-decoration: none;
         font-weight: bold;
-    }
-
-    .msg-warning {
-        background: #fcf8e3;
-        color: #8a6d3b;
-        border: 1px solid #faebcc;
-        padding: 10px 12px;
-        border-radius: 10px;
-        font-weight: bold;
-        margin-bottom: 12px;
     }
 
     .filtro {
@@ -133,6 +144,8 @@
 
     .filtro-label {
         font-weight: bold;
+        color: #333;
+        font-size: 14px;
     }
 
     .filtro-input {
@@ -140,6 +153,7 @@
         border-radius: 8px;
         border: 1px solid #cfcfcf;
         min-width: 160px;
+        background: #fff;
     }
 
     .filtro-botones {

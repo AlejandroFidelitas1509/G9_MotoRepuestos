@@ -1,0 +1,25 @@
+﻿@model int
+@{
+    ViewData["Title"] = "Procesando...";
+    var idVenta = Model;
+}
+
+<div class="container mt-5 text-center">
+    <h3 class="text-success fw-bold">Compra exitosa ✅</h3>
+    <p>Abriendo la factura en una nueva pestaña...</p>
+    <p>Redirigiendo al punto de venta para una nueva compra...</p>
+</div>
+
+<script>
+    (function () {
+        const urlPdf = '@Url.Action("FacturaPdf", "PuntoVenta", new { id = idVenta })';
+
+        // abrir PDF en nueva pestaña
+        window.open(urlPdf, '_blank');
+
+        // volver al POS
+        setTimeout(() => {
+            window.location.href = '@Url.Action("Index", "PuntoVenta")';
+        }, 900);
+    })();
+</script>

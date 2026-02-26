@@ -1,26 +1,32 @@
 using G9MotoRepuestos.Data;
-using Microsoft.EntityFrameworkCore;
+using G9MotoRepuestos.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using MR.AccesoDatos.Bitacora;
-using MR.LogicaNegocio.Bitacora;
-using MR.AccesoDatos.Productos;
-using MR.LogicaNegocio.Productos;
-using MR.Abstracciones.AccesoADatos.Productos;
-using MR.Abstracciones.LogicaDeNegocio.Productos;
+using Microsoft.EntityFrameworkCore;
+
 using MR.Abstracciones.AccesoADatos.Bitacora;
-using MR.Abstracciones.LogicaDeNegocio.Bitacora;
-using G9MotoRepuestos.Services; 
-using MR.AccesoDatos.Categorias;
-using MR.LogicaNegocio.Categorias;
+
 using MR.Abstracciones.AccesoADatos.Categorias;
+using MR.Abstracciones.AccesoADatos.Productos;
+using MR.Abstracciones.LogicaDeNegocio.Bitacora;
 using MR.Abstracciones.LogicaDeNegocio.Categorias;
-using MR.AccesoDatos.Repositorios;
-using MR.LogicaNegocio.Servicios;
-using MR.LogicaNegocio.Mapeos;
+using MR.Abstracciones.LogicaDeNegocio.Productos;
 using MR.AccesoDatos;
+using MR.AccesoDatos.Bitacora;
+using MR.AccesoDatos.Categorias;
+using MR.AccesoDatos.Productos;
+using MR.AccesoDatos.Repositorios;
+using MR.LogicaNegocio.Bitacora;
+using MR.LogicaNegocio.Categorias;
+using MR.LogicaNegocio.Mapeos;
+using MR.LogicaNegocio.Productos;
+using MR.LogicaNegocio.Servicios;
+using QuestPDF.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ✅ QuestPDF license (Community)
+QuestPDF.Settings.License = LicenseType.Community;
 
 // --- CONFIGURACIÓN DE BASE DE DATOS ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -31,7 +37,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// --- SISTEMA DE AUTENTICACIÓN (Tu Login con Cookies) ---
+// --- SISTEMA DE AUTENTICACIÓN ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -42,22 +48,31 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "MotoRepuestosRojas.Session";
     });
 
+// --- SESSION ---
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
 builder.Services.AddControllersWithViews();
 
-// --- INYECCIÓN DE DEPENDENCIAS (Arquitectura por capas) ---
-
-// Servicio de Correo (Agregado para recuperación de contraseña)
+// --- DI (Servicios propios) ---
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IPuntoVentaService, PuntoVentaService>();
+builder.Services.AddScoped<IVentasService, VentasService>();
 
-// Bitácora
-
+// --- Bitácora / Capas ---
 builder.Services.AddDbContext<Contexto>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IBitacoraProductosAD>(_ => new BitacoraProductosAD(connectionString));
 builder.Services.AddScoped<IBitacoraProductosLN, BitacoraProductosLN>();
 
-// Productos
+
 builder.Services.AddScoped<IProductosAD>(_ => new ProductosAD(connectionString));
 builder.Services.AddScoped<IProductosLN, ProductosLN>();
 
@@ -81,7 +96,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-// --- PIPELINE DE LA APLICACIÓN ---
+
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -96,8 +111,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
-// El orden es Sagrado: Autenticación antes que Autorización
+
 app.UseAuthentication();
 app.UseAuthorization();
 
