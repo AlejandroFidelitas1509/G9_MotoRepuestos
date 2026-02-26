@@ -19,4 +19,20 @@ document.querySelectorAll('.btn-outline-danger').forEach(boton => {
         const nombre = card.querySelector('h6').innerText;
         agregarAlCarrito(nombre, "");
     });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("categoriaIdInput");
+        const items = document.querySelectorAll(".categoria-item");
+
+        items.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.getAttribute("data-id");
+                input.value = id;
+
+                // UI: marcar activo (opcional)
+                items.forEach(x => x.classList.remove("fw-bold", "text-danger"));
+                btn.classList.add("fw-bold", "text-danger");
+            });
+        });
+    });
 });

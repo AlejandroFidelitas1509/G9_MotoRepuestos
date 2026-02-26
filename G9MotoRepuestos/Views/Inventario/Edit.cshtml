@@ -68,24 +68,30 @@
 
                         <div class="cp-section">
                             <div class="cp-section-title">Precios y stock</div>
-                            <div class="cp-section-sub">Costo, venta, stock y código de barras.</div>
+                            <div class="cp-section-sub">Costo, margen, venta, stock y código de barras.</div>
 
                             <div class="row g-3 mt-1">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <label asp-for="PrecioCosto" class="form-label cp-label">Precio costo</label>
-                                    <input asp-for="PrecioCosto" class="form-control cp-input" />
+                                    <input asp-for="PrecioCosto" id="PrecioCosto" class="form-control cp-input" inputmode="decimal" />
                                     <span asp-validation-for="PrecioCosto" class="text-danger"></span>
                                 </div>
 
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
+                                    <label asp-for="MargenPorcentaje" class="form-label cp-label">Margen (%)</label>
+                                    <input asp-for="MargenPorcentaje" id="MargenPorcentaje" class="form-control cp-input" placeholder="Ej: 30" inputmode="decimal" />
+                                    <span asp-validation-for="MargenPorcentaje" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-md-3">
                                     <label asp-for="PrecioVenta" class="form-label cp-label">Precio venta *</label>
-                                    <input asp-for="PrecioVenta" class="form-control cp-input" />
+                                    <input asp-for="PrecioVenta" id="PrecioVenta" class="form-control cp-input" inputmode="decimal" />
                                     <span asp-validation-for="PrecioVenta" class="text-danger"></span>
                                 </div>
 
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <label asp-for="StockActual" class="form-label cp-label">Stock *</label>
-                                    <input asp-for="StockActual" class="form-control cp-input" />
+                                    <input asp-for="StockActual" class="form-control cp-input" inputmode="numeric" />
                                     <span asp-validation-for="StockActual" class="text-danger"></span>
                                 </div>
 
@@ -106,7 +112,8 @@
                             <div class="mt-3">
                                 <label asp-for="IdCategoria" class="form-label cp-label">Categoría</label>
                                 <div class="d-flex gap-2">
-                                    <select asp-for="IdCategoria" class="form-select cp-input"
+                                    <select asp-for="IdCategoria"
+                                            class="form-select cp-input"
                                             asp-items="(IEnumerable<SelectListItem>)ViewBag.Categorias">
                                         <option value="">-- Seleccione --</option>
                                     </select>
@@ -148,24 +155,64 @@
     </div>
 </div>
 
-<script>
-    const input = document.getElementById('imagenInput');
-    const img = document.getElementById('previewImg');
-    const empty = document.getElementById('previewEmpty');
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 
-    if (input) {
-        input.addEventListener('change', () => {
-            const file = input.files && input.files[0];
-            if (!file || !file.type.startsWith('image/')) {
-                return;
-            }
-            const url = URL.createObjectURL(file);
-            img.src = url;
-            img.style.display = 'block';
-            empty.style.display = 'none';
+    <script>
+        // ---- Preview imagen (tu código) ----
+        const input = document.getElementById('imagenInput');
+        const img = document.getElementById('previewImg');
+        const empty = document.getElementById('previewEmpty');
+
+        if (input) {
+            input.addEventListener('change', () => {
+                const file = input.files && input.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+
+                const url = URL.createObjectURL(file);
+                img.src = url;
+                img.style.display = 'block';
+                empty.style.display = 'none';
+            });
+        }
+
+        // ---- Auto cálculo PrecioVenta desde Costo + Margen% ----
+        document.addEventListener("DOMContentLoaded", () => {
+            const costoEl = document.getElementById("PrecioCosto");
+            const margenEl = document.getElementById("MargenPorcentaje");
+            const ventaEl = document.getElementById("PrecioVenta");
+
+            if (!costoEl || !margenEl || !ventaEl) return;
+
+            const toNumber = (v) => {
+                if (v === null || v === undefined) return NaN;
+                v = v.toString().trim();
+                if (!v) return NaN;
+
+                // soporta coma o punto
+                v = v.replace(/\s/g, "").replace(",", ".");
+                return parseFloat(v);
+            };
+
+            const calc = () => {
+                const costo = toNumber(costoEl.value);
+                const margen = toNumber(margenEl.value);
+
+                if (isNaN(costo) || isNaN(margen)) return;
+                if (costo < 0 || margen < 0) return;
+
+                const venta = costo * (1 + (margen / 100));
+                ventaEl.value = venta.toFixed(2);
+            };
+
+            costoEl.addEventListener("input", calc);
+            margenEl.addEventListener("input", calc);
+
+            // Opcional: si el usuario escribe margen después, se recalcula.
+            // No auto-calculo inicial porque no hay margen persistido.
         });
-    }
-</script>
+    </script>
+}
 
 <style>
     .cp-wrap {
