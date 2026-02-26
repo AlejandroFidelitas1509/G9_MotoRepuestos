@@ -24,7 +24,7 @@ namespace G9MotoRepuestos.Controllers
         {
             var q = _db.Cierres.AsQueryable();
 
-            // Normalizar fechas a día completo
+
             if (desde.HasValue)
                 q = q.Where(x => x.FechaRegistro >= desde.Value.Date);
 
@@ -38,24 +38,24 @@ namespace G9MotoRepuestos.Controllers
             if (cierres.Count == 0)
                 TempData["Warning"] = "No existen registros";
 
-            // Para que la vista mantenga los valores del filtro
+
             ViewBag.Desde = desde?.ToString("yyyy-MM-dd");
             ViewBag.Hasta = hasta?.ToString("yyyy-MM-dd");
 
             return View(cierres);
         }
 
-        // ✅ Realizar cierre (diario, semanal, mensual)
+        // ✅ Realizar cierre (diario, semanal, mensual) - FIX: fecha como string para validar formato inválido
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RealizarCierre(string tipo, DateTime? fecha, DateTime? fechaInicio, DateTime? fechaFin)
+        public async Task<IActionResult> RealizarCierre(string tipo, string? fecha, DateTime? fechaInicio, DateTime? fechaFin)
         {
             tipo = (tipo ?? "").Trim().ToLower();
 
             DateTime inicio;
             DateTime fin;
 
-            // ✅ Validación: fecha requerida y rango
+            // ✅ Validación: fecha requerida y formato
             if (tipo == "diario")
             {
                 if (string.IsNullOrWhiteSpace(fecha))
