@@ -377,6 +377,8 @@ namespace G9MotoRepuestos.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response.Cookies.Delete("IdUsuario");
+
             return RedirectToAction("Index", "Home");
         }
     }
