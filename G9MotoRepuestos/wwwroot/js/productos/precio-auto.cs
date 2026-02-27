@@ -16,10 +16,15 @@
         v = v.replace(/\s / g, "").replace(",", ".");
         return parseFloat(v);
     };
-
-    const setValue = (el, num, decimals = 2) => {
+    const setValue = (el, num) => {
         if (!el) return;
-        el.value = Number.isFinite(num) ? num.toFixed(decimals) : "";
+        if (!Number.isFinite(num))
+        {
+            el.value = "";
+            return;
+        }
+
+        el.value = Math.round(num).toString();
     };
 
     const calcVenta = () => {
