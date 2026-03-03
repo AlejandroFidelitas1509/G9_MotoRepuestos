@@ -161,7 +161,7 @@ namespace G9MotoRepuestos.Controllers
                     model.ImageURL = $"/images/productos/{fileName}";
                 }
 
-                // ✅ Crear y capturar ID real
+                CalcularPrecioVentaDesdeMargen(model);
                 var nuevoId = await _productosLN.CrearAsync(model);
                 model.IdProducto = nuevoId;
 
@@ -189,6 +189,21 @@ namespace G9MotoRepuestos.Controllers
                 return View(model);
             }
         }
+        private void CalcularPrecioVentaDesdeMargen(ProductoDto model)
+        {
+            // Si no hay costo o no hay margen, no tocamos PrecioVenta
+            if (!model.PrecioCosto.HasValue || !model.MargenPorcentaje.HasValue)
+                return;
+
+            var costo = model.PrecioCosto.Value;
+            var margen = model.MargenPorcentaje.Value;
+
+            if (costo < 0) costo = 0;
+            if (margen < 0) margen = 0;
+
+            model.PrecioVenta = Math.Round(costo * (1m + (margen / 100m)), 2);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -245,7 +260,7 @@ namespace G9MotoRepuestos.Controllers
                     // mantener imagen anterior
                     model.ImageURL = antes?.ImageURL;
                 }
-
+                CalcularPrecioVentaDesdeMargen(model);
                 await _productosLN.ActualizarAsync(model);
 
                 // ✅ Bitácora

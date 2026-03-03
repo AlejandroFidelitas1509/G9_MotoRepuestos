@@ -42,6 +42,7 @@
         <h3 class="subtitulo">Cierre Diario</h3>
 
         <label class="label">Fecha</label>
+        <!-- ✅ IMPORTANT: name="fecha" (string en controller) -->
         <input type="date" name="fecha" class="input" required />
 
         <input type="hidden" name="tipo" value="diario" />
@@ -96,6 +97,9 @@
         document.getElementById("formSemanal").style.display = tipo === "semanal" ? "block" : "none";
         document.getElementById("formMensual").style.display = tipo === "mensual" ? "block" : "none";
     }
+
+    // ✅ Opcional: asegurar que al cargar la página se muestre el formulario correcto
+    document.addEventListener("DOMContentLoaded", cambiarFormulario);
 </script>
 
 <!-- ESTILOS -->
@@ -215,4 +219,7 @@
         color: #166534;
         border-color: #bbf7d0;
     }
+
+
+
 </style>

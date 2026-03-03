@@ -18,36 +18,60 @@ namespace G9MotoRepuestos.Controllers
 
         public IActionResult Cierres() => View();
 
-        public async Task<IActionResult> Historial()
+        // ✅ Issue 145: Historial + filtros (desde/hasta)
+        [HttpGet]
+        public async Task<IActionResult> Historial(DateTime? desde, DateTime? hasta)
         {
-            var cierres = await _db.Cierres
+            var q = _db.Cierres.AsQueryable();
+
+
+            if (desde.HasValue)
+                q = q.Where(x => x.FechaRegistro >= desde.Value.Date);
+
+            if (hasta.HasValue)
+                q = q.Where(x => x.FechaRegistro < hasta.Value.Date.AddDays(1));
+
+            var cierres = await q
                 .OrderByDescending(x => x.FechaRegistro)
                 .ToListAsync();
+
+            if (cierres.Count == 0)
+                TempData["Warning"] = "No existen registros";
+
+
+            ViewBag.Desde = desde?.ToString("yyyy-MM-dd");
+            ViewBag.Hasta = hasta?.ToString("yyyy-MM-dd");
 
             return View(cierres);
         }
 
-        // ✅ Realizar cierre (diario, semanal, mensual)
+        // ✅ Realizar cierre (diario, semanal, mensual) - FIX: fecha como string para validar formato inválido
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RealizarCierre(string tipo, DateTime? fecha, DateTime? fechaInicio, DateTime? fechaFin)
+        public async Task<IActionResult> RealizarCierre(string tipo, string? fecha, DateTime? fechaInicio, DateTime? fechaFin)
         {
             tipo = (tipo ?? "").Trim().ToLower();
 
             DateTime inicio;
             DateTime fin;
 
-            // ✅ Validación: fecha requerida y rango
+            // ✅ Validación: fecha requerida y formato
             if (tipo == "diario")
             {
-                if (fecha == null)
+                if (string.IsNullOrWhiteSpace(fecha))
                 {
                     TempData["Error"] = "La fecha es requerida";
                     return RedirectToAction(nameof(Cierres));
                 }
 
-                inicio = fecha.Value.Date;
-                fin = fecha.Value.Date.AddDays(1).AddTicks(-1);
+                if (!DateTime.TryParse(fecha, out var fechaParseada))
+                {
+                    TempData["Error"] = "La fecha tiene un formato inválido";
+                    return RedirectToAction(nameof(Cierres));
+                }
+
+                inicio = fechaParseada.Date;
+                fin = fechaParseada.Date.AddDays(1).AddTicks(-1);
             }
             else if (tipo == "semanal")
             {

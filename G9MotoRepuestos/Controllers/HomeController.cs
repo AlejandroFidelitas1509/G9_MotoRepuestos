@@ -4,6 +4,8 @@ using G9MotoRepuestos.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using MR.Abstracciones.LogicaDeNegocio.Productos;
+using MR.Abstracciones.LogicaDeNegocio.Categorias;
 
 namespace G9MotoRepuestos.Controllers
 {
@@ -12,12 +14,21 @@ namespace G9MotoRepuestos.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
 
+        private readonly IProductosLN _productosLN;
+
+        private readonly ICategoriasLN _categoriasLN;
+
         public HomeController(
             ILogger<HomeController> logger,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IProductosLN productosLN,
+            ICategoriasLN categoriasLN
+        )
         {
             _logger = logger;
             _context = context;
+            _productosLN = productosLN;
+            _categoriasLN = categoriasLN;
         }
 
         public IActionResult Index()
@@ -34,13 +45,26 @@ namespace G9MotoRepuestos.Controllers
         [Authorize(Roles = "Admin,Administrador,Vendedor")]
         public IActionResult PanelControl()
         {
-
             return View();
         }
 
-        public IActionResult Catalogo()
+
+        public async Task<IActionResult> Catalogo(int? categoriaId)
         {
-            return View();
+            var categorias = await _categoriasLN.ListarAsync(true);     // solo activas
+            var productos = await _productosLN.ListarAsync(true);       
+
+            if (categoriaId.HasValue)
+                productos = productos.Where(p => p.IdCategoria == categoriaId.Value);
+
+            var vm = new CatalogoVm
+            {
+                Categorias = categorias,
+                Productos = productos,
+                CategoriaId = categoriaId
+            };
+
+            return View(vm);
         }
 
         public IActionResult Nosotros()
