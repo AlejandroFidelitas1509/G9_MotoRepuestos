@@ -36,5 +36,10 @@ namespace MR.Abstracciones.EntidadesParaUI
         [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
         public int? StockActual { get; set; }
 
+
+        [Range(0, 1000, ErrorMessage = "El margen debe ser >= 0")]
+        public decimal? MargenPorcentaje { get; set; }
+
+
     }
 }

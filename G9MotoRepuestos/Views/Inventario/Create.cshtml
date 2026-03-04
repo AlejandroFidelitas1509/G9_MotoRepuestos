@@ -5,6 +5,8 @@
     ViewData["Title"] = "Crear Producto";
 }
 
+<link rel="stylesheet" href="~/css/Home/Catalogo.css" asp-append-version="true" />
+
 <div class="cp-wrap">
 
     <!-- Header -->
@@ -73,28 +75,34 @@
 
                         <div class="cp-section">
                             <div class="cp-section-title">Precios y stock</div>
-                            <div class="cp-section-sub">Define el precio de venta y el stock inicial.</div>
+                            <div class="cp-section-sub">Define el costo, margen y el precio de venta automáticamente.</div>
 
                             <div class="row g-3 mt-1">
                                 <div class="col-12 col-md-4">
                                     <label asp-for="PrecioCosto" class="form-label cp-label">Precio costo (opcional)</label>
-                                    <input asp-for="PrecioCosto" class="form-control cp-input" placeholder="₡0" />
+                                    <input asp-for="PrecioCosto" id="PrecioCosto" class="form-control cp-input" placeholder="₡0" inputmode="decimal" />
                                     <span asp-validation-for="PrecioCosto" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-12 col-md-4">
+                                    <label asp-for="MargenPorcentaje" class="form-label cp-label">Margen (%)</label>
+                                    <input asp-for="MargenPorcentaje" id="MargenPorcentaje" class="form-control cp-input" placeholder="Ej: 30" inputmode="decimal" />
+                                    <span asp-validation-for="MargenPorcentaje" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-md-4">
                                     <label asp-for="PrecioVenta" class="form-label cp-label">Precio venta *</label>
-                                    <input asp-for="PrecioVenta" class="form-control cp-input" placeholder="₡0" />
+                                    <input asp-for="PrecioVenta" id="PrecioVenta" class="form-control cp-input" placeholder="₡0" inputmode="decimal" />
                                     <span asp-validation-for="PrecioVenta" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-12 col-md-4">
                                     <label asp-for="StockActual" class="form-label cp-label">Stock inicial *</label>
-                                    <input asp-for="StockActual" class="form-control cp-input" placeholder="0" />
+                                    <input asp-for="StockActual" class="form-control cp-input" placeholder="0" inputmode="numeric" />
                                     <span asp-validation-for="StockActual" class="text-danger"></span>
                                 </div>
 
-                                <div class="col-12">
+                                <div class="col-12 col-md-8">
                                     <label asp-for="CodigoBarras" class="form-label cp-label">Código de barras (opcional)</label>
                                     <input asp-for="CodigoBarras" class="form-control cp-input" placeholder="Ej: 7501031311309" />
                                     <span asp-validation-for="CodigoBarras" class="text-danger"></span>
@@ -179,35 +187,118 @@
     </div>
 </div>
 
-<script>
-    const input = document.getElementById('imagenInput');
-    const img = document.getElementById('previewImg');
-    const empty = document.getElementById('previewEmpty');
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 
-    if (input) {
-        input.addEventListener('change', () => {
-            const file = input.files && input.files[0];
-            if (!file) {
-                img.style.display = 'none';
-                empty.style.display = 'flex';
-                img.src = '';
-                return;
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // =========================
+            // PREVIEW IMAGEN
+            // =========================
+            const input = document.getElementById('imagenInput');
+            const img = document.getElementById('previewImg');
+            const empty = document.getElementById('previewEmpty');
+
+            if (input) {
+                input.addEventListener('change', () => {
+                    const file = input.files && input.files[0];
+
+                    if (!file || !file.type.startsWith('image/')) {
+                        if (img) img.style.display = 'none';
+                        if (empty) empty.style.display = 'flex';
+                        if (img) img.src = '';
+                        return;
+                    }
+
+                    const url = URL.createObjectURL(file);
+                    if (img) {
+                        img.src = url;
+                        img.style.display = 'block';
+                    }
+                    if (empty) empty.style.display = 'none';
+                });
             }
 
-            if (!file.type.startsWith('image/')) {
-                img.style.display = 'none';
-                empty.style.display = 'flex';
-                img.src = '';
-                return;
+            // =========================
+            // AUTO CÁLCULO PRECIOS
+            // =========================
+            const costoEl = document.getElementById("PrecioCosto");
+            const margenEl = document.getElementById("MargenPorcentaje");
+            const ventaEl = document.getElementById("PrecioVenta");
+
+            if (!costoEl || !margenEl || !ventaEl) return;
+
+            let lock = false;
+
+            const toNumber = (v) => {
+                if (v === null || v === undefined) return NaN;
+                v = v.toString().trim();
+                if (!v) return NaN;
+
+                // soporta coma o punto
+                v = v.replace(/\s/g, "").replace(",", ".");
+                return parseFloat(v);
+            };
+
+            const setValue = (el, num, decimals = 2) => {
+                if (!el) return;
+                el.value = Number.isFinite(num) ? num.toFixed(decimals) : "";
+            };
+
+            const calcVenta = () => {
+                if (lock) return;
+                lock = true;
+
+                const costo = toNumber(costoEl.value);
+                const margen = toNumber(margenEl.value);
+
+                if (Number.isFinite(costo) && Number.isFinite(margen) && costo >= 0 && margen >= 0) {
+                    const venta = costo * (1 + (margen / 100));
+                    setValue(ventaEl, venta, 2);
+                }
+
+                lock = false;
+            };
+
+            const calcMargen = () => {
+                if (lock) return;
+                lock = true;
+
+                const costo = toNumber(costoEl.value);
+                const venta = toNumber(ventaEl.value);
+
+                if (Number.isFinite(costo) && Number.isFinite(venta) && costo > 0 && venta >= 0) {
+                    const margen = ((venta / costo) - 1) * 100;
+                    setValue(margenEl, margen, 2);
+                }
+
+                lock = false;
+            };
+
+            // Eventos
+            costoEl.addEventListener("input", () => {
+                const margen = toNumber(margenEl.value);
+                if (Number.isFinite(margen)) calcVenta();
+                else calcMargen();
+            });
+
+            margenEl.addEventListener("input", calcVenta);
+            ventaEl.addEventListener("input", calcMargen);
+
+            // Auto completar margen al abrir (modo Edit)
+            const costoIni = toNumber(costoEl.value);
+            const ventaIni = toNumber(ventaEl.value);
+            const margenIni = toNumber(margenEl.value);
+
+            if (!Number.isFinite(margenIni) && Number.isFinite(costoIni) && Number.isFinite(ventaIni) && costoIni > 0) {
+                calcMargen();
             }
 
-            const url = URL.createObjectURL(file);
-            img.src = url;
-            img.style.display = 'block';
-            empty.style.display = 'none';
         });
-    }
-</script>
+    </script>
+}
+}
 
 <style>
     /* Paleta: rojo/negro como tu sitio */
