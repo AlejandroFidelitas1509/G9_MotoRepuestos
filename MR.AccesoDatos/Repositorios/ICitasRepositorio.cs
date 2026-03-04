@@ -15,6 +15,8 @@ namespace MR.AccesoDatos.Repositorios
         Task<bool> ActualizarCitaAsync(Citas cita);
         Task<bool> EliminarCitaAsync(int id);
 
+        Task<List<Citas>> ObtenerCitasPorUsuarioAsync(int idUsuario);
+
 
     }
 }

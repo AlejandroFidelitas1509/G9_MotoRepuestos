@@ -1,5 +1,6 @@
 @using MR.LogicaNegocio.Dtos
-@model List<CitasDto>
+@model List<MR.AccesoDatos.Entidades.Citas>
+
 
 @{
     ViewData["Title"] = "Listado de Citas";
@@ -9,11 +10,8 @@
 
 <h2 class="text-center fw-bold mb-4">Listado de Citas</h2>
 
-
-
 <div class="table-container">
     <table class="table">
-        <a asp-controller="Citas" asp-action="Create" class="btn btn-danger fw-bold mt-3 mb-3">NUEVA CITA</a>
         <thead>
             <tr>
                 <th>Id</th>
@@ -32,7 +30,7 @@
                 <tr>
                     <td>@cita.IdCita</td>
                     <td>@cita.Detalle</td>
-                    <td>@cita.Fecha.ToString("ddd-dd-MMM-yyyy HH:mm")</td>
+                    <td>@cita.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@cita.Modelo</td>
                     <td>@cita.Placa</td>
                     <td>
@@ -44,7 +42,7 @@
                 <td class="text-center">
                     <a asp-controller="Citas" asp-action="Edit" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning">Editar</a>
                     
-                    <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Eliminar</a>
+                    <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Cancelar</a>
                 </td>
             </tr>
                         }
@@ -52,3 +50,4 @@
     </table>
 </div>
 
+<a asp-controller="Citas" asp-action="Create" class="btn btn-success fw-bold mt-3">Nueva Cita</a>
