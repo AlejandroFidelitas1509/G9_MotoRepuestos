@@ -62,5 +62,30 @@ namespace MR.AccesoDatos.Repositorios
         {
             return await _contexto.Citas.ToListAsync();
         }
+
+
+        public async Task<List<Citas>> ObtenerCitasPorUsuarioAsync(int idUsuario)
+        {
+            return await _contexto.Citas
+                         .Where(c => c.IdUsuario == idUsuario)
+                         .Select(c => new Citas
+                         {
+                             IdCita = c.IdCita,
+                             Detalle = c.Detalle,
+                             Fecha = c.Fecha,
+                             Modelo = c.Modelo,
+                             Placa = c.Placa,
+                             Estado = c.Estado,
+                             IdUsuario = c.IdUsuario
+                         })
+                         .ToListAsync();
+
+        }
+
+
+
+
+
+
     }
 }

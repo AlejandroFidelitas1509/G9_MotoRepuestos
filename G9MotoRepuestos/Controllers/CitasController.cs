@@ -130,5 +130,20 @@ namespace G9MotoRepuestos.Controllers
         }
 
 
+
+        public async Task<IActionResult> MisCitas()
+        {
+            if (!Request.Cookies.TryGetValue("IdUsuario", out string idUsuarioStr) || !int.TryParse(idUsuarioStr, out int idUsuario))
+            {
+                return RedirectToAction("Login", "Account"); // si no está logueado
+            }
+
+            var citasUsuario = await _citasRepositorio.ObtenerCitasPorUsuarioAsync(idUsuario);
+            return View(citasUsuario);
+        }
+
+
+
+
     }
 }
