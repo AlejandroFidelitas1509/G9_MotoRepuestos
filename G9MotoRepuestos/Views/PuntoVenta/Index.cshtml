@@ -267,7 +267,7 @@ else
 
             document.getElementById("formaPagoFinal").value = metodo;
 
-            // Si no es efectivo, no obligamos monto (el controller no lo exige)
+            // Si no es efectivo, no obligamos monto (el controller no lo exige)66
             document.getElementById("montoRecibidoFinal").value = (metodo === "Efectivo" ? recibido : 0);
 
             document.getElementById("formFinalizar").submit();

@@ -2,12 +2,12 @@
 {
     public class CartItemVm
     {
-        public int Id { get; set; }                 // Id del producto/servicio
-        public string Codigo { get; set; } = "";    // código/barra si existe
+        public int Id { get; set; }
+        public string Codigo { get; set; } = "";
         public string Nombre { get; set; } = "";
         public decimal Precio { get; set; }
-        public int Stock { get; set; }              // si aplica
-        public int Cantidad { get; set; } = 1;
+        public int Cantidad { get; set; }
+        public int Stock { get; set; }
 
         public decimal TotalLinea => Precio * Cantidad;
     }
