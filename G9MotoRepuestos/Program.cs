@@ -21,6 +21,10 @@ using MR.LogicaNegocio.Mapeos;
 using MR.LogicaNegocio.Productos;
 using MR.LogicaNegocio.Servicios;
 using QuestPDF.Infrastructure;
+using MR.Abstracciones.AccesoADatos.Calendarios;
+using MR.Abstracciones.LogicaDeNegocio.Calendarios;
+using MR.AccesoDatos.Calendarios;
+using MR.LogicaNegocio.Calendarios;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,6 +87,9 @@ builder.Services.AddScoped<ICitasRepositorio, CitasRepositorio>();
 builder.Services.AddScoped<ICitasServicio, CitasServicio>();
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(MapeoClases));
+
+builder.Services.AddScoped<IBloqueosCalendarioRepositorio, BloqueosCalendarioRepositorio>();
+builder.Services.AddScoped<IBloqueosCalendarioServicio, BloqueosCalendarioServicio>();
 
 
 builder.WebHost.ConfigureKestrel(options =>
