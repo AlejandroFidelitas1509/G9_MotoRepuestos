@@ -1,11 +1,12 @@
-using System.Diagnostics;
-using G9MotoRepuestos.Models;
 using G9MotoRepuestos.Data;
-using Microsoft.AspNetCore.Mvc;
+using G9MotoRepuestos.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using MR.Abstracciones.LogicaDeNegocio.Productos;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MR.Abstracciones.LogicaDeNegocio.Categorias;
+using MR.Abstracciones.LogicaDeNegocio.Productos;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace G9MotoRepuestos.Controllers
 {
@@ -43,8 +44,50 @@ namespace G9MotoRepuestos.Controllers
         }
 
         [Authorize(Roles = "Admin,Administrador,Vendedor")]
-        public IActionResult PanelControl()
+        public async Task<IActionResult> PanelControl()
         {
+            int ventasHoyCantidad = 0;
+            decimal ventasHoyMonto = 0;
+
+            try
+            {
+                await using var conn = _context.Database.GetDbConnection();
+                if (conn.State != System.Data.ConnectionState.Open)
+                    await conn.OpenAsync();
+
+                // Cantidad de ventas de hoy
+                await using (var cmdCantidad = conn.CreateCommand())
+                {
+                    cmdCantidad.CommandText = @"
+                SELECT COUNT(*)
+                FROM dbo.Ventas
+                WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
+
+                    var resultCantidad = await cmdCantidad.ExecuteScalarAsync();
+                    ventasHoyCantidad = resultCantidad != null ? Convert.ToInt32(resultCantidad) : 0;
+                }
+
+                // Monto total vendido hoy
+                await using (var cmdMonto = conn.CreateCommand())
+                {
+                    cmdMonto.CommandText = @"
+                SELECT ISNULL(SUM(Total), 0)
+                FROM dbo.Ventas
+                WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
+
+                    var resultMonto = await cmdMonto.ExecuteScalarAsync();
+                    ventasHoyMonto = resultMonto != null ? Convert.ToDecimal(resultMonto) : 0;
+                }
+            }
+            catch
+            {
+                ventasHoyCantidad = 0;
+                ventasHoyMonto = 0;
+            }
+
+            ViewBag.VentasHoyCantidad = ventasHoyCantidad;
+            ViewBag.VentasHoyMonto = ventasHoyMonto;
+
             return View();
         }
 

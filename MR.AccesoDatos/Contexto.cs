@@ -17,6 +17,8 @@ namespace MR.AccesoDatos
 
         public DbSet<Citas> Citas { get; set; }
 
+        public DbSet<BloqueosCalendario> BloqueosCalendario { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

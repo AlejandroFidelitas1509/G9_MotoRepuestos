@@ -35,7 +35,14 @@
             <div class="card kpi-card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100">
                 <div class="text-danger mb-2"><i class="fas fa-cash-register fa-2x"></i></div>
                 <h6 class="text-muted small text-uppercase fw-bold">Ventas Hoy</h6>
-                <h3 class="fw-bold mb-0 text-danger">₡85,000</h3>
+
+                <h3 class="fw-bold mb-1 text-danger">@ViewBag.VentasHoyCantidad</h3>
+                <small class="text-muted d-block">Cantidad de ventas</small>
+
+                <hr class="my-2" />
+
+                <h5 class="fw-bold mb-0 text-dark">₡ @(((decimal)ViewBag.VentasHoyMonto).ToString("N2"))</h5>
+                <small class="text-muted d-block">Monto total vendido</small>
             </div>
         </div>
         <div class="col-md-3">
