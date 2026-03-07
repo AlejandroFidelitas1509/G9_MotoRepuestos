@@ -45,7 +45,7 @@ namespace G9MotoRepuestos.Controllers
             if (ModelState.IsValid)
             {
                 // Leer el IdUsuario desde la cookie
-                if (Request.Cookies.TryGetValue("IdUsuario", out string idUsuarioStr))
+                if (Request.Cookies.TryGetValue("IdUsuario", out string? idUsuarioStr))
                 {
                     if (int.TryParse(idUsuarioStr, out int idUsuario))
                     {
@@ -86,17 +86,16 @@ namespace G9MotoRepuestos.Controllers
         {
             if (ModelState.IsValid)
             {
-                var citaEntity = _mapper.Map<Citas>(citaDto);
-                var actualizado = await _citasRepositorio.ActualizarCitaAsync(citaEntity);
+                var respuesta = await _citasServicio.ActualizarCitaAsync(citaDto);
 
-                if (actualizado)
+                if (!respuesta.EsError)
                     return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError(string.Empty, respuesta.Mensaje);
             }
 
             return View(citaDto);
-
         }
-
 
         public async Task<IActionResult> Delete(int id)
         {
@@ -133,7 +132,7 @@ namespace G9MotoRepuestos.Controllers
 
         public async Task<IActionResult> MisCitas()
         {
-            if (!Request.Cookies.TryGetValue("IdUsuario", out string idUsuarioStr) || !int.TryParse(idUsuarioStr, out int idUsuario))
+            if (!Request.Cookies.TryGetValue("IdUsuario", out string? idUsuarioStr) || !int.TryParse(idUsuarioStr, out int idUsuario))
             {
                 return RedirectToAction("Login", "Account"); // si no está logueado
             }

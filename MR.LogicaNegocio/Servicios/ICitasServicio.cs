@@ -19,5 +19,7 @@ namespace MR.LogicaNegocio.Servicios
 
         Task <CustomResponse<CitasDto>> EliminarCitaAsync(int id);
 
+       
+
     }
 }
