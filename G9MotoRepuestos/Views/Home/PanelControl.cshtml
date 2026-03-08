@@ -2,20 +2,18 @@
     ViewData["Title"] = "Panel de Control";
 }
 
-@* Vinculamos el CSS específico y la fuente Oswald por si no estuviera en el Layout *@
 <link rel="stylesheet" href="~/css/Panel.css" asp-append-version="true" />
 
 <div class="container my-5 py-4 fade-in">
-    @* --- HEADER DEL PANEL --- *@
+
     <div class="mb-5">
         <h2 class="fw-bold text-uppercase section-title">
             PANEL DE CONTROL <i class="fas fa-tachometer-alt text-danger ms-2"></i>
         </h2>
-        <p class="text-muted">Bienvenido, <span class="fw-bold text-dark">@User.Identity?.Name</span>. Resumen administrativo Mercedes Norte.</p>
+        <p class="text-muted">Bienvenido, <span class="fw-bold text-dark">@User.Identity?.Name</span>. Resumen administrativo .</p>
         <hr class="border-danger opacity-100" style="width: 60px; height: 4px; border-radius: 2px;">
     </div>
 
-    @* --- TARJETAS DE ESTADÍSTICAS (KPIs) --- *@
     <div class="row g-4 mb-5">
         <div class="col-md-3">
             <div class="card kpi-card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100">
@@ -48,13 +46,19 @@
         <div class="col-md-3">
             <div class="card kpi-card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100">
                 <div class="text-danger mb-2"><i class="fas fa-calendar-check fa-2x"></i></div>
-                <h6 class="text-muted small text-uppercase fw-bold">Citas Taller</h6>
+                <h6 class="text-muted small text-uppercase fw-bold">Citas</h6>
+                <h3 class="fw-bold mb-0">8</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card kpi-card border-0 shadow-sm rounded-4 p-3 text-center bg-white h-100">
+                <div class="text-danger mb-2"><i class="fas fa-calendar-check fa-2x"></i></div>
+                <h6 class="text-muted small text-uppercase fw-bold">Servicios</h6>
                 <h3 class="fw-bold mb-0">8</h3>
             </div>
         </div>
     </div>
 
-    @* --- CUADRÍCULA DE MÓDULOS --- *@
     <div class="p-4 p-md-5 bg-dark rounded-4 shadow-lg">
         <h5 class="text-white fw-bold mb-4 border-bottom border-secondary pb-2">
             <i class="fas fa-th-large me-2 text-danger"></i>GESTIÓN DEL NEGOCIO
@@ -111,58 +115,5 @@
             </div>
         </div>
     </div>
-
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0 text-uppercase">INGRESOS POR VENTAS (Semana Actual)</h5>
-                    <span class="badge bg-light text-danger border border-danger">Actualizado hoy</span>
-                </div>
-                <div style="height: 300px;">
-                    <canvas id="ventasChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @section Scripts {
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            const ctx = document.getElementById('ventasChart').getContext('2d');
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
-                    datasets: [{
-                        label: 'Ventas en ₡',
-                        data: [45000, 78000, 32000, 95000, 120000, 150000, 85000], // Datos de ejemplo
-                        borderColor: '#d32f2f', // Tu rojo
-                        backgroundColor: 'rgba(211, 47, 47, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4, // Curva la línea para que se vea moderna
-                        pointBackgroundColor: '#212121'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-        </script>
-    }
+    
 </div>
