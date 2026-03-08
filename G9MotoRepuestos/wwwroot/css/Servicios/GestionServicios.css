@@ -1,0 +1,58 @@
+﻿/* Paleta: Rojo #B01E1E | Negro #111111 */
+:root {
+    --primary-red: #B01E1E;
+    --dark-black: #111111;
+}
+
+.panel-modulo {
+    background: #ffffff;
+    border-top: 5px solid var(--primary-red);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.titulo-modulo {
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--dark-black);
+    letter-spacing: -1px;
+}
+
+/* Estilo para DataTable */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--primary-red) !important;
+    color: white !important;
+    border: none;
+    border-radius: 0;
+}
+
+.table thead {
+    background-color: var(--dark-black);
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.btn-rojo {
+    background-color: var(--primary-red);
+    color: white;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.3s;
+    border-radius: 0;
+}
+
+    .btn-rojo:hover {
+        background-color: var(--dark-black);
+        color: white;
+    }
+
+.form-control {
+    border: 2px solid #eee;
+    border-radius: 0;
+}
+
+    .form-control:focus {
+        border-color: var(--primary-red);
+        box-shadow: none;
+    }
