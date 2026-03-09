@@ -16,7 +16,6 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
     <link rel="stylesheet" href="~/css/paleta/Colores.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -48,19 +47,33 @@
 
                 <div class="collapse navbar-collapse" id="navMain">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            @if (esPersonalAdmin)
-                            {
+                        @if (esPersonalAdmin)
+                        {
+                            <li class="nav-item">
                                 <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="PanelControl">PANEL DE CONTROL</a>
-                            }
-                            else
-                            {
-                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>
-                            }
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
-                        </li>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Servicios">SERVICIOS</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>                          
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
+                            </li>
+                        }
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="@(esPersonalAdmin ? "Index" : "MisCitas")">
+                                    @(esPersonalAdmin ? "GESTIÓN CITAS" : "MIS CITAS")
+                                </a>
+                            </li>
+                        }
                     </ul>
 
                     @if (!esPersonalAdmin)
@@ -88,26 +101,31 @@
 
         <div class="offcanvas-header border-bottom border-secondary py-3">
             <h5 class="offcanvas-title fw-bold text-danger" style="font-family: 'Oswald', sans-serif !important;">
-                <i class="fas fa-motorcycle me-2"></i> PRODUCTOS
+                <i class="fas fa-motorcycle me-2"></i> EXPLORAR
             </h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
 
         <div class="offcanvas-body p-0 d-flex flex-column">
             <div class="list-group list-group-flush flex-grow-1">
+                <a asp-action="Servicios" asp-controller="Home"
+                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom bg-danger text-white fw-bold"
+                   style="font-family: 'Oswald', sans-serif !important;">
+                    <i class="fas fa-wrench me-2"></i> NUESTROS SERVICIOS
+                </a>
                 <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Motor"
                    class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important; transition: 0.3s;">
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
                     Repuestos de Motor
                 </a>
                 <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Accesorios"
                    class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important; transition: 0.3s;">
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
                     Accesorios
                 </a>
                 <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Aceites"
-                   class="list-group-item list-group-item-action py-3 border-secondary"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important; transition: 0.3s;">
+                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
+                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
                     Aceites y Lubricantes
                 </a>
             </div>
@@ -164,7 +182,7 @@
                 <div class="text-center text-muted small mb-3">Hoy</div>
                 <div class="d-flex mb-3">
                     <div class="bg-white p-3 rounded-3 shadow-sm border-start border-danger border-3" style="max-width: 85%;">
-                        <p class="mb-0 small">¡Hola! Bienvenido a Moto Repuestos Rojas. ¿En qué te puedo ayudar hoy?</p>
+                        <p class="mb-0 small">¡Hola! ¿Deseas agendar un servicio o buscas algún repuesto específico?</p>
                     </div>
                 </div>
             </div>
@@ -179,7 +197,7 @@
         </div>
     </div>
 
-    <button id="btnAbrirChat" class="chat-float shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat" aria-label="Abrir Chat">
+    <button id="btnAbrirChat" class="chat-float shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
         <i class="fas fa-comment-dots"></i>
     </button>
 

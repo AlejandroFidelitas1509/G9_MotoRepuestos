@@ -1,7 +1,13 @@
 ﻿@model IEnumerable<G9MotoRepuestos.Models.Servicios>
+@{
+    ViewData["Title"] = "Gestión de Servicios | Moto Repuestos Rojas";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 <link rel="stylesheet" href="~/css/Servicios/GestionServicios.css" asp-append-version="true" />
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
+    @* --- HEADER --- *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="titulo-modulo m-0">Gestión de Servicios</h2>
         <a asp-action="AgregarServicio" class="btn-rojo px-4 py-2 text-decoration-none">
@@ -9,15 +15,15 @@
         </a>
     </div>
 
+    @* --- PANEL --- *@
     <div class="panel-modulo p-4">
         <table id="tablaServicios" class="table table-hover w-100">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Imagen</th>
                     <th>Nombre</th>
                     <th>Precio</th>
-                    <th>Estado</th>
+                    <th class="text-center">Estado</th>
                     <th class="text-center">Acciones</th>
                 </tr>
             </thead>
@@ -25,14 +31,15 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="align-middle fw-bold">#@item.IdServicio</td>
                         <td class="align-middle">
-                            <img src="@item.ImagenUrl" alt="Servicio" style="width: 50px; height: 50px; object-fit: cover;" class="border" />
+                            <img src="@item.ImagenUrl" alt="Servicio" style="width: 50px; height: 50px; object-fit: cover;" class="border rounded-0" />
                         </td>
-                        <td class="align-middle text-uppercase">@item.Nombre</td>
-                        <td class="align-middle fw-bold text-danger">₡@item.Precio.ToString("N0")</td>
                         <td class="align-middle">
-                            <span class="badge @(item.Estado ? "bg-success" : "bg-dark") rounded-0">
+                            <span class="fw-bold text-uppercase">@item.Nombre</span>
+                        </td>
+                        <td class="align-middle fw-bold text-danger">₡@item.Precio.ToString("N0")</td>
+                        <td class="align-middle text-center">
+                            <span class="badge @(item.Estado ? "bg-success" : "bg-dark")">
                                 @(item.Estado ? "Activo" : "Inactivo")
                             </span>
                         </td>
@@ -41,6 +48,7 @@
                                 <a asp-action="EditarServicio" asp-route-id="@item.IdServicio" class="btn btn-sm btn-dark rounded-0 me-1">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @* Aquí podrías aplicar SweetAlert en el futuro *@
                                 <a asp-action="EliminarServicio" asp-route-id="@item.IdServicio" class="btn btn-sm btn-outline-danger rounded-0">
                                     <i class="fas fa-trash"></i>
                                 </a>
@@ -54,7 +62,6 @@
 </div>
 
 @section Scripts {
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
@@ -65,7 +72,10 @@
                     "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
                 },
                 "pageLength": 10,
-                "responsive": true
+                "responsive": true,
+                "columnDefs": [
+                    { "orderable": false, "targets": [0, 4] }
+                ]
             });
         });
     </script>

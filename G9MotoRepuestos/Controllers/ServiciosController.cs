@@ -16,18 +16,16 @@ namespace G9MotoRepuestos.Controllers
             _hostEnvironment = hostEnvironment;
         }
 
+        // 1. LISTADO
         public async Task<IActionResult> GestionServicios()
         {
-            var servicios = await _context.Servicios.ToListAsync();
-            return View(servicios);
+            return View(await _context.Servicios.ToListAsync());
         }
 
-        public IActionResult AgregarServicio()
-        {
-            return View();
-        }
+        // 2. AGREGAR (GET)
+        public IActionResult AgregarServicio() => View();
 
-
+        // 3. AGREGAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarServicio(Servicios servicio, IFormFile? ImagenFile)
@@ -37,40 +35,32 @@ namespace G9MotoRepuestos.Controllers
 
             if (ModelState.IsValid)
             {
-                if (ImagenFile != null)
-                {
-                    servicio.ImagenUrl = await GuardarImagen(ImagenFile);
-                }
-                else
-                {
-                    servicio.ImagenUrl = "/images/default-servicio.png";
-                }
+                servicio.ImagenUrl = ImagenFile != null
+                    ? await GuardarImagen(ImagenFile)
+                    : "/images/default-servicio.png";
 
                 _context.Add(servicio);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(GestionServicios));
             }
-
             return View(servicio);
         }
 
+        // 4. EDITAR (GET)
         public async Task<IActionResult> EditarServicio(int? id)
         {
             if (id == null) return NotFound();
-
             var servicio = await _context.Servicios.FindAsync(id);
             if (servicio == null) return NotFound();
-
             return View(servicio);
         }
 
-
+        // 5. EDITAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarServicio(int id, Servicios servicio, IFormFile? ImagenFile)
         {
             if (id != servicio.IdServicio) return NotFound();
-
             ModelState.Remove("ImagenUrl");
 
             if (ModelState.IsValid)
@@ -78,9 +68,7 @@ namespace G9MotoRepuestos.Controllers
                 try
                 {
                     if (ImagenFile != null)
-                    {
                         servicio.ImagenUrl = await GuardarImagen(ImagenFile);
-                    }
 
                     _context.Update(servicio);
                     await _context.SaveChangesAsync();
@@ -95,16 +83,16 @@ namespace G9MotoRepuestos.Controllers
             return View(servicio);
         }
 
+        // 6. ELIMINAR (GET)
         public async Task<IActionResult> EliminarServicio(int? id)
         {
             if (id == null) return NotFound();
-
             var servicio = await _context.Servicios.FirstOrDefaultAsync(m => m.IdServicio == id);
             if (servicio == null) return NotFound();
-
             return View(servicio);
         }
 
+        // 7. ELIMINAR (POST)
         [HttpPost, ActionName("EliminarConfirmado")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarConfirmado(int id)
@@ -117,6 +105,8 @@ namespace G9MotoRepuestos.Controllers
             }
             return RedirectToAction(nameof(GestionServicios));
         }
+
+        // --- MÉTODOS DE APOYO (ESTOS SON LOS QUE FALTABAN) ---
 
         private bool ServicioExists(int id)
         {
@@ -133,12 +123,10 @@ namespace G9MotoRepuestos.Controllers
                 Directory.CreateDirectory(rutaCarpeta);
 
             string rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
-
             using (var fileStream = new FileStream(rutaCompleta, FileMode.Create))
             {
                 await archivo.CopyToAsync(fileStream);
             }
-
             return "/images/servicios/" + nombreArchivo;
         }
     }

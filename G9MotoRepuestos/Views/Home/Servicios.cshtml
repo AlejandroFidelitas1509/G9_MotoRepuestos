@@ -1,0 +1,98 @@
+﻿@model IEnumerable<G9MotoRepuestos.Models.Servicios>
+
+@{
+    ViewData["Title"] = "Nuestros Servicios";
+}
+
+<div class="container mt-5 fade-in">
+    <div class="text-center mb-5">
+        <h6 class="text-danger fw-bold text-uppercase">Expertos en Motos</h6>
+        <h2 class="display-5 fw-bold text-dark">SERVICIOS DISPONIBLES</h2>
+        <div class="mx-auto" style="width: 80px; height: 4px; background-color: var(--rojo-rojas);"></div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm product-card-hover">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-light-danger p-3 rounded">
+                                <i class="fas fa-tools fa-2x text-danger"></i>
+                            </div>
+                            <span class="badge bg-dark">Precio: ₡ @item.Precio.ToString("N0")</span>
+                        </div>
+                        <h4 class="fw-bold">@item.Nombre</h4>
+                        <p class="text-muted">@item.Descripcion</p>
+                    </div>
+                    <div class="card-footer bg-white border-0 p-4 pt-0">
+                        @* REVISIÓN DE IDENTIDAD REFORZADA *@
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            @* BOTÓN PARA USUARIOS LOGUEADOS *@
+                            <button class="btn btn-danger w-100 fw-bold rounded-0 py-2"
+                                    onclick="abrirAgendar('@item.Nombre', '@item.IdServicio')">
+                                AGENDAR CITA
+                            </button>
+                        }
+                        else
+                        {
+                            @* BOTÓN PARA USUARIOS NO LOGUEADOS - Apunta a tu controlador Usuarios *@
+                            <a asp-controller="Usuarios" asp-action="Login"
+                               asp-route-returnUrl="@Context.Request.Path"
+                               class="btn btn-outline-dark w-100 fw-bold rounded-0 py-2">
+                                INICIA SESIÓN PARA AGENDAR
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@* MODAL PARA AGENDAR *@
+<div class="modal fade" id="modalAgendar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title fw-bold">SOLICITAR CITA</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="CrearCita" asp-controller="Citas" method="post">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="servicioId" name="IdServicio" />
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Servicio Seleccionado</label>
+                        <input type="text" id="servicioNombre" class="form-control bg-light" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Fecha y Hora</label>
+                        <input type="datetime-local" name="FechaCita" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Comentarios Adicionales</label>
+                        <textarea name="Notas" class="form-control" rows="3" placeholder="Ej: Mi moto es una Pulsar NS200..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger px-4">CONFIRMAR CITA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirAgendar(nombre, id) {
+            // Verificación extra en JS por seguridad
+            document.getElementById('servicioNombre').value = nombre;
+            document.getElementById('servicioId').value = id;
+            var myModal = new bootstrap.Modal(document.getElementById('modalAgendar'));
+            myModal.show();
+        }
+    </script>
+}
