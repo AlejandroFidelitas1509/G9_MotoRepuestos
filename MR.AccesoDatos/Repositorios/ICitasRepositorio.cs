@@ -10,10 +10,14 @@ namespace MR.AccesoDatos.Repositorios
     public interface ICitasRepositorio
     {
         Task<List<Citas>> ObtenerCitasAsync();
-        Task<Citas> ObtenerCitaPorIdAsync(int id);
+        Task<Citas?> ObtenerCitaPorIdAsync(int id);
         Task<bool> AgregarCitaAsync(Citas cita);
         Task<bool> ActualizarCitaAsync(Citas cita);
         Task<bool> EliminarCitaAsync(int id);
+
+        Task<List<Citas>> ObtenerCitasPorUsuarioAsync(int idUsuario);
+
+        Task<bool> EstaFechaBloqueadaAsync(DateTime fecha);
 
 
     }

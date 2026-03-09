@@ -73,6 +73,20 @@
                                     @(esPersonalAdmin ? "GESTIÓN CITAS" : "MIS CITAS")
                                 </a>
                             </li>
+                            }
+                            else
+                            {
+                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>
+                            }
+                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="MisCitas">Mis Citas</a>
+                            </li>
                         }
                     </ul>
 

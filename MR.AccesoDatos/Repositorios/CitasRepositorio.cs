@@ -24,20 +24,19 @@ namespace MR.AccesoDatos.Repositorios
         public async Task<bool> ActualizarCitaAsync(Citas cita)
         {
             var citaExistente = await _contexto.Citas.FindAsync(cita.IdCita);
+
             if (citaExistente == null)
                 return false;
 
-            // Actualizar propiedades
             citaExistente.Detalle = cita.Detalle;
             citaExistente.Fecha = cita.Fecha;
             citaExistente.Modelo = cita.Modelo;
             citaExistente.Placa = cita.Placa;
             citaExistente.Estado = cita.Estado;
-            citaExistente.IdUsuario = citaExistente.IdUsuario; // No se actualiza el IdUsuario
 
             await _contexto.SaveChangesAsync();
-            return true;
 
+            return true;
         }
 
         public async Task<bool> EliminarCitaAsync(int id)
@@ -53,7 +52,7 @@ namespace MR.AccesoDatos.Repositorios
 
         }
 
-        public async Task<Citas> ObtenerCitaPorIdAsync(int id)
+        public async Task<Citas?> ObtenerCitaPorIdAsync(int id)
         {
             return await _contexto.Citas.FindAsync(id);
         }
@@ -62,5 +61,23 @@ namespace MR.AccesoDatos.Repositorios
         {
             return await _contexto.Citas.ToListAsync();
         }
+
+        public async Task<List<Citas>> ObtenerCitasPorUsuarioAsync(int idUsuario)
+        {
+            return await _contexto.Citas
+                 .Where(c => c.IdUsuario == idUsuario)
+                 .ToListAsync();
+        }
+
+
+
+        public async Task<bool> EstaFechaBloqueadaAsync(DateTime fecha)
+{
+    return await _contexto.BloqueosCalendario
+        .AnyAsync(b => b.Activo &&
+                       b.FechaInicio <= fecha &&
+                       b.FechaFin > fecha);
+}
+
     }
 }

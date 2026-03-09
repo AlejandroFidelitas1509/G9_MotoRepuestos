@@ -1,0 +1,65 @@
+@using MR.LogicaNegocio.Dtos
+@model List<MR.AccesoDatos.Entidades.Citas>
+
+
+@{
+    ViewData["Title"] = "Listado de Citas";
+}
+
+<link rel="stylesheet" href="~/css/Citas.css" />
+
+<h2 class="text-center fw-bold mb-4">Listado de Citas</h2>
+
+<div class="table-container">
+    <table id="tablaMisCitas" class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Detalle</th>
+                <th>Fecha y Hora</th>
+                <th>Modelo</th>
+                <th>Placa</th>
+                <th>Estado</th>
+                <th>Usuario</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cita in Model)
+            {
+                <tr>
+                    <td>@cita.IdCita</td>
+                    <td>@cita.Detalle</td>
+                    <td>@cita.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@cita.Modelo</td>
+                    <td>@cita.Placa</td>
+                    <td>
+                        @(cita.Estado == 0 ? "Pendiente" :
+                                            cita.Estado == 1 ? "En Revision" :
+                                            cita.Estado == 2 ? "Finalizada" : "Desconocido")
+                </td>
+                <td>@cita.IdUsuario</td>
+                <td class="text-center">
+                    <a asp-controller="Citas" asp-action="Edit" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning">Editar</a>
+                    
+                    <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Cancelar</a>
+                </td>
+            </tr>
+                        }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <!-- jQuery primero -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables después -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- Tu script personalizado -->
+    <script src="~/js/citas/citas.js"></script>
+}
+
+<a asp-controller="Citas" asp-action="Create" class="btn btn-success fw-bold mt-3">Nueva Cita</a>

@@ -12,17 +12,17 @@ namespace MR.AccesoDatos.Entidades
 
 
         public int IdCita { get; set; }
-        
-        public string Detalle { get; set; }
+
+        public string Detalle { get; set; } = string.Empty;
         public DateTime Fecha { get; set; }
 
-        public string Modelo { get; set; }
+        public string? Modelo { get; set; }
 
-        public string Placa { get; set; }
+        public string? Placa { get; set; }
         public int Estado { get; set; }
 
 
-        public int IdUsuario { get; set; }
+        public int ?IdUsuario { get; set; }
 
 
     }

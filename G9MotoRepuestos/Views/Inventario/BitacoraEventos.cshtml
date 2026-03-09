@@ -1,82 +1,456 @@
-﻿@using MR.Abstracciones.EntidadesParaUI;
-@model IEnumerable<BitacoraProductosDto>
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model PagedResult<BitacoraProductosDto>
 
 @{
     ViewData["Title"] = "Bitácora de Productos";
+
+    // Filtros que guardas en ViewBag
+    string desde = ViewBag.Desde ?? "";
+    string hasta = ViewBag.Hasta ?? "";
+    string accionSel = ViewBag.AccionSel ?? "";
+    string usuarioSel = ViewBag.UsuarioSel ?? "";
+
+    // Combos
+    var acciones = (IEnumerable<string>)(ViewBag.Acciones ?? new List<string>());
+    var usuarios = (IEnumerable<(int IdUsuario, string Nombre)>)(ViewBag.Usuarios ?? new List<(int, string)>());
+
+    // Paginación
+  int currentPage = Model.Page;
+    int pageSize = 15;
+    int totalPages = Model.TotalPages;
+
+    var items = Model.Items?.ToList() ?? new List<BitacoraProductosDto>();
+
+    string BuildUrl(int p)
+    {
+        var qs = new List<string>
+        {
+            $"page={p}",
+            $"pageSize={pageSize}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(desde)) qs.Add($"desde={Uri.EscapeDataString(desde)}");
+        if (!string.IsNullOrWhiteSpace(hasta)) qs.Add($"hasta={Uri.EscapeDataString(hasta)}");
+        if (!string.IsNullOrWhiteSpace(accionSel)) qs.Add($"accion={Uri.EscapeDataString(accionSel)}");
+        if (!string.IsNullOrWhiteSpace(usuarioSel)) qs.Add($"idUsuario={Uri.EscapeDataString(usuarioSel)}");
+
+        return "?" + string.Join("&", qs);
+    }
 }
 
-<h1 class="text-danger">@ViewData["Title"]</h1>
-<hr />
+<div class="bx-page">
 
-<div class="mb-3">
-    <a asp-action="Index" class="btn btn-dark">Volver al Inventario</a>
-</div>
+    <!-- Header -->
+    <div class="bx-hero">
+        <div class="bx-hero-left">
+            <div class="bx-kicker">Panel</div>
+            <h1 class="bx-title">Bitácora de Productos</h1>
+            <div class="bx-sub">Revisa los cambios realizados, filtra por fecha, acción o usuario.</div>
+        </div>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Id</th>
-                <th>Fecha</th>
-                <th>Acción</th>
-                <th>Tabla</th>
-                <th>IdUsuario</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model == null || !Model.Any())
-            {
-                <tr>
-                    <td colspan="5" class="text-center">No hay eventos registrados.</td>
-                </tr>
-            }
-            else
-            {
-                foreach (var item in Model)
-                {
+        <div class="bx-hero-right">
+            <a asp-action="Index" class="btn btn-dark bx-btn">← Volver al Inventario</a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bx-card">
+        <form method="get" asp-action="BitacoraEventos" class="bx-filters">
+            <input type="hidden" name="page" value="1" />
+            <input type="hidden" name="pageSize" value="15" />
+
+            <div class="bx-row">
+                <div class="bx-field">
+                    <label class="bx-label">Desde</label>
+                    <input type="date" name="desde" value="@desde" class="form-control bx-input" />
+                </div>
+
+                <div class="bx-field">
+                    <label class="bx-label">Hasta</label>
+                    <input type="date" name="hasta" value="@hasta" class="form-control bx-input" />
+                </div>
+
+                <div class="bx-field">
+                    <label class="bx-label">Acción</label>
+                    <select name="accion" class="form-select bx-input">
+                        <option value="">Todas</option>
+                        @foreach (var a in acciones)
+                        {
+                            <option value="@a" selected="@(a == accionSel ? "selected" : null)">@a</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="bx-field">
+                    <label class="bx-label">Usuario</label>
+                    <select name="idUsuario" class="form-select bx-input">
+                        <option value="">Todos</option>
+                        @foreach (var u in usuarios)
+                        {
+                            <option value="@u.IdUsuario" selected="@(u.IdUsuario.ToString() == usuarioSel ? "selected" : null)">
+                                @u.Nombre
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="bx-actions">
+                    <button class="btn btn-danger bx-btn" type="submit">Filtrar</button>
+                    <a class="btn btn-outline-dark bx-btn" asp-action="BitacoraEventos">Limpiar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="bx-card bx-table-wrap">
+        <div class="table-responsive">
+            <table class="table bx-table align-middle">
+                <thead>
                     <tr>
-                        <td>@item.IdBitacora</td>
-                        <td>@(item.Fecha?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
-                        <td>@item.Accion</td>
-                        <td>@item.TablaAfectada</td>
-                        <td>@(item.IdUsuario?.ToString() ?? "N/A")</td>
+                        <th style="width:70px;">#</th>
+                        <th style="width:170px;">Fecha</th>
+                        <th style="width:120px;">Acción</th>
+                        <th style="width:260px;">Producto</th>
+                        <th style="width:160px;">Usuario</th>
+                        <th>Descripción</th>
+                        <th style="width:110px;">Detalle</th>
                     </tr>
+                </thead>
+
+                <tbody>
+                    @if (!items.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No hay eventos registrados.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in items)
+                        {
+                            var badgeClass = item.Accion switch
+                            {
+                                "CREAR" => "bx-badge bx-badge-success",
+                                "EDITAR" => "bx-badge bx-badge-warn",
+                                "ELIMINAR" => "bx-badge bx-badge-danger",
+                                _ => "bx-badge bx-badge-neutral"
+                            };
+
+                            var nombreProducto = string.IsNullOrWhiteSpace(item.NombreProducto)
+                                ? (item.RegistroId.HasValue ? $"#{item.RegistroId}" : "-")
+                                : item.NombreProducto;
+
+                            <tr>
+                                <td class="fw-bold">@item.IdBitacora</td>
+                                <td>@item.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
+
+                                <td><span class="@badgeClass">@item.Accion</span></td>
+
+                                <td class="bx-td-product">@nombreProducto</td>
+
+                                <td class="fw-semibold">@(item.UsuarioNombre ?? "N/A")</td>
+
+                                <td class="bx-td-desc">@(string.IsNullOrWhiteSpace(item.Descripcion) ? "-" : item.Descripcion)</td>
+
+                                <td>
+                                    <button class="btn btn-dark btn-sm bx-btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalDetalle-@item.IdBitacora">
+                                        Ver
+                                    </button>
+
+                                    @{
+                                        ProductoDto? antes = null;
+                                        ProductoDto? despues = null;
+
+                                        try
+                                        {
+                                            if (!string.IsNullOrWhiteSpace(item.AntesJson))
+                                                antes = System.Text.Json.JsonSerializer.Deserialize<ProductoDto>(item.AntesJson);
+
+                                            if (!string.IsNullOrWhiteSpace(item.DespuesJson))
+                                                despues = System.Text.Json.JsonSerializer.Deserialize<ProductoDto>(item.DespuesJson);
+                                        }
+                                        catch { }
+                                    }
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="modalDetalle-@item.IdBitacora" tabindex="-1">
+                                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header bx-modal-header">
+                                                    <h5 class="modal-title">Detalle del Evento #@item.IdBitacora</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <div class="bx-detail-grid">
+                                                        <div><strong>Fecha:</strong></div><div>@item.Fecha.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                                                        <div><strong>Usuario:</strong></div><div>@(item.UsuarioNombre ?? "N/A")</div>
+                                                        <div><strong>Acción:</strong></div><div><span class="@badgeClass">@item.Accion</span></div>
+                                                        <div><strong>Producto:</strong></div><div>@nombreProducto</div>
+                                                    </div>
+
+                                                    <hr class="bx-hr" />
+
+                                                    @if (antes == null && despues == null)
+                                                    {
+                                                        <div class="text-muted">No hay información de detalle disponible.</div>
+                                                    }
+                                                    else if (antes == null && despues != null)
+                                                    {
+                                                        <div class="bx-section-title">Producto creado</div>
+                                                        <div class="bx-info-card">
+                                                            <div><strong>Nombre:</strong> @despues.Nombre</div>
+                                                            <div><strong>Marca:</strong> @despues.Marca</div>
+                                                            <div><strong>Precio Venta:</strong> @despues.PrecioVenta</div>
+                                                            <div><strong>Stock:</strong> @despues.StockActual</div>
+                                                            @if (!string.IsNullOrWhiteSpace(despues.Descripcion))
+                                                            { <div><strong>Descripción:</strong> @despues.Descripcion</div> }
+                                                        </div>
+                                                    }
+                                                    else if (antes != null && despues == null)
+                                                    {
+                                                        <div class="bx-section-title">Producto eliminado / desactivado</div>
+                                                        <div class="bx-info-card">
+                                                            <div><strong>Nombre:</strong> @antes.Nombre</div>
+                                                            <div><strong>Marca:</strong> @antes.Marca</div>
+                                                            <div><strong>Precio Venta:</strong> @antes.PrecioVenta</div>
+                                                            <div><strong>Stock:</strong> @antes.StockActual</div>
+                                                            @if (!string.IsNullOrWhiteSpace(antes.Descripcion))
+                                                            { <div><strong>Descripción:</strong> @antes.Descripcion</div> }
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bx-section-title">Cambios realizados</div>
+
+                                                        <table class="table table-bordered bx-mini-table align-middle">
+                                                            <thead class="table-dark">
+                                                                <tr>
+                                                                    <th style="width:30%;">Campo</th>
+                                                                    <th>Antes</th>
+                                                                    <th>Después</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @{
+                                                                    bool hubo = false;
+
+                                                                    void Row(string campo, object? a, object? d, string? cls = null)
+                                                                    {
+                                                                        <tr>
+                                                                            <td class="fw-semibold">@campo</td>
+                                                                            <td>@(a ?? "-")</td>
+                                                                            <td class="@cls">@(d ?? "-")</td>
+                                                                        </tr>;
+                                                                    }
+
+                                                                    if (antes!.Nombre != despues!.Nombre) { hubo = true; Row("Nombre", antes.Nombre, despues.Nombre); }
+                                                                    if (antes.Marca != despues.Marca) { hubo = true; Row("Marca", antes.Marca, despues.Marca); }
+
+                                                                    if (antes.Descripcion != despues.Descripcion)
+                                                                    {
+                                                                        hubo = true;
+                                                                        Row("Descripción",
+                                                                            string.IsNullOrWhiteSpace(antes.Descripcion) ? "-" : antes.Descripcion,
+                                                                            string.IsNullOrWhiteSpace(despues.Descripcion) ? "-" : despues.Descripcion);
+                                                                    }
+
+                                                                    if (antes.PrecioCosto != despues.PrecioCosto) { hubo = true; Row("Precio Costo", antes.PrecioCosto, despues.PrecioCosto); }
+
+                                                                    if (antes.PrecioVenta != despues.PrecioVenta)
+                                                                    {
+                                                                        hubo = true;
+                                                                        var subio = (despues.PrecioVenta ?? 0) > (antes.PrecioVenta ?? 0);
+                                                                        Row("Precio Venta", antes.PrecioVenta, despues.PrecioVenta, subio ? "text-success fw-bold" : "text-danger fw-bold");
+                                                                    }
+
+                                                                    if (antes.StockActual != despues.StockActual)
+                                                                    {
+                                                                        hubo = true;
+                                                                        var subio = (despues.StockActual ?? 0) > (antes.StockActual ?? 0);
+                                                                        Row("Stock", antes.StockActual, despues.StockActual, subio ? "text-success fw-bold" : "text-danger fw-bold");
+                                                                    }
+
+                                                                    if (antes.CodigoBarras != despues.CodigoBarras)
+                                                                    {
+                                                                        hubo = true;
+                                                                        Row("Código de Barras",
+                                                                            string.IsNullOrWhiteSpace(antes.CodigoBarras) ? "-" : antes.CodigoBarras,
+                                                                            string.IsNullOrWhiteSpace(despues.CodigoBarras) ? "-" : despues.CodigoBarras);
+                                                                    }
+
+                                                                    if (antes.IdCategoria != despues.IdCategoria) { hubo = true; Row("Categoría", antes.IdCategoria, despues.IdCategoria); }
+                                                                    if (antes.ImageURL != despues.ImageURL) { hubo = true; Row("Imagen", "Anterior", "Actualizada"); }
+
+                                                                    if (!hubo)
+                                                                    {
+                                                                        <tr>
+                                                                            <td colspan="3" class="text-center text-muted">No se detectaron cambios en campos principales.</td>
+                                                                        </tr>
+                                                                    }
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    }
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-dark bx-btn" data-bs-dismiss="modal">Cerrar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Modal -->
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="bx-pager">
+            <div class="bx-pager-right">
+                <a class="btn btn-outline-dark bx-btn-sm @(Model.HasPrevious ? "" : "disabled")"
+                   href="@(Model.HasPrevious? BuildUrl(currentPage - 1) : "#")">
+                    ← Anterior
+                </a>
+
+                @{
+                    var start = Math.Max(1, currentPage - 3);
+                    var end = Math.Min(totalPages, currentPage + 3);
+
+                    if (currentPage <= 3)
+                    {
+                        start = 1;
+                        end = Math.Min(totalPages, 7);
+                    }
+
+                    if (currentPage >= totalPages - 2)
+                    {
+                        end = totalPages;
+                        start = Math.Max(1, totalPages - 6);
+                    }
+
+                    for (int p = start; p <= end; p++)
+                    {
+                        var active = p == currentPage ? "bx-page-active" : "";
+                        <a class="bx-page-num @active" href="@BuildUrl(p)">@p</a>
+                    }
                 }
-            }
-        </tbody>
-    </table>
-</div>
+
+                <a class="btn btn-outline-dark bx-btn-sm @(Model.HasNext ? "" : "disabled")"
+                   href="@(Model.HasNext? BuildUrl(currentPage + 1) : "#")">
+                    Siguiente →
+                </a>
+            </div>
+        </div>
+
+    </div> 
+</div>      
 
 <style>
-    h1 {
-        font-weight: bold;
-        margin-bottom: 20px;
+    .bx-page { padding: 10px 4px 28px; }
+
+    .bx-hero {
+        display: flex; justify-content: space-between; align-items: flex-end; gap: 14px;
+        margin-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,.08); padding-bottom: 12px;
+    }
+    .bx-kicker { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .75rem; color: #6c757d; }
+    .bx-title { margin: 0; color: #d32f2f; font-weight: 900; letter-spacing: -0.02em; }
+    .bx-sub { color: #6c757d; margin-top: 6px; font-weight: 600; }
+    .bx-hero-right { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .bx-card {
+        background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 16px; padding: 14px;
+        box-shadow: 0 12px 24px rgba(0,0,0,.06); margin-bottom: 14px;
     }
 
-    table {
-        border: 1px solid #333;
+    .bx-row { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; align-items: end; }
+    .bx-field { display: flex; flex-direction: column; gap: 6px; }
+    .bx-label { font-weight: 900; color: #222; font-size: .9rem; }
+    .bx-input { border-radius: 12px; padding: .6rem .8rem; border-color: rgba(0,0,0,.15); }
+    .bx-actions { display: flex; gap: 10px; align-items: end; justify-content: flex-start; }
+
+    .bx-btn { border-radius: 12px; font-weight: 900; padding: .6rem 1rem; }
+    .bx-btn-sm { border-radius: 10px; font-weight: 900; padding: .35rem .7rem; }
+
+    .btn-danger { background-color: #d32f2f !important; border: none !important; }
+    .btn-danger:hover { background-color: #b71c1c !important; }
+    .btn-dark { background-color: #222 !important; border: none !important; }
+    .btn-dark:hover { background-color: #444 !important; }
+
+    .bx-table-wrap { padding: 0; overflow: hidden; }
+    .bx-table { margin: 0; }
+    .bx-table thead th {
+        background: #222; color: #fff; position: sticky; top: 0; z-index: 2;
+        padding: 12px 10px; font-weight: 900; border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .bx-table tbody td { padding: 12px 10px; border-color: rgba(0,0,0,.06); vertical-align: middle; }
+
+    .bx-td-desc { max-width: 540px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bx-td-product { font-weight: 800; color: #111; }
+
+    .bx-badge { display: inline-block; padding: .38rem .6rem; border-radius: 10px; font-weight: 900; font-size: .78rem; }
+    .bx-badge-success { background: #198754; color: #fff; }
+    .bx-badge-warn { background: #ffc107; color: #111; }
+    .bx-badge-danger { background: #dc3545; color: #fff; }
+    .bx-badge-neutral { background: #6c757d; color: #fff; }
+
+    .bx-modal-header { background: #222; color: #fff; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .bx-detail-grid { display: grid; grid-template-columns: 130px 1fr; gap: 8px 14px; align-items: center; }
+    .bx-hr { border-color: rgba(0,0,0,.08); margin: 14px 0; }
+    .bx-section-title { font-weight: 900; color: #d32f2f; margin-bottom: 10px; text-align: center; }
+    .bx-info-card { border: 1px solid rgba(0,0,0,.08); border-radius: 14px; padding: 12px 14px; background: #f8f9fa; }
+    .bx-mini-table thead th { background: #222 !important; color: #fff !important; }
+
+    .bx-pager {
+        display: flex;
+        justify-content: center; /* ← centra horizontalmente */
+        align-items: center;
+        padding: 12px 14px;
+        border-top: 1px solid rgba(0,0,0,.06);
+        background: #fff;
     }
 
-    thead {
-        background-color: #333;
-        color: #fff;
+    .bx-pager-right {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center; /* ← centra los botones */
     }
 
-    tbody tr:hover {
-        background-color: #f2f2f2;
+    .bx-page-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        border: 1px solid rgba(0,0,0,.15);
+        text-decoration: none;
+        font-weight: 900;
+        color: #222;
+        background: #fff;
+    }
+    .bx-page-num:hover { background: rgba(0,0,0,.04); }
+    .bx-page-active { background: #222; color: #fff !important; border-color: #222; }
+
+    .bx-dots { font-weight: 900; opacity: .55; padding: 0 4px; }
+
+    @@media (max-width: 992px) {
+        .bx-hero { flex-direction: column; align-items: flex-start; }
+        .bx-row { grid-template-columns: 1fr 1fr; }
+        .bx-actions { grid-column: 1 / -1; }
+        .bx-td-desc { max-width: 320px; }
+        .bx-pager { flex-direction: column; gap: 10px; align-items: flex-start; }
     }
 
-    td, th {
-        text-align: center;
-        vertical-align: middle;
+    @@media (max-width: 576px) {
+        .bx-row { grid-template-columns: 1fr; }
+        .bx-td-desc { max-width: 240px; }
     }
-
-    .btn-dark {
-        background-color: #333 !important;
-        color: #fff !important;
-    }
-
-        .btn-dark:hover {
-            background-color: #555 !important;
-        }
 </style>

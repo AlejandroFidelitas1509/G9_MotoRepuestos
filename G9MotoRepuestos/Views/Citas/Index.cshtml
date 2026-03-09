@@ -5,41 +5,40 @@
     ViewData["Title"] = "Listado de Citas";
 }
 
+<link rel="stylesheet" href="~/css/Citas.css" />
+
+
 <h2 class="text-center fw-bold mb-4">Listado de Citas</h2>
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
 
 
-<table class="table table-striped table-hover table-bordered">
-    <thead class="table-dark">
-        <tr>
-            <th>Id</th>
-            <th>Detalle</th>
-            <th>Fecha y Hora</th>
-            <th>Modelo</th>
-            <th>Placa</th>
-            <th>Estado</th>
-            <th>Usuario</th>
-            <th class="text-center">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var cita in Model)
-        {
+<div class="table-container">
+    <table id="tablaCitas"  class="table">
+        <a asp-controller="Citas" asp-action="Create" class="btn btn-danger fw-bold mt-3 mb-3">NUEVA CITA</a>
+        <thead>
             <tr>
-                <td>@cita.IdCita</td>
-                <td>@cita.Detalle</td>
-                <td>@cita.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@cita.Modelo</td>
-                <td>@cita.Placa</td>
-                <td>
-                    @(cita.Estado == 0 ? "Pendiente" :
-                    cita.Estado == 1 ? "Revision" :
-                    cita.Estado == 2 ? "Finalizada" : "Desconocido")
+                <th>Id</th>
+                <th>Detalle</th>
+                <th>Fecha y Hora</th>
+                <th>Modelo</th>
+                <th>Placa</th>
+                <th>Estado</th>
+                <th>Usuario</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cita in Model)
+            {
+                <tr>
+                    <td>@cita.IdCita</td>
+                    <td>@cita.Detalle</td>
+                    <td>@cita.Fecha.ToString("ddd-dd-MMM-yyyy HH:mm")</td>
+                    <td>@cita.Modelo</td>
+                    <td>@cita.Placa</td>
+                    <td>
+                        @(cita.Estado == 0 ? "Pendiente" :
+                                            cita.Estado == 1 ? "En Revision" :
+                                            cita.Estado == 2 ? "Finalizada" : "Desconocido")
                 </td>
                 <td>@cita.IdUsuario</td>
                 <td class="text-center">
@@ -48,8 +47,22 @@
                     <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Eliminar</a>
                 </td>
             </tr>
-        }
-    </tbody>
-</table>
+                        }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <!-- jQuery primero -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<a asp-controller="Citas" asp-action="Create" class="btn btn-success fw-bold">Nueva Cita</a>
+    <!-- DataTables después -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- Tu script personalizado -->
+    <script src="~/js/citas/citas.js"></script>
+
+}
+
+

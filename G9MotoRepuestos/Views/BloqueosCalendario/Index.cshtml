@@ -1,0 +1,42 @@
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model IEnumerable<BloqueosCalendarioDto>
+
+@{
+    ViewData["Title"] = "Bloqueos de Calendario";
+}
+
+<h2>Bloqueos del Calendario</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Bloqueo</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Motivo</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FechaInicio</td>
+                <td>@item.FechaFin</td>
+                <td>@item.Motivo</td>
+                <td>@item.Activo</td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdBloqueo" class="btn btn-warning">Editar</a>
+
+                    <a asp-action="Delete" asp-route-id="@item.IdBloqueo" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

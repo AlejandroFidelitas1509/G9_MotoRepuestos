@@ -1,0 +1,35 @@
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model BloqueosCalendarioDto
+
+@{
+    ViewData["Title"] = "Eliminar Bloqueo";
+}
+
+<h2>Eliminar Bloqueo</h2>
+
+<h4>¿Está seguro que desea eliminar este bloqueo?</h4>
+
+<div>
+    <dl class="row">
+
+        <dt class="col-sm-2">Inicio</dt>
+        <dd class="col-sm-10">@Model.FechaInicio</dd>
+
+        <dt class="col-sm-2">Fin</dt>
+        <dd class="col-sm-10">@Model.FechaFin</dd>
+
+        <dt class="col-sm-2">Motivo</dt>
+        <dd class="col-sm-10">@Model.Motivo</dd>
+
+    </dl>
+</div>
+
+<form asp-action="Delete">
+
+    <input type="hidden" asp-for="IdBloqueo" />
+
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+
+</form>

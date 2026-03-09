@@ -7,19 +7,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MR.Abstracciones.AccesoADatos.Calendarios;
 
 namespace MR.LogicaNegocio.Servicios
 {
     public class CitasServicio : ICitasServicio
     {
+
         private readonly ICitasRepositorio _citasRepositorio;
         private readonly IMapper _mapper;
+        private readonly IBloqueosCalendarioRepositorio _bloqueosCalendarioRepositorio;
 
 
-        public CitasServicio(ICitasRepositorio citasRepositorio, IMapper mapper)
+
+        public CitasServicio(
+            ICitasRepositorio citasRepositorio,
+            IMapper mapper,
+            IBloqueosCalendarioRepositorio bloqueosCalendarioRepositorio)
         {
             _citasRepositorio = citasRepositorio;
             _mapper = mapper;
+            _bloqueosCalendarioRepositorio = bloqueosCalendarioRepositorio;
         }
 
 
@@ -42,15 +50,23 @@ namespace MR.LogicaNegocio.Servicios
                 return respuesta;
             }
 
-            if(!await _citasRepositorio.AgregarCitaAsync(_mapper.Map<Citas>(citaDto)))
+            // VALIDAR SI LA FECHA ESTÁ BLOQUEADA
+            if (await _bloqueosCalendarioRepositorio.EstaFechaBloqueadaAsync(citaDto.Fecha))
+            {
+                respuesta.EsError = true;
+                respuesta.Mensaje = "La fecha seleccionada no está disponible para agendar citas.";
+                return respuesta;
+            }
+
+            // GUARDAR LA CITA
+            if (!await _citasRepositorio.AgregarCitaAsync(_mapper.Map<Citas>(citaDto)))
             {
                 respuesta.EsError = true;
                 respuesta.Mensaje = "Error al agregar la cita.";
                 return respuesta;
             }
+
             return respuesta;
-
-
         }
 
 
@@ -92,6 +108,30 @@ namespace MR.LogicaNegocio.Servicios
                 respuesta.Mensaje = "Datos de la cita no proporcionados.";
                 return respuesta;
             }
+
+            if (citaDto.Fecha < DateTime.Now)
+            {
+                respuesta.EsError = true;
+                respuesta.Mensaje = "La fecha y hora de la cita no pueden ser en el pasado.";
+                return respuesta;
+            }
+
+            if (await _bloqueosCalendarioRepositorio.EstaFechaBloqueadaAsync(citaDto.Fecha))
+            {
+                respuesta.EsError = true;
+                respuesta.Mensaje = "La fecha seleccionada no está disponible para agendar citas.";
+                return respuesta;
+            }
+
+            var actualizado = await _citasRepositorio.ActualizarCitaAsync(_mapper.Map<Citas>(citaDto));
+
+            if (!actualizado)
+            {
+                respuesta.EsError = true;
+                respuesta.Mensaje = "Error al actualizar la cita.";
+                return respuesta;
+            }
+
             return respuesta;
         }
 

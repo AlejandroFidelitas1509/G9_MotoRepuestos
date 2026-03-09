@@ -12,32 +12,76 @@
         <a asp-controller="Contabilidad" asp-action="Cierres" class="btn-crear">+ Nuevo Cierre</a>
     </div>
 
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>Fecha Registro</th>
-                <th>Tipo</th>
-                <th>Periodo</th>
-                <th>Balance</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
+    <!-- ✅ Filtro por rango de fechas (Issue 145) -->
+    <form method="get" asp-controller="Contabilidad" asp-action="Historial" class="filtro">
+        <div class="filtro-grupo">
+            <label class="filtro-label">Desde</label>
+            <input type="date" name="desde" class="filtro-input" value="@ViewBag.Desde" />
+        </div>
 
-        <tbody>
-            @foreach (var c in Model)
-            {
+        <div class="filtro-grupo">
+            <label class="filtro-label">Hasta</label>
+            <input type="date" name="hasta" class="filtro-input" value="@ViewBag.Hasta" />
+        </div>
+
+        <div class="filtro-botones">
+            <button type="submit" class="btn-filtrar">Filtrar</button>
+            <a asp-controller="Contabilidad" asp-action="Historial" class="btn-limpiar">Limpiar</a>
+        </div>
+    </form>
+
+    <!-- ✅ Mensajes -->
+    @if (TempData["Ok"] != null)
+    {
+        <div class="msg msg-ok">@TempData["Ok"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="msg msg-error">@TempData["Error"]</div>
+    }
+    @if (TempData["Warning"] != null)
+    {
+        <div class="msg msg-warning">@TempData["Warning"]</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="sin-registros">
+            No existen registros.
+        </div>
+    }
+    else
+    {
+        <table class="tabla">
+            <thead>
                 <tr>
-                    <td>@c.FechaRegistro.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@c.Tipo</td>
-                    <td>@c.FechaInicio.ToString("yyyy-MM-dd") - @c.FechaFin.ToString("yyyy-MM-dd")</td>
-                    <td style="font-weight:bold;">₡@c.BalanceTotal.ToString("N2")</td>
-                    <td>
-                        <a class="accion-editar" asp-controller="Contabilidad" asp-action="CierreResultado" asp-route-id="@c.IdCierres">Ver</a>
-                    </td>
+                    <th>Fecha Registro</th>
+                    <th>Tipo</th>
+                    <th>Periodo</th>
+                    <th>Balance</th>
+                    <th>Acción</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.FechaRegistro.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@c.Tipo</td>
+                        <td>@c.FechaInicio.ToString("yyyy-MM-dd") - @c.FechaFin.ToString("yyyy-MM-dd")</td>
+                        <td style="font-weight:bold;">₡@c.BalanceTotal.ToString("N2")</td>
+                        <td>
+                            <a class="accion-editar"
+                               asp-controller="Contabilidad"
+                               asp-action="CierreResultado"
+                               asp-route-id="@c.IdCierres">Ver</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
 
 <style>
@@ -67,6 +111,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
     .btn-volver {
@@ -85,6 +131,101 @@
         padding: 8px 15px;
         border-radius: 8px;
         font-weight: bold;
+    }
+
+    /* ✅ Filtro */
+    .filtro {
+        display: flex;
+        gap: 12px;
+        align-items: end;
+        flex-wrap: wrap;
+        background: #f7f7f7;
+        border: 1px solid #e0e0e0;
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    .filtro-grupo {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .filtro-label {
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .filtro-input {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #cfcfcf;
+        outline: none;
+        min-width: 160px;
+    }
+
+    .filtro-botones {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-left: auto;
+    }
+
+    .btn-filtrar {
+        background: #000;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-limpiar {
+        background: #a6a6a6;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    /* ✅ Mensajes */
+    .msg {
+        padding: 10px 12px;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        font-weight: bold;
+    }
+
+    .msg-ok {
+        background: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #c3e6cb;
+    }
+
+    .msg-error {
+        background: #f2dede;
+        color: #a94442;
+        border: 1px solid #ebccd1;
+    }
+
+    .msg-warning {
+        background: #fcf8e3;
+        color: #8a6d3b;
+        border: 1px solid #faebcc;
+    }
+
+    .sin-registros {
+        padding: 12px;
+        border-radius: 10px;
+        background: #fcf8e3;
+        color: #8a6d3b;
+        border: 1px solid #faebcc;
+        font-weight: bold;
+        text-align: center;
     }
 
     .tabla {
@@ -113,3 +254,4 @@
         text-decoration: none;
     }
 </style>
+

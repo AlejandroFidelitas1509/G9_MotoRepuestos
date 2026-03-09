@@ -12,14 +12,14 @@ namespace MR.LogicaNegocio.Dtos
         public int IdCita { get; set; }
         [Required(ErrorMessage ="Detalle obligatorio. ")]
 
-        public string Detalle { get; set; }
+        public string Detalle { get; set; } = string.Empty;
         [Required(ErrorMessage = "Fecha obligatorio. ")]
         public DateTime Fecha { get; set; }
 
-        public string Modelo { get; set; }
+        public string? Modelo { get; set; }
 
 
-        public string Placa { get; set; }
+        public string? Placa { get; set; }
         public int Estado { get; set; }
 
 
