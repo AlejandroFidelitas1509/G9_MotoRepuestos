@@ -3,147 +3,113 @@
     ViewData["Title"] = "Gestión de Usuarios | Moto Repuestos Rojas";
 }
 
-<link rel="stylesheet" href="~/css/GestionUsuarios.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+<link rel="stylesheet" href="~/css/Usuarios/GestionUsuarios.css" asp-append-version="true" />
 
-<div class="container my-5 py-4 fade-in">
-    @* --- HEADER --- *@
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h2 class="fw-bold mb-0 text-uppercase section-title">
-                Gestión de Usuarios <i class="fas fa-users-cog text-danger ms-2"></i>
-            </h2>
-            <p class="text-muted small mt-1">Administración de personal y clientes de Moto Repuestos Rojas.</p>
-            <hr class="border-danger opacity-100 mt-2" style="width: 50px; height: 4px;">
-        </div>
-
-        <a asp-controller="Usuarios" asp-action="CrearUsuario" class="btn btn-danger rounded-pill fw-bold px-4 btn-red-rojas shadow-sm d-flex align-items-center">
-            <i class="fas fa-user-plus me-2"></i>NUEVO USUARIO
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="titulo-modulo m-0">Gestión de Usuarios</h2>
+        <a asp-action="CrearUsuario" class="btn-rojo px-4 py-2 text-decoration-none">
+            <i class="fas fa-plus me-2"></i>NUEVO USUARIO
         </a>
     </div>
 
-    @* --- TABLA --- *@
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-white border-bottom p-4">
-            <div class="row">
-                <div class="col-md-5">
-                    <div class="input-group search-input-group rounded-pill overflow-hidden border">
-                        <span class="input-group-text bg-white border-0 text-muted ps-3"><i class="fas fa-search"></i></span>
-                        <input type="text" id="userInput" class="form-control border-0 ps-2" placeholder="Buscar por nombre, correo o ID...">
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="panel-modulo p-4">
+        <table id="tablaUsuarios" class="table table-hover w-100">
+            <thead>
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Correo Electrónico</th>
+                    <th class="text-center">Rol</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    bool estaActivo = item.Estado ?? false;
+                    bool esAdmin = item.Rol?.Tipo == "Admin" || item.Rol?.Tipo == "Administrador";
 
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 custom-table">
-                <thead class="bg-dark text-white text-uppercase small">
                     <tr>
-                        <th class="ps-4 py-3">Nombre Completo</th>
-                        <th class="py-3">Correo Electrónico</th>
-                        <th class="py-3 text-center">Rol</th>
-                        <th class="py-3 text-center">Estado</th>
-                        <th class="py-3 text-end pe-4">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="userTable">
-                    @foreach (var item in Model)
-                    {
-                        bool estaActivo = item.Estado ?? false;
-                        bool esAdmin = item.Rol?.Tipo == "Admin" || item.Rol?.Tipo == "Administrador";
-
-                        <tr class="user-row">
-                            <td class="ps-4 py-3">
-                                <h6 class="mb-0 fw-bold @(estaActivo ? "" : "text-muted")">@item.NombreCompleto</h6>
-                                <span class="text-muted small">ID: #@item.IdUsuario</span>
-                            </td>
-                            <td class="text-muted">@item.Correo</td>
-                            <td class="text-center">
-                                <span class="badge @(esAdmin ? "bg-danger" : "bg-dark") rounded-pill text-uppercase">
-                                    @(item.Rol?.Tipo ?? "Cliente")
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge @(estaActivo ? "bg-success" : "bg-danger") rounded-pill px-3 shadow-sm">
-                                    @(estaActivo ? "ACTIVO" : "BLOQUEADO")
-                                </span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <a asp-action="EditarUsuario" asp-route-id="@item.IdUsuario" class="btn btn-action shadow-sm" title="Editar"><i class="fas fa-pen text-primary"></i></a>
-
+                        <td class="align-middle">
+                            <span class="fw-bold @(estaActivo ? "" : "text-muted") text-uppercase">@item.NombreCompleto</span>
+                        </td>
+                        <td class="align-middle text-muted small">@item.Correo</td>
+                        <td class="align-middle text-center">
+                            <span class="badge @(esAdmin ? "bg-danger" : "bg-dark")">
+                                @(item.Rol?.Tipo ?? "Cliente")
+                            </span>
+                        </td>
+                        <td class="align-middle text-center">
+                            <span class="badge @(estaActivo ? "bg-success" : "bg-dark")">
+                                @(estaActivo ? "Activo" : "Bloqueado")
+                            </span>
+                        </td>
+                        <td class="text-center align-middle">
+                            <div class="btn-group">
+                                <a asp-action="EditarUsuario" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-dark rounded-0 me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 @if (!esAdmin)
                                 {
-                                    <form asp-action="CambiarEstado" asp-route-id="@item.IdUsuario" method="post" class="d-inline ms-1 form-confirmar">
+                                    <form asp-action="CambiarEstado" asp-route-id="@item.IdUsuario" method="post" class="d-inline ms-1">
                                         @Html.AntiForgeryToken()
-                                        <button type="button"
-                                                class="btn btn-action shadow-sm btn-cambiar-estado"
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-0 btn-cambiar-estado"
                                                 data-nombre="@item.NombreCompleto"
-                                                data-accion="@(estaActivo ? "BLOQUEAR" : "ACTIVAR")"
-                                                title="@(estaActivo ? "Bloquear" : "Activar")">
-                                            <i class="fas @(estaActivo ? "fa-ban" : "fa-check-circle") @(estaActivo ? "text-danger" : "text-success")"></i>
+                                                data-accion="@(estaActivo ? "BLOQUEAR" : "ACTIVAR")">
+                                            <i class="fas @(estaActivo ? "fa-ban" : "fa-check-circle")"></i>
                                         </button>
                                     </form>
                                 }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
+
+
 @section Scripts {
-    @* CDN de SweetAlert2 *@
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function () {
-            // 1. Script de búsqueda
-            $("#userInput").on("keyup", function () {
-                var value = $(this).val().toLowerCase();
-                $("#userTable tr").filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                });
+            $('#tablaUsuarios').DataTable({
+                "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
+                "pageLength": 10,
+                "responsive": true,
+                "columnDefs": [{ "orderable": false, "targets": 4 }]
             });
 
-            // 2. Confirmación de Bloqueo/Activación con SweetAlert2
             $(".btn-cambiar-estado").on("click", function () {
-                var boton = $(this);
-                var nombre = boton.data("nombre");
-                var accion = boton.data("accion");
-                var form = boton.closest("form");
-
+                var btn = $(this);
                 Swal.fire({
                     title: '¿Confirmar acción?',
-                    text: "¿Deseas " + accion.toLowerCase() + " al usuario: " + nombre + "?",
+                    text: "¿Deseas " + btn.data("accion").toLowerCase() + " al usuario: " + btn.data("nombre") + "?",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: accion === 'BLOQUEAR' ? '#d33' : '#28a745',
+                    confirmButtonColor: '#B01E1E',
                     cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sí, ' + accion,
-                    cancelButtonText: 'Cancelar',
-                    border: 'none',
-                    borderRadius: '15px'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
+                    confirmButtonText: 'Confirmar'
+                }).then((result) => { if (result.isConfirmed) btn.closest("form").submit(); });
             });
 
-            // 3. Notificación de éxito si existe TempData["Mensaje"]
             @if (TempData["Mensaje"] != null)
             {
                     <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Operación Exitosa!',
-                        text: '@TempData["Mensaje"]',
-                        timer: 2500,
-                        showConfirmButton: false
-                    });
+                    Swal.fire({ icon: 'success', title: '¡Listo!', text: '@TempData["Mensaje"]', timer: 2500, showConfirmButton: false });
                     </text>
             }
         });
     </script>
 }
+        
+        
+        
+        
