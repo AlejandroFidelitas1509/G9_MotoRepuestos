@@ -1,15 +1,20 @@
 using AutoMapper;
+using G9MotoRepuestos.Data;
 using G9MotoRepuestos.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using MR.AccesoDatos.Entidades;
 using MR.AccesoDatos.Repositorios;
 using MR.LogicaNegocio.Dtos;
 using MR.LogicaNegocio.Servicios;
 
+
 namespace G9MotoRepuestos.Controllers
 {
     public class CitasController : Controller
     {
+        private readonly ApplicationDbContext _context;
 
         private readonly ILogger<CitasController> _logger;
 
@@ -18,13 +23,16 @@ namespace G9MotoRepuestos.Controllers
         private readonly IMapper _mapper;
 
 
+
+
         public CitasController(ILogger<CitasController> logger, ICitasServicio citasServicio, ICitasRepositorio citasRepositorio,
-            IMapper mapper)
+            IMapper mapper, ApplicationDbContext context)
         {
             _logger = logger;
             _citasServicio = citasServicio;
             _citasRepositorio = citasRepositorio;
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -35,6 +43,7 @@ namespace G9MotoRepuestos.Controllers
 
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -42,6 +51,8 @@ namespace G9MotoRepuestos.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CitasDto citaDto)
         {
+
+
             if (ModelState.IsValid)
             {
                 // Leer el IdUsuario desde la cookie

@@ -11,8 +11,14 @@
     <div class="col-md-8">
         <form asp-action="Create" method="post" class="border p-4 rounded shadow bg-light">
             <div class="mb-3">
-                <label asp-for="Detalle" class="form-label fw-bold"></label>
-                <input asp-for="Detalle" class="form-control" />
+                <label asp-for="Detalle" class="form-label fw-bold">Servicio</label>
+                <select asp-for="Detalle" class="form-select">
+                    <option value="">Seleccione un servicio</option>
+                    <option value="Cambio de aceite">Cambio de aceite</option>
+                    <option value="Revisión eléctrica">Revisión Eléctrica</option>
+                    <option value="Mantenimiento general">Mantenimiento General</option>
+                    <option value="Cambio de fibras y frenos">Cambio de Fibras y frenos</option>
+                </select>
                 <span asp-validation-for="Detalle" class="text-danger"></span>
             </div>
 
@@ -43,8 +49,6 @@
                 </select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
-
-
 
             <div class="text-center">
                 <button type="submit" class="btn btn-danger fw-bold">Guardar</button>
