@@ -1,0 +1,77 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap');
+
+:root {
+    --primary-red: #B01E1E;
+    --dark-black: #111111;
+    --gris-borde: #dee2e6;
+    --font-main: 'Oswald', sans-serif;
+}
+
+body {
+    font-family: var(--font-main);
+}
+
+.titulo-modulo {
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--dark-black);
+    border-left: 5px solid var(--primary-red);
+    padding-left: 15px;
+    letter-spacing: 1px;
+}
+
+.panel-modulo {
+    background: #ffffff;
+    border: 1px solid var(--gris-borde);
+    border-top: 5px solid var(--primary-red);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Encabezado Negro idéntico a Usuarios */
+#tablaServicios thead {
+    background-color: var(--dark-black) !important;
+    color: white !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+#tablaServicios th {
+    border: none;
+    padding: 15px !important;
+}
+
+/* Badges Técnicos (Oswald y Pequeños) */
+#tablaServicios .badge {
+    font-family: var(--font-main) !important;
+    font-weight: 400;
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+}
+
+.btn-rojo {
+    background-color: var(--primary-red) !important;
+    color: white !important;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 0;
+    transition: background 0.3s;
+}
+
+    .btn-rojo:hover {
+        background-color: #8a1717 !important;
+    }
+
+/* Paginación */
+.page-item.active .page-link {
+    background-color: var(--primary-red) !important;
+    border-color: var(--primary-red) !important;
+    color: white !important;
+}
+
+.page-link {
+    color: var(--dark-black);
+    border-radius: 0 !important;
+}

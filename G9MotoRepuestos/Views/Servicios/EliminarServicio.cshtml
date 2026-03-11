@@ -1,0 +1,24 @@
+﻿@model G9MotoRepuestos.Models.Servicios
+<link rel="stylesheet" href="~/css/Servicios/GestionServicios.css" asp-append-version="true" />
+
+<div class="container mt-5">
+    <div class="panel-modulo p-5 text-center border-danger border-top border-4">
+        <h3 class="fw-bold text-uppercase">¿Eliminar este servicio?</h3>
+        <p class="text-muted">@Model.Nombre</p>
+
+        <form asp-action="EliminarConfirmado" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="IdServicio" name="id" />
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger rounded-0 py-3 fw-bold">
+                    SÍ, ELIMINAR DEFINITIVAMENTE
+                </button>
+                <a asp-action="GestionServicios" class="btn btn-dark rounded-0 py-3">
+                    CANCELAR Y VOLVER
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
