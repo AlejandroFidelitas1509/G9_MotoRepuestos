@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MR.Abstracciones.LogicaDeNegocio.Categorias;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
+using System.Data;
 using System.Diagnostics;
 using System.Security.Claims;
-using System.Data;
 
 namespace G9MotoRepuestos.Controllers
 {
@@ -18,16 +18,11 @@ namespace G9MotoRepuestos.Controllers
         private readonly IProductosLN _productosLN;
         private readonly ICategoriasLN _categoriasLN;
 
-        private readonly IProductosLN _productosLN;
-
-        private readonly ICategoriasLN _categoriasLN;
-
         public HomeController(
             ILogger<HomeController> logger,
             ApplicationDbContext context,
-            IProductosLN productosLN,  
-            ICategoriasLN categoriasLN)  
-
+            IProductosLN productosLN,
+            ICategoriasLN categoriasLN)
         {
             _logger = logger;
             _context = context;
@@ -37,17 +32,19 @@ namespace G9MotoRepuestos.Controllers
 
         public IActionResult Index()
         {
-            var userRole = User.FindFirstValue(ClaimTypes.Role) ?? User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+            var userRole = User.FindFirstValue(ClaimTypes.Role)
+                          ?? User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
             if (userRole == "Admin" || userRole == "Administrador" || userRole == "Vendedor")
             {
                 return RedirectToAction("PanelControl");
             }
+
             return View();
         }
 
         [Authorize(Roles = "Admin,Administrador,Vendedor")]
-        public async Task<IActionResult> PanelControl() // Agregado async Task
+        public async Task<IActionResult> PanelControl()
         {
             int ventasHoyCantidad = 0;
             decimal ventasHoyMonto = 0;
@@ -58,25 +55,27 @@ namespace G9MotoRepuestos.Controllers
 
             try
             {
-                // 1. Conteo de Servicios (LINQ)
                 serviciosTotales = await _context.Servicios.CountAsync();
                 serviciosActivos = await _context.Servicios.CountAsync(s => s.Estado == true);
 
-                // 2. Conexión para SQL Directo
                 await using var conn = _context.Database.GetDbConnection();
+
                 if (conn.State != ConnectionState.Open)
                     await conn.OpenAsync();
 
                 await using (var cmdVentas = conn.CreateCommand())
                 {
-                    cmdVentas.CommandText = "SELECT COUNT(*), ISNULL(SUM(Total), 0) FROM dbo.Ventas WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
-                    using (var reader = await cmdVentas.ExecuteReaderAsync())
+                    cmdVentas.CommandText = @"
+                        SELECT COUNT(*), ISNULL(SUM(Total), 0)
+                        FROM dbo.Ventas
+                        WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
+
+                    await using var reader = await cmdVentas.ExecuteReaderAsync();
+
+                    if (await reader.ReadAsync())
                     {
-                        if (await reader.ReadAsync())
-                        {
-                            ventasHoyCantidad = reader.GetInt32(0);
-                            ventasHoyMonto = reader.GetDecimal(1);
-                        }
+                        ventasHoyCantidad = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
+                        ventasHoyMonto = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1);
                     }
                 }
 
@@ -87,60 +86,18 @@ namespace G9MotoRepuestos.Controllers
                             (SELECT COUNT(*) FROM dbo.Usuarios),
                             (SELECT COUNT(*) FROM dbo.Usuarios WHERE Estado = 1);";
 
-                    using (var reader = await cmdUsers.ExecuteReaderAsync())
+                    await using var reader = await cmdUsers.ExecuteReaderAsync();
+
+                    if (await reader.ReadAsync())
                     {
-                        if (await reader.ReadAsync())
-                        {
-                            usuariosTotales = reader.GetInt32(0);
-                            usuariosActivos = reader.GetInt32(1);
-                        }
+                        usuariosTotales = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
+                        usuariosActivos = reader.IsDBNull(1) ? 0 : reader.GetInt32(1);
                     }
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en PanelControl al obtener estadísticas.");
-                
-        public async Task<IActionResult> PanelControl()
-        {
-            int ventasHoyCantidad = 0;
-            decimal ventasHoyMonto = 0;
-
-            try
-            {
-                await using var conn = _context.Database.GetDbConnection();
-                if (conn.State != System.Data.ConnectionState.Open)
-                    await conn.OpenAsync();
-
-                // Cantidad de ventas de hoy
-                await using (var cmdCantidad = conn.CreateCommand())
-                {
-                    cmdCantidad.CommandText = @"
-                SELECT COUNT(*)
-                FROM dbo.Ventas
-                WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
-
-                    var resultCantidad = await cmdCantidad.ExecuteScalarAsync();
-                    ventasHoyCantidad = resultCantidad != null ? Convert.ToInt32(resultCantidad) : 0;
-                }
-
-                // Monto total vendido hoy
-                await using (var cmdMonto = conn.CreateCommand())
-                {
-                    cmdMonto.CommandText = @"
-                SELECT ISNULL(SUM(Total), 0)
-                FROM dbo.Ventas
-                WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
-
-                    var resultMonto = await cmdMonto.ExecuteScalarAsync();
-                    ventasHoyMonto = resultMonto != null ? Convert.ToDecimal(resultMonto) : 0;
-                }
-            }
-            catch
-            {
-                ventasHoyCantidad = 0;
-                ventasHoyMonto = 0;
-
             }
 
             ViewBag.VentasHoyCantidad = ventasHoyCantidad;
@@ -153,18 +110,15 @@ namespace G9MotoRepuestos.Controllers
             return View();
         }
 
-
-        public IActionResult Catalogo()
-        {
-            return View(); 
-
         public async Task<IActionResult> Catalogo(int? categoriaId)
         {
-            var categorias = await _categoriasLN.ListarAsync(true);     
-            var productos = await _productosLN.ListarAsync(true);       
+            var categorias = await _categoriasLN.ListarAsync(true);
+            var productos = await _productosLN.ListarAsync(true);
 
             if (categoriaId.HasValue)
-                productos = productos.Where(p => p.IdCategoria == categoriaId.Value);
+            {
+                productos = productos.Where(p => p.IdCategoria == categoriaId.Value).ToList();
+            }
 
             var vm = new CatalogoVm
             {
@@ -174,18 +128,7 @@ namespace G9MotoRepuestos.Controllers
             };
 
             return View(vm);
-
         }
-        //public async Task<IActionResult> Catalogo(int? categoriaId)
-        //{
-        //    var categorias = await _categoriasLN.ListarAsync(true);
-        //    var productos = await _productosLN.ListarAsync(true);
-
-        //    if (categoriaId.HasValue)
-        //        productos = productos.Where(p => p.IdCategoria == categoriaId.Value).ToList();
-
-        //    return View(new CatalogoVm { Categorias = categorias, Productos = productos, CategoriaId = categoriaId });
-        //}
 
         public async Task<IActionResult> Servicios()
         {
@@ -196,16 +139,35 @@ namespace G9MotoRepuestos.Controllers
             return View(servicios);
         }
 
-        public IActionResult Nosotros() => View();
-        public IActionResult Privacy() => View();
+        public IActionResult Nosotros()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
 
         public IActionResult TestConexion()
         {
-            try { return Content(_context.Database.CanConnect() ? "OK ✅" : "Error ❌"); }
-            catch (Exception ex) { return Content(ex.Message); }
+            try
+            {
+                return Content(_context.Database.CanConnect() ? "OK ✅" : "Error ❌");
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
+        }
     }
 }
