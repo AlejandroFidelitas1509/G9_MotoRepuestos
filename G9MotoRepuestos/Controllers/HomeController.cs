@@ -18,16 +18,11 @@ namespace G9MotoRepuestos.Controllers
         private readonly IProductosLN _productosLN;
         private readonly ICategoriasLN _categoriasLN;
 
-        private readonly IProductosLN _productosLN;
-
-        private readonly ICategoriasLN _categoriasLN;
-
         public HomeController(
             ILogger<HomeController> logger,
             ApplicationDbContext context,
-            IProductosLN productosLN,  
-            ICategoriasLN categoriasLN)  
-
+            IProductosLN productosLN,
+            ICategoriasLN categoriasLN)
         {
             _logger = logger;
             _context = context;
@@ -58,11 +53,10 @@ namespace G9MotoRepuestos.Controllers
 
             try
             {
-                // 1. Conteo de Servicios (LINQ)
                 serviciosTotales = await _context.Servicios.CountAsync();
                 serviciosActivos = await _context.Servicios.CountAsync(s => s.Estado == true);
 
-                // 2. Conexión para SQL Directo
+
                 await using var conn = _context.Database.GetDbConnection();
                 if (conn.State != ConnectionState.Open)
                     await conn.OpenAsync();
@@ -100,47 +94,6 @@ namespace G9MotoRepuestos.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en PanelControl al obtener estadísticas.");
-                
-        public async Task<IActionResult> PanelControl()
-        {
-            int ventasHoyCantidad = 0;
-            decimal ventasHoyMonto = 0;
-
-            try
-            {
-                await using var conn = _context.Database.GetDbConnection();
-                if (conn.State != System.Data.ConnectionState.Open)
-                    await conn.OpenAsync();
-
-                // Cantidad de ventas de hoy
-                await using (var cmdCantidad = conn.CreateCommand())
-                {
-                    cmdCantidad.CommandText = @"
-                SELECT COUNT(*)
-                FROM dbo.Ventas
-                WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
-
-                    var resultCantidad = await cmdCantidad.ExecuteScalarAsync();
-                    ventasHoyCantidad = resultCantidad != null ? Convert.ToInt32(resultCantidad) : 0;
-                }
-
-                // Monto total vendido hoy
-                await using (var cmdMonto = conn.CreateCommand())
-                {
-                    cmdMonto.CommandText = @"
-                SELECT ISNULL(SUM(Total), 0)
-                FROM dbo.Ventas
-                WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
-
-                    var resultMonto = await cmdMonto.ExecuteScalarAsync();
-                    ventasHoyMonto = resultMonto != null ? Convert.ToDecimal(resultMonto) : 0;
-                }
-            }
-            catch
-            {
-                ventasHoyCantidad = 0;
-                ventasHoyMonto = 0;
-
             }
 
             ViewBag.VentasHoyCantidad = ventasHoyCantidad;
@@ -156,25 +109,7 @@ namespace G9MotoRepuestos.Controllers
 
         public IActionResult Catalogo()
         {
-            return View(); 
-
-        public async Task<IActionResult> Catalogo(int? categoriaId)
-        {
-            var categorias = await _categoriasLN.ListarAsync(true);     
-            var productos = await _productosLN.ListarAsync(true);       
-
-            if (categoriaId.HasValue)
-                productos = productos.Where(p => p.IdCategoria == categoriaId.Value);
-
-            var vm = new CatalogoVm
-            {
-                Categorias = categorias,
-                Productos = productos,
-                CategoriaId = categoriaId
-            };
-
-            return View(vm);
-
+            return View();
         }
         //public async Task<IActionResult> Catalogo(int? categoriaId)
         //{
