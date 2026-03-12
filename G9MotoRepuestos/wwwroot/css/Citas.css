@@ -1,120 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap');
+
 :root {
-    /* Colores Material UI */
-    --primary-red: #d32f2f;
-    --dark-black: #212121;
-    --light-white: #f5f5f5;
-    --secondary-grey: #9e9e9e;
-    /* Fuente única */
+    --rojo-rojas: #B01E1E;
+    --negro-rojas: #111111;
+    --gris-fondo: #f8f9fa;
     --font-main: 'Oswald', sans-serif;
-    /* Semántica */
-    --bg-main: var(--light-white);
-    --text-header: var(--dark-black);
-    --accent: var(--primary-red);
 }
 
-/* Estilos generales */
 body {
-    background-color: var(--bg-main);
+    background-color: var(--gris-fondo);
     font-family: var(--font-main);
-    color: var(--dark-black);
-    margin: 0;
-    padding: 0;
 }
 
-/* Encabezado */
-h2 {
-    color: var(--text-header);
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-}
 
-/* Contenedor de la tabla */
-.table-container {
-    max-width: 90%;
-    margin: 0 auto;
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
 
-/* Tabla */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-}
 
-    .table thead {
-        background-color: var(--dark-black);
-        color: var(--light-white);
+    .btn-rojo:hover {
+        background-color: #8a1717;
+        color: white;
     }
 
-    .table th, .table td {
-        padding: 0.75rem 1rem;
-        text-align: center;
-        border: 1px solid var(--secondary-grey);
-    }
+/* Tabla de Citas - Encabezado Negro */
+#tablaCitas thead {
+    background-color: var(--negro-rojas);
+    color: white !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
 
-    .table tbody tr:hover {
-        background-color: rgba(211, 47, 47, 0.05);
-        transition: background-color 0.3s ease;
-    }
+#tablaCitas th {
+    border: none;
+    padding: 15px;
+    color: white;
+}
 
-/* Botones */
-.btn {
-    font-family: var(--font-main);
-    font-weight: 600;
-    border-radius: 6px;
+/* Badges corregidos */
+#tablaCitas .badge {
+    font-family: var(--font-main) !important;
+    font-weight: 400;
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+}
+
+/* Colores */
+.bg-danger {
+    background-color: var(--rojo-rojas) !important;
+}
+
+.bg-dark {
+    background-color: var(--negro-rojas) !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+}
+
+/* Paginación */
+.page-item.active .page-link {
+    background-color: var(--rojo-rojas) !important;
+    border-color: var(--rojo-rojas) !important;
+    color: white !important;
+}
+
+.page-link {
+    color: var(--negro-rojas);
+    border-radius: 0 !important;
+}
+
+/* Efecto hover en filas de la tabla */
+#tablaCitas tbody tr:hover {
+    background-color: #f8d7da; /* rojo claro */
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efecto hover en la tabla completa */
+#tablaCitas:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
-    padding: 0.4rem 0.8rem;
-}
-
-.btn-warning {
-    background-color: #fbc02d;
-    border: none;
-    color: var(--dark-black);
-}
-
-    .btn-warning:hover {
-        background-color: #f9a825;
-        transform: scale(1.05);
-    }
-
-.btn-info {
-    background-color: #0288d1;
-    border: none;
-    color: white;
-}
-
-    .btn-info:hover {
-        background-color: #0277bd;
-        transform: scale(1.05);
-    }
-
-.btn-danger {
-    background-color: var(--primary-red);
-    border: none;
-    color: white;
-}
-
-    .btn-danger:hover {
-        background-color: #b71c1c;
-        transform: scale(1.05);
-    }
-
-.btn-success {
-    background-color: #388e3c;
-    border: none;
-    color: white;
-}
-
-    .btn-success:hover {
-        background-color: #2e7d32;
-        transform: scale(1.05);
-    }
-
-.form-control:focus, .form-select:focus {
-    border-color: #dc3545; /* rojo Bootstrap */
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }

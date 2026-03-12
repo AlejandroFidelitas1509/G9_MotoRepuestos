@@ -5,34 +5,40 @@
     ViewData["Title"] = "Eliminar Cita";
 }
 
-<h2>Eliminar Cita</h2>
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card shadow-lg border-0" style="max-width: 600px; width: 100%;">
+        <div class="card-body text-center">
+            <!-- Título principal -->
+            <h2 class="text-dark fw-bold mb-3">Eliminar Cita</h2>
+            <h5 class="text-muted mb-4">¿Estás seguro que deseas eliminar esta cita?</h5>
 
-<h3>¿Estás seguro que deseas eliminar esta cita?</h3>
+            <!-- Detalles de la cita -->
+            <dl class="row text-start">
+                <dt class="col-sm-4 fw-bold">Detalle</dt>
+                <dd class="col-sm-8">@Model.Detalle</dd>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Detalle</dt>
-        <dd class="col-sm-10">@Model.Detalle</dd>
+                <dt class="col-sm-4 fw-bold">Fecha</dt>
+                <dd class="col-sm-8">@Model.Fecha</dd>
 
-        <dt class="col-sm-2">Fecha</dt>
-        <dd class="col-sm-10">@Model.Fecha</dd>
+                <dt class="col-sm-4 fw-bold">Modelo</dt>
+                <dd class="col-sm-8">@Model.Modelo</dd>
 
-        <dt class="col-sm-2">Modelo</dt>
-        <dd class="col-sm-10">@Model.Modelo</dd>
+                <dt class="col-sm-4 fw-bold">Placa</dt>
+                <dd class="col-sm-8">@Model.Placa</dd>
 
-        <dt class="col-sm-2">Placa</dt>
-        <dd class="col-sm-10">@Model.Placa</dd>
+                <dt class="col-sm-4 fw-bold">Estado</dt>
+                <dd class="col-sm-8">
+                    @(Model.Estado == 0 ? "Pendiente" :
+                                        Model.Estado == 1 ? "Terminada" : "Cancelada")
+                </dd>
+            </dl>
 
-        <dt class="col-sm-2">Estado</dt>
-        <dd class="col-sm-10">
-            @(Model.Estado == 0 ? "Pendiente" :
-                        Model.Estado == 1 ? "Terminada" : "Cancelada")
-        </dd>
-    </dl>
+            <!-- Botones de acción -->
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="IdCita" />
+                <button type="submit" class="btn btn-danger me-2">Eliminar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="IdCita" />
-    <button type="submit" class="btn btn-danger">Eliminar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>

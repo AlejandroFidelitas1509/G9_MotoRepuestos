@@ -41,11 +41,17 @@
                                             cita.Estado == 2 ? "Finalizada" : "Desconocido")
                 </td>
                 <td>@cita.IdUsuario</td>
-                <td class="text-center">
-                    <a asp-controller="Citas" asp-action="Edit" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning">Editar</a>
-                    
-                    <a asp-controller="Citas" asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">Eliminar</a>
-                </td>
+                <td>
+                    <!-- Botón Editar con ícono -->
+                    <a asp-action="Edit" asp-route-id="@cita.IdCita" class="btn btn-sm btn-warning me-2">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                        <!-- Botón Eliminar con ícono -->
+                        <a asp-action="Delete" asp-route-id="@cita.IdCita" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
             </tr>
                         }
         </tbody>
@@ -64,5 +70,7 @@
     <script src="~/js/citas/citas.js"></script>
 
 }
+
+
 
 

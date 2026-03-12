@@ -63,6 +63,8 @@ namespace G9MotoRepuestos.Controllers
                         citaDto.IdUsuario = idUsuario;
                     }
                 }
+                citaDto.Estado = 0;
+
 
                 var respuesta = await _citasServicio.AgregarCitaAsync(citaDto);
                 if (!respuesta.EsError)
