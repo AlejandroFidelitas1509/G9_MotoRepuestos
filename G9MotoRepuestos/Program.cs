@@ -2,29 +2,31 @@ using G9MotoRepuestos.Data;
 using G9MotoRepuestos.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-
 using MR.Abstracciones.AccesoADatos.Bitacora;
-
+using MR.Abstracciones.AccesoADatos.Calendarios;
 using MR.Abstracciones.AccesoADatos.Categorias;
+using MR.Abstracciones.AccesoADatos.Finanzas;
 using MR.Abstracciones.AccesoADatos.Productos;
 using MR.Abstracciones.LogicaDeNegocio.Bitacora;
+using MR.Abstracciones.LogicaDeNegocio.Calendarios;
 using MR.Abstracciones.LogicaDeNegocio.Categorias;
+using MR.Abstracciones.LogicaDeNegocio.Finanzas;
 using MR.Abstracciones.LogicaDeNegocio.Productos;
 using MR.AccesoDatos;
 using MR.AccesoDatos.Bitacora;
+using MR.AccesoDatos.Calendarios;
 using MR.AccesoDatos.Categorias;
+using MR.AccesoDatos.Finanzas;
 using MR.AccesoDatos.Productos;
 using MR.AccesoDatos.Repositorios;
 using MR.LogicaNegocio.Bitacora;
+using MR.LogicaNegocio.Calendarios;
 using MR.LogicaNegocio.Categorias;
+using MR.LogicaNegocio.Finanzas;
 using MR.LogicaNegocio.Mapeos;
 using MR.LogicaNegocio.Productos;
 using MR.LogicaNegocio.Servicios;
 using QuestPDF.Infrastructure;
-using MR.Abstracciones.AccesoADatos.Calendarios;
-using MR.Abstracciones.LogicaDeNegocio.Calendarios;
-using MR.AccesoDatos.Calendarios;
-using MR.LogicaNegocio.Calendarios;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -90,6 +92,11 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(MapeoClases));
 
 builder.Services.AddScoped<IBloqueosCalendarioRepositorio, BloqueosCalendarioRepositorio>();
 builder.Services.AddScoped<IBloqueosCalendarioServicio, BloqueosCalendarioServicio>();
+
+builder.Services.AddScoped<IFinanzasAD>(sp =>
+    new FinanzasAD(builder.Configuration.GetConnectionString("DefaultConnection")!));
+
+builder.Services.AddScoped<IFinanzasLN, FinanzasLN>();
 
 
 builder.WebHost.ConfigureKestrel(options =>

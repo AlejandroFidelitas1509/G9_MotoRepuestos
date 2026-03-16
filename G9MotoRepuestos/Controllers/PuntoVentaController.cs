@@ -5,6 +5,7 @@ using G9MotoRepuestos.Services;
 using G9MotoRepuestos.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using MR.Abstracciones.LogicaDeNegocio.Finanzas;
 
 namespace G9MotoRepuestos.Controllers
 {
@@ -13,11 +14,16 @@ namespace G9MotoRepuestos.Controllers
         private const string CART_KEY = "PV_CART";
         private readonly IVentasService _ventas;
         private readonly ApplicationDbContext _db;
+        private readonly IFinanzasLN _finanzasLN;
 
-        public PuntoVentaController(IVentasService ventas, ApplicationDbContext db)
+        public PuntoVentaController(
+            IVentasService ventas,
+            ApplicationDbContext db,
+            IFinanzasLN finanzasLN)
         {
             _ventas = ventas;
             _db = db;
+            _finanzasLN = finanzasLN;
         }
 
         public IActionResult Index()
@@ -93,7 +99,7 @@ namespace G9MotoRepuestos.Controllers
 
             item.Cantidad = qty;
 
-            SaveCart(cart); // ✅ esto es clave
+            SaveCart(cart);
 
             TempData["Ok"] = "Cantidad actualizada.";
             return RedirectToAction(nameof(Index));
@@ -164,6 +170,12 @@ namespace G9MotoRepuestos.Controllers
             var idUsuarioStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             int? idUsuario = int.TryParse(idUsuarioStr, out var n) ? n : (int?)null;
 
+            if (!idUsuario.HasValue || idUsuario.Value <= 0)
+            {
+                TempData["Error"] = "No se pudo identificar el usuario actual.";
+                return RedirectToAction(nameof(Index));
+            }
+
             try
             {
                 var idVenta = await _ventas.CrearVentaAsync(
@@ -174,6 +186,15 @@ namespace G9MotoRepuestos.Controllers
                     0m,
                     vm.Total,
                     vm.Carrito
+                );
+
+                await _finanzasLN.RegistrarIngresoAutomaticoAsync(
+                    vm.Total,
+                    idUsuario.Value,
+                    "Venta",
+                    $"Venta #{idVenta} - Forma de pago: {formaPago}",
+                    "Venta",
+                    idVenta
                 );
 
                 SaveCart(new List<CartItemVm>());

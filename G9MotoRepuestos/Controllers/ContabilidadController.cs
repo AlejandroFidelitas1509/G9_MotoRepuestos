@@ -1,205 +1,137 @@
-﻿using G9MotoRepuestos.Data;
-using G9MotoRepuestos.Models;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MR.Abstracciones.EntidadesParaUI;
+using MR.Abstracciones.LogicaDeNegocio.Finanzas;
 
 namespace G9MotoRepuestos.Controllers
 {
+    [Authorize]
     public class ContabilidadController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IFinanzasLN _finanzasLN;
 
-        public ContabilidadController(ApplicationDbContext db)
+        public ContabilidadController(IFinanzasLN finanzasLN)
         {
-            _db = db;
+            _finanzasLN = finanzasLN;
         }
 
-        public IActionResult Index() => View();
-
-        public IActionResult Cierres() => View();
-
-        // ✅ Issue 145: Historial + filtros (desde/hasta)
         [HttpGet]
-        public async Task<IActionResult> Historial(DateTime? desde, DateTime? hasta)
+        public async Task<IActionResult> Index(
+            string? textoBusqueda,
+            DateTime? desde,
+            DateTime? hasta,
+            string? tipoFiltro,
+            string? origenFiltro)
         {
-            var q = _db.Cierres.AsQueryable();
+            var modelo = new ContabilidadIndexDto
+            {
+                TextoBusqueda = textoBusqueda,
+                Desde = desde,
+                Hasta = hasta,
+                TipoFiltro = tipoFiltro,
+                OrigenFiltro = origenFiltro,
+                Resumen = await _finanzasLN.ObtenerResumenAsync(desde, hasta, tipoFiltro, origenFiltro),
+                Movimientos = (await _finanzasLN.ObtenerMovimientosAsync(
+                    textoBusqueda,
+                    desde,
+                    hasta,
+                    tipoFiltro,
+                    origenFiltro)).ToList()
+            };
 
+            return View(modelo);
+        }
 
-            if (desde.HasValue)
-                q = q.Where(x => x.FechaRegistro >= desde.Value.Date);
+        [HttpGet]
+        public IActionResult RegistrarMovimiento()
+        {
+            var modelo = new MovimientoFinancieroDto
+            {
+                Fecha = DateTime.Now,
+                Origen = "Manual"
+            };
 
-            if (hasta.HasValue)
-                q = q.Where(x => x.FechaRegistro < hasta.Value.Date.AddDays(1));
+            return View(modelo);
+        }
 
-            var cierres = await q
-                .OrderByDescending(x => x.FechaRegistro)
-                .ToListAsync();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegistrarMovimiento(MovimientoFinancieroDto modelo)
+        {
+            try
+            {
+                modelo.IdUsuario = ObtenerIdUsuarioActual();
 
-            if (cierres.Count == 0)
-                TempData["Warning"] = "No existen registros";
+                if (string.IsNullOrWhiteSpace(modelo.Origen))
+                    modelo.Origen = "Manual";
 
+                await _finanzasLN.RegistrarMovimientoAsync(modelo);
 
-            ViewBag.Desde = desde?.ToString("yyyy-MM-dd");
-            ViewBag.Hasta = hasta?.ToString("yyyy-MM-dd");
+                TempData["Success"] = "El movimiento se registró correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View(modelo);
+            }
+        }
 
+        [HttpGet]
+        public IActionResult RealizarCierre(DateTime? desde, DateTime? hasta)
+        {
+            var hoy = DateTime.Today;
+
+            var modelo = new CierreContableDto
+            {
+                FechaInicio = desde ?? hoy,
+                FechaFin = hasta ?? hoy,
+                FechaRegistro = DateTime.Now,
+                Tipo = "Diario"
+            };
+
+            return View(modelo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RealizarCierre(CierreContableDto modelo)
+        {
+            try
+            {
+                modelo.IdUsuario = ObtenerIdUsuarioActual();
+
+                await _finanzasLN.RegistrarCierreAsync(modelo);
+
+                TempData["Success"] = "El cierre contable se registró correctamente.";
+                return RedirectToAction(nameof(HistorialCierres));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View(modelo);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HistorialCierres()
+        {
+            var cierres = await _finanzasLN.ObtenerCierresAsync();
             return View(cierres);
         }
 
-        // ✅ Realizar cierre (diario, semanal, mensual) - FIX: fecha como string para validar formato inválido
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RealizarCierre(string tipo, string? fecha, DateTime? fechaInicio, DateTime? fechaFin)
+        private int ObtenerIdUsuarioActual()
         {
-            tipo = (tipo ?? "").Trim().ToLower();
+            var claim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst("IdUsuario")?.Value ??
+                User.FindFirst("id")?.Value;
 
-            DateTime inicio;
-            DateTime fin;
+            if (int.TryParse(claim, out int idUsuario))
+                return idUsuario;
 
-            // ✅ Validación: fecha requerida y formato
-            if (tipo == "diario")
-            {
-                if (string.IsNullOrWhiteSpace(fecha))
-                {
-                    TempData["Error"] = "La fecha es requerida";
-                    return RedirectToAction(nameof(Cierres));
-                }
-
-                if (!DateTime.TryParse(fecha, out var fechaParseada))
-                {
-                    TempData["Error"] = "La fecha tiene un formato inválido";
-                    return RedirectToAction(nameof(Cierres));
-                }
-
-                inicio = fechaParseada.Date;
-                fin = fechaParseada.Date.AddDays(1).AddTicks(-1);
-            }
-            else if (tipo == "semanal")
-            {
-                if (fechaInicio == null || fechaFin == null)
-                {
-                    TempData["Error"] = "La fecha es requerida";
-                    return RedirectToAction(nameof(Cierres));
-                }
-
-                if (fechaFin.Value.Date < fechaInicio.Value.Date)
-                {
-                    TempData["Error"] = "El rango es inválido: la fecha final no puede ser menor que la inicial.";
-                    return RedirectToAction(nameof(Cierres));
-                }
-
-                inicio = fechaInicio.Value.Date;
-                fin = fechaFin.Value.Date.AddDays(1).AddTicks(-1);
-
-                // ✅ Validación: ya tiene cierre semanal
-                bool yaCerrado = await _db.Cierres.AnyAsync(c =>
-                    c.Tipo == "Semanal" && c.FechaInicio == inicio && c.FechaFin == fin);
-
-                if (yaCerrado)
-                {
-                    TempData["Error"] = "Ese periodo ya cuenta con un cierre semanal.";
-                    return RedirectToAction(nameof(Cierres));
-                }
-            }
-            else if (tipo == "mensual")
-            {
-                if (fechaInicio == null)
-                {
-                    TempData["Error"] = "La fecha es requerida";
-                    return RedirectToAction(nameof(Cierres));
-                }
-
-                var mesSeleccionado = new DateTime(fechaInicio.Value.Year, fechaInicio.Value.Month, 1);
-                var hoy = DateTime.Today;
-
-                // ✅ Validación: no cierre futuro
-                if (mesSeleccionado > new DateTime(hoy.Year, hoy.Month, 1))
-                {
-                    TempData["Error"] = "No es posible realizar un cierre para una fecha futura";
-                    return RedirectToAction(nameof(Cierres));
-                }
-
-                inicio = mesSeleccionado.Date;
-                fin = mesSeleccionado.AddMonths(1).AddTicks(-1);
-
-                // ✅ Evitar cierre duplicado mensual
-                bool yaCerrado = await _db.Cierres.AnyAsync(c =>
-                    c.Tipo == "Mensual" && c.FechaInicio == inicio && c.FechaFin == fin);
-
-                if (yaCerrado)
-                {
-                    TempData["Error"] = "Ese periodo ya cuenta con un cierre mensual.";
-                    return RedirectToAction(nameof(Cierres));
-                }
-            }
-            else
-            {
-                TempData["Error"] = "Tipo de cierre inválido.";
-                return RedirectToAction(nameof(Cierres));
-            }
-
-            // ✅ Validación: debe haber movimientos
-            var movimientos = await _db.Finanzas
-                .Where(f => f.Fecha >= inicio && f.Fecha <= fin)
-                .ToListAsync();
-
-            if (movimientos.Count == 0)
-            {
-                TempData["Warning"] = "No existen ventas/movimientos para cerrar";
-                return RedirectToAction(nameof(Cierres));
-            }
-
-            decimal totalIngresos = movimientos
-                .Where(x => (x.Tipo ?? "").ToLower() == "ingreso")
-                .Sum(x => x.Monto);
-
-            decimal totalEgresos = movimientos
-                .Where(x => (x.Tipo ?? "").ToLower() == "egreso")
-                .Sum(x => x.Monto);
-
-            decimal saldoFinal = totalIngresos - totalEgresos;
-
-            var cierre = new Cierres
-            {
-                FechaInicio = inicio,
-                FechaFin = fin,
-                FechaRegistro = DateTime.Now,
-                Tipo = tipo == "diario" ? "Diario" : tipo == "semanal" ? "Semanal" : "Mensual",
-                BalanceTotal = saldoFinal,
-                IdUsuario = null
-            };
-
-            _db.Cierres.Add(cierre);
-            await _db.SaveChangesAsync();
-
-            TempData["Ok"] = "Cierre realizado exitosamente.";
-            return RedirectToAction(nameof(CierreResultado), new { id = cierre.IdCierres });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CierreResultado(int id)
-        {
-            var cierre = await _db.Cierres.FirstOrDefaultAsync(x => x.IdCierres == id);
-            if (cierre == null) return RedirectToAction(nameof(Cierres));
-
-            var movimientos = await _db.Finanzas
-                .Where(f => f.Fecha >= cierre.FechaInicio && f.Fecha <= cierre.FechaFin)
-                .OrderBy(f => f.Fecha)
-                .ToListAsync();
-
-            decimal totalIngresos = movimientos.Where(x => (x.Tipo ?? "").ToLower() == "ingreso").Sum(x => x.Monto);
-            decimal totalEgresos = movimientos.Where(x => (x.Tipo ?? "").ToLower() == "egreso").Sum(x => x.Monto);
-
-            ViewBag.Tipo = cierre.Tipo;
-            ViewBag.FechaInicio = cierre.FechaInicio;
-            ViewBag.FechaFin = cierre.FechaFin;
-            ViewBag.TotalIngresos = totalIngresos;
-            ViewBag.TotalEgresos = totalEgresos;
-            ViewBag.SaldoFinal = cierre.BalanceTotal;
-
-            return View(movimientos);
+            return 0;
         }
     }
 }
-
-
-

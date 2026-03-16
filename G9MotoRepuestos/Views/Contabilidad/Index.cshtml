@@ -1,187 +1,174 @@
-﻿@{
-    ViewData["Title"] = "Módulo de Contabilidad";
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model ContabilidadIndexDto
+
+@{
+    ViewData["Title"] = "Contabilidad";
 }
 
-<style>
-    /* Fondo general */
-    body {
-        background-color: #f4f4f4 !important;
-        font-family: Arial, sans-serif;
-    }
+<div class="container-fluid py-4">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
 
-    /* Contenedor general */
-    .main-container {
-        width: 80%;
-        max-width: 900px;
-        margin: 40px auto;
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+                <div>
+                    <h2 class="fw-bold text-danger mb-1">Módulo de Contabilidad</h2>
+                    <p class="text-muted mb-0">Consulta movimientos, revisa balances y realiza cierres contables.</p>
+                </div>
 
-    /* Título */
-    .main-title {
-        text-align: center;
-        font-size: 28px;
-        color: #c62828;
-        margin-bottom: 25px;
-        font-weight: bold;
-    }
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-controller="Contabilidad" asp-action="RegistrarMovimiento" class="btn btn-dark rounded-3">
+                        <i class="bi bi-plus-circle me-1"></i> Registrar movimiento
+                    </a>
+                    <a asp-controller="Contabilidad" asp-action="RealizarCierre" class="btn btn-danger rounded-3">
+                        <i class="bi bi-cash-stack me-1"></i> Realizar cierre
+                    </a>
+                    <a asp-controller="Contabilidad" asp-action="HistorialCierres" class="btn btn-outline-secondary rounded-3">
+                        <i class="bi bi-clock-history me-1"></i> Historial de cierres
+                    </a>
+                </div>
+            </div>
 
-    /* Buscador */
-    .search-box {
-        width: 100%;
-        padding: 10px 12px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        margin-bottom: 20px;
-        font-size: 15px;
-    }
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
 
-    /* Estilo para montos */
-    .monto-ingreso {
-        color: #2e7d32; /* Verde */
-        font-weight: bold;
-    }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
 
-    .monto-egreso {
-        color: #c62828; /* Rojo */
-        font-weight: bold;
-    }
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body">
+                            <div class="text-muted small mb-1">Total ingresos</div>
+                            <div class="fs-3 fw-bold text-success">₡@Model.Resumen.TotalIngresos.ToString("N2")</div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body">
+                            <div class="text-muted small mb-1">Total egresos</div>
+                            <div class="fs-3 fw-bold text-danger">₡@Model.Resumen.TotalEgresos.ToString("N2")</div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body">
+                            <div class="text-muted small mb-1">Balance total</div>
+                            <div class="fs-3 fw-bold @(Model.Resumen.BalanceTotal >= 0 ? "text-primary" : "text-danger")">
+                                ₡@Model.Resumen.BalanceTotal.ToString("N2")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    /* Tabla personalizada */
-    .table-custom {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-    }
+            <form asp-action="Index" method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">Buscar</label>
+                    <input asp-for="TextoBusqueda" class="form-control rounded-3" placeholder="Categoría, descripción, tipo..." />
+                </div>
 
-        .table-custom th {
-            background: #212121;
-            color: white;
-            padding: 10px;
-            text-align: left;
-        }
+                <div class="col-md-2">
+                    <label class="form-label">Desde</label>
+                    <input asp-for="Desde" type="date" class="form-control rounded-3" />
+                </div>
 
-        .table-custom td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
+                <div class="col-md-2">
+                    <label class="form-label">Hasta</label>
+                    <input asp-for="Hasta" type="date" class="form-control rounded-3" />
+                </div>
 
-    /* Botón rojo */
-    .btn-red {
-        background-color: #c62828;
-        color: white !important;
-        padding: 10px 18px;
-        border-radius: 6px;
-        border: none;
-        text-decoration: none;
-        font-size: 15px;
-    }
+                <div class="col-md-2">
+                    <label class="form-label">Tipo</label>
+                    <select asp-for="TipoFiltro" class="form-select rounded-3">
+                        <option value="">Todos</option>
+                        <option value="Ingreso">Ingreso</option>
+                        <option value="Egreso">Egreso</option>
+                    </select>
+                </div>
 
-        .btn-red:hover {
-            background-color: #a51f1f;
-            color: white !important;
-        }
+                <div class="col-md-2">
+                    <label class="form-label">Origen</label>
+                    <select asp-for="OrigenFiltro" class="form-select rounded-3">
+                        <option value="">Todos</option>
+                        <option value="Venta">Venta</option>
+                        <option value="Compra">Compra</option>
+                        <option value="Servicio">Servicio</option>
+                        <option value="Manual">Manual</option>
+                        <option value="Ajuste">Ajuste</option>
+                    </select>
+                </div>
 
-    /* Botón gris */
-    .btn-gray {
-        background-color: #616161;
-        color: white !important;
-        padding: 10px 18px;
-        border-radius: 6px;
-        border: none;
-        text-decoration: none;
-        font-size: 15px;
-    }
+                <div class="col-md-1 d-grid">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-danger rounded-3">Filtrar</button>
+                </div>
+            </form>
 
-        .btn-gray:hover {
-            background-color: #4e4e4e;
-            color: white !important;
-        }
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Origen</th>
+                            <th>Referencia</th>
+                            <th>Usuario</th>
+                            <th class="text-end">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Movimientos != null && Model.Movimientos.Any())
+                        {
+                            foreach (var item in Model.Movimientos)
+                            {
+                                <tr>
+                                    <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="badge @(item.Tipo == "Ingreso" ? "bg-success" : "bg-danger")">
+                                            @item.Tipo
+                                        </span>
+                                    </td>
+                                    <td>@item.Categoria</td>
+                                    <td>@item.Descripcion</td>
+                                    <td>@item.Origen</td>
+                                    <td>@(item.IdReferencia?.ToString() ?? "-")</td>
+                                    <td>@item.UsuarioNombre</td>
+                                    <td class="text-end fw-bold @(item.Tipo == "Ingreso" ? "text-success" : "text-danger")">
+                                        @(item.Tipo == "Ingreso"
+                                                                        ? "₡" + item.Monto.ToString("N2")
+                                                                        : "-₡" + item.Monto.ToString("N2"))
+                            </td>
+                        </tr>
+                                                }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    No hay movimientos registrados para los filtros seleccionados.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-    
-
-    /* Acciones */
-    .action-edit,
-    .action-delete {
-        color: #c62828 !important;
-        font-weight: bold;
-        text-decoration: none;
-        margin-right: 10px;
-    }
-
-        .action-edit:hover,
-        .action-delete:hover {
-            text-decoration: underline;
-        }
-</style>
-
-<div class="main-container">
-
-    <h2 class="main-title">Módulo de Contabilidad</h2>
-
-    <!-- Buscador -->
-    <input type="text" class="search-box" placeholder="Buscar movimientos... Ej: 'ventas diarias'">
-
-    <!-- Tabla historial -->
-    <table class="table-custom">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Tipo</th>
-                <th>Categoría</th>
-                <th>Descripción</th>
-                <th>Monto</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>2025-01-12</td>
-                <td>Ingreso</td>
-                <td>Venta</td>
-                <td>Venta #001</td>
-                <td class="monto-ingreso">₡5,000</td>
-            </tr>
-
-            <tr>
-                <td>2025-01-12</td>
-                <td>Egreso</td>
-                <td>Caja</td>
-                <td>Compra de insumos</td>
-                <td class="monto-egreso">-₡1,200</td>
-            </tr>
-
-            <tr>
-                <td>2025-01-13</td>
-                <td>Ingreso</td>
-                <td>Venta</td>
-                <td>Venta #002</td>
-                <td class="monto-ingreso">₡3,500</td>
-            </tr>
-        </tbody>
-
-
-    </table>
-
-    <!-- Botones del módulo -->
-    <div class="d-flex justify-content-center mt-4" style="gap: 20px;">
-
-        <a asp-controller="Contabilidad" asp-action="Cierres" class="btn-red">
-            Cierres Contables
-        </a>
-
-        <a asp-controller="Contabilidad" asp-action="Historial" class="btn-gray">
-            Historial de Cierres
-        </a>
-        <a asp-controller="Finanzas" asp-action="Index" class="btn-gray">
-            Movimientos (Finanzas)
-        </a>
-
-
+        </div>
     </div>
-
 </div>
