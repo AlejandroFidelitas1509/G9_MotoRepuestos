@@ -113,12 +113,6 @@ namespace G9MotoRepuestos.Controllers
             return View();
         }
 
-
-
-        public IActionResult Catalogo()
-        {
-            return View();
-
         public async Task<IActionResult> Catalogo(int? categoriaId)
         {
             var categorias = await _categoriasLN.ListarAsync(true);
@@ -137,7 +131,6 @@ namespace G9MotoRepuestos.Controllers
             };
 
             return View(vm);
-
         }
 
         public async Task<IActionResult> Servicios()

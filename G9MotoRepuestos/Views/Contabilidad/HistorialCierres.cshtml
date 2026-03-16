@@ -1,0 +1,80 @@
+﻿@using MR.Abstracciones.EntidadesParaUI
+@model IEnumerable<CierreContableDto>
+
+@{
+    ViewData["Title"] = "Historial de Cierres";
+}
+
+<div class="container-fluid py-4">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+                <div>
+                    <h2 class="fw-bold text-danger mb-1">Historial de cierres</h2>
+                    <p class="text-muted mb-0">Consulta los cierres contables registrados en el sistema.</p>
+                </div>
+
+                <div>
+                    <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-outline-secondary rounded-3">
+                        Volver
+                    </a>
+                </div>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha inicio</th>
+                            <th>Fecha fin</th>
+                            <th>Fecha registro</th>
+                            <th>Tipo</th>
+                            <th>Ingresos</th>
+                            <th>Egresos</th>
+                            <th>Balance</th>
+                            <th>Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.FechaFin.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.Tipo</td>
+                                    <td class="text-success fw-bold">₡@item.TotalIngresos.ToString("N2")</td>
+                                    <td class="text-danger fw-bold">₡@item.TotalEgresos.ToString("N2")</td>
+                                    <td class="fw-bold @(item.BalanceTotal >= 0 ? "text-primary" : "text-danger")">
+                                        ₡@item.BalanceTotal.ToString("N2")
+                                    </td>
+                                    <td>@item.UsuarioNombre</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    No hay cierres contables registrados.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
