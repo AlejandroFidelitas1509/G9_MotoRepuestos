@@ -1,60 +1,363 @@
 ﻿@model G9MotoRepuestos.Models.Usuario
 @{
-    ViewData["Title"] = "Crear Usuario | Moto Repuestos Rojas";
+    ViewData["Title"] = "Nuevo Usuario";
 }
 
-<link rel="stylesheet" href="~/css/Usuarios/CrearUsuario.css" asp-append-version="true" />
+<style>
+    /* ── Layout de dos columnas ───────────────────────────────────── */
+    .form-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 20px;
+        align-items: start;
+        max-width: 860px;
+    }
 
-<div class="contenedor-crear">
-    <div class="tarjeta-formulario">
-        <div class="encabezado-form">
-            <h2 class="titulo-oswald">NUEVO USUARIO</h2>
-            <div class="linea-roja"></div>
-            <p class="subtitulo">Registro administrativo de personal</p>
+    /* ── Panel izquierdo informativo ──────────────────────────────── */
+    .info-panel {
+        background: linear-gradient(135deg, #c92a2a 0%, #a61e1e 50%, #1e2a4a 100%);
+        border-radius: 16px;
+        padding: 28px 24px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(201,42,42,.2);
+    }
+
+        .info-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .info-panel .info-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(255,255,255,.15);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .info-panel h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .info-panel p {
+            font-size: 12px;
+            color: rgba(255,255,255,.65);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+    .info-tip {
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+        .info-tip i {
+            font-size: 13px;
+            margin-top: 1px;
+            flex-shrink: 0;
+            opacity: .8;
+        }
+
+        .info-tip span {
+            font-size: 11px;
+            color: rgba(255,255,255,.75);
+            line-height: 1.5;
+        }
+
+    /* ── Card del formulario ──────────────────────────────────────── */
+    .form-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .form-card-header .header-icon {
+            width: 36px;
+            height: 36px;
+            background: #fff1f1;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #c92a2a;
+            flex-shrink: 0;
+        }
+
+        .form-card-header .header-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .form-card-header .header-sub {
+            font-size: 11px;
+            color: #8a94a6;
+            margin-top: 1px;
+        }
+
+    .form-card-body {
+        padding: 24px;
+    }
+
+    /* ── Campos del formulario ────────────────────────────────────── */
+    .field-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+        .field-group.full {
+            grid-template-columns: 1fr;
+        }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .field label {
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            color: #4a5568 !important;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .field input,
+        .field select {
+            background: #f8fafd !important;
+            border: 1px solid #dde3ee !important;
+            border-radius: 9px !important;
+            color: #1a202c !important;
+            font-size: 13.5px !important;
+            padding: 9px 12px !important;
+            transition: border-color .15s, background .15s, box-shadow .15s;
+            width: 100%;
+        }
+
+            .field input:focus,
+            .field select:focus {
+                background: #fff !important;
+                border-color: rgba(201,42,42,.4) !important;
+                box-shadow: 0 0 0 3px rgba(201,42,42,.08) !important;
+                outline: none !important;
+                color: #1a202c !important;
+            }
+
+            .field input::placeholder {
+                color: #b0b8c8 !important;
+            }
+
+        .field .text-danger {
+            font-size: 11px !important;
+            color: #c92a2a !important;
+            margin-top: 2px;
+        }
+
+    /* ── Separador de sección ─────────────────────────────────────── */
+    .section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #8a94a6;
+        margin: 4px 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #edf0f7;
+        }
+
+    /* ── Botones ──────────────────────────────────────────────────── */
+    .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #edf0f7;
+        margin-top: 8px;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────────── */
+    @@media (max-width: 900px) {
+        .form-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .info-panel {
+            display: none;
+        }
+
+        .field-group {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@* ── Encabezado de página ─────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+    <div>
+        <div style="font-size:20px;font-weight:700;color:#1a202c">
+            <i class="fas fa-user-plus me-2" style="color:#c92a2a"></i> Nuevo Usuario
+        </div>
+        <div style="font-size:12px;color:#8a94a6;margin-top:2px">
+            Completa los datos para registrar un nuevo usuario en el sistema
+        </div>
+    </div>
+    <a asp-action="GestionUsuarios" class="btn-app-secondary">
+        <i class="fas fa-arrow-left"></i> Volver a usuarios
+    </a>
+</div>
+
+@* ── Layout dos columnas ──────────────────────────────────────────── *@
+<div class="form-layout">
+
+    @* ── Panel informativo izquierdo ─────────────────────────────── *@
+    <div class="info-panel">
+        <div class="info-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h3>Registro de usuario</h3>
+        <p>Los usuarios creados aquí tendrán acceso al sistema según el rol asignado.</p>
+
+        <div class="info-tip">
+            <i class="fas fa-shield-alt"></i>
+            <span>Los <strong>Administradores</strong> tienen acceso completo al panel de gestión.</span>
+        </div>
+        <div class="info-tip">
+            <i class="fas fa-store"></i>
+            <span>Los <strong>Vendedores</strong> pueden gestionar ventas, citas e inventario.</span>
+        </div>
+        <div class="info-tip">
+            <i class="fas fa-key"></i>
+            <span>La contraseña temporal debe ser cambiada en el primer inicio de sesión.</span>
+        </div>
+    </div>
+
+    @* ── Formulario ───────────────────────────────────────────────── *@
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="header-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div>
+                <div class="header-title">Datos del nuevo usuario</div>
+                <div class="header-sub">Todos los campos marcados son obligatorios</div>
+            </div>
         </div>
 
-        <form asp-action="CrearUsuario" asp-controller="Usuarios" method="post">
-            @Html.AntiForgeryToken()
-            <div class="form-grid">
+        <div class="form-card-body">
+            <form asp-action="CrearUsuario" asp-controller="Usuarios" method="post">
+                @Html.AntiForgeryToken()
 
-                <div class="campo">
-                    <label>Nombre Completo</label>
-                    <input asp-for="NombreCompleto" type="text" placeholder="Ej: Carlos Rojas" required />
-                    <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+                @* ── Información personal ── *@
+                <div class="section-label">
+                    <i class="fas fa-id-card" style="color:#c92a2a;font-size:11px"></i>
+                    Información personal
                 </div>
 
-                <div class="campo">
-                    <label>Correo Electrónico</label>
-                    <input asp-for="Correo" type="email" placeholder="usuario@motorojas.com" required />
-                    <span asp-validation-for="Correo" class="text-danger"></span>
+                <div class="field-group" style="max-width:560px">
+                    <div class="field">
+                        <label>Nombre completo *</label>
+                        <input asp-for="NombreCompleto" type="text" placeholder="Ej: Carlos Rojas" required />
+                        <span asp-validation-for="NombreCompleto" class="text-danger"></span>
+                    </div>
+                    <div class="field">
+                        <label>Teléfono</label>
+                        <input asp-for="Telefono" type="text" placeholder="0000-0000" />
+                    </div>
                 </div>
 
-                <div class="campo">
-                    <label>Teléfono</label>
-                    <input asp-for="Telefono" type="text" placeholder="0000-0000" />
+                @* ── Acceso al sistema ── *@
+                <div class="section-label" style="margin-top:8px">
+                    <i class="fas fa-lock" style="color:#c92a2a;font-size:11px"></i>
+                    Acceso al sistema
                 </div>
 
-                <div class="campo">
-                    <label>Contraseña Temporal</label>
-                    <input asp-for="PasswordHash" type="password" placeholder="••••••••" required />
-                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                <div class="field-group" style="max-width:560px">
+                    <div class="field">
+                        <label>Correo electrónico *</label>
+                        <input asp-for="Correo" type="email" placeholder="usuario@motorojas.com" required />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+                    <div class="field">
+                        <label>Contraseña temporal *</label>
+                        <input asp-for="PasswordHash" type="password" placeholder="••••••••" required />
+                        <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                    </div>
                 </div>
 
-                <div class="campo">
-                    <label>Rol de Usuario</label>
-                    <select asp-for="IdRol" asp-items="ViewBag.IdRol" required>
-                        <option value="" disabled selected>Seleccione un rol...</option>
-                    </select>
-                    <span asp-validation-for="IdRol" class="text-danger"></span>
+                @* ── Rol ── *@
+                <div class="section-label" style="margin-top:8px">
+                    <i class="fas fa-user-tag" style="color:#c92a2a;font-size:11px"></i>
+                    Permisos
                 </div>
 
-                <div class="botones-container">
-                    <button type="submit" class="btn-rojo">GUARDAR USUARIO</button>
-                    <a asp-action="GestionUsuarios" class="btn-negro">CANCELAR Y VOLVER</a>
+                <div class="field-group full" style="max-width:270px">
+                    <div class="field">
+                        <label>Rol de usuario *</label>
+                        <select asp-for="IdRol" asp-items="ViewBag.IdRol" required>
+                            <option value="" disabled selected>Seleccione un rol...</option>
+                        </select>
+                        <span asp-validation-for="IdRol" class="text-danger"></span>
+                    </div>
                 </div>
-            </div>
-        </form>
+
+                @* ── Acciones ── *@
+                <div class="form-actions">
+                    <button type="submit" class="btn-app-primary">
+                        <i class="fas fa-save"></i> Guardar usuario
+                    </button>
+                    <a asp-action="GestionUsuarios" class="btn-app-ghost">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+
+            </form>
+        </div>
     </div>
+
 </div>
 
 @section Scripts {

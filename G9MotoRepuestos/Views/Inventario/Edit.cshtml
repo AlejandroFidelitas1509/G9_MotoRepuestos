@@ -4,239 +4,580 @@
 
 @{
     ViewData["Title"] = "Editar Producto";
+    var tieneImagen = !string.IsNullOrWhiteSpace(Model.ImageURL);
 }
 
-<div class="cp-wrap">
+<style>
+    .cp-page {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-    <div class="cp-hero rounded-4 shadow-sm p-4 mb-4">
-        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+    .cp-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) minmax(320px, .95fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+    .left-stack,
+    .right-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .form-card,
+    .img-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .form-card-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .hdr-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .form-card-body {
+        padding: 18px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .field label {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            color: #4a5568 !important;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            background: #f8fafd !important;
+            border: 1px solid #dde3ee !important;
+            border-radius: 9px !important;
+            color: #1a202c !important;
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+            transition: border-color .15s, box-shadow .15s, background .15s;
+            width: 100%;
+        }
+
+            .field input:focus,
+            .field select:focus,
+            .field textarea:focus {
+                background: #fff !important;
+                outline: none !important;
+                border-color: rgba(201,42,42,.4) !important;
+                box-shadow: 0 0 0 3px rgba(201,42,42,.08) !important;
+            }
+
+            .field input::placeholder,
+            .field textarea::placeholder {
+                color: #b0b8c8 !important;
+            }
+
+        .field .text-danger {
+            font-size: 11px !important;
+            color: #c92a2a !important;
+        }
+
+    .field-row {
+        display: grid;
+        gap: 12px;
+    }
+
+    .field-row-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .field-row-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .hint {
+        font-size: 11px;
+        color: #8a94a6;
+        margin-top: 2px;
+    }
+
+    .id-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #fff1f1;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 99px;
+    }
+
+    .tips-panel {
+        background: linear-gradient(135deg, #c92a2a 0%, #a61e1e 55%, #1e2a4a 100%);
+        border-radius: 14px;
+        padding: 16px 18px;
+        box-shadow: 0 4px 16px rgba(201,42,42,.18);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .tips-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -28px;
+            right: -28px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+    .tip-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 12px;
+        color: rgba(255,255,255,.9);
+        line-height: 1.45;
+        margin-bottom: 7px;
+    }
+
+        .tip-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .tip-row i {
+            font-size: 10px;
+            margin-top: 3px;
+            opacity: .8;
+            flex-shrink: 0;
+        }
+
+    .img-card-body {
+        padding: 16px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .file-box {
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .img-preview {
+        width: 100%;
+        min-height: 320px;
+        aspect-ratio: 4/3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafd;
+        border: 1px dashed #d7deea;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .img-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .img-empty {
+        text-align: center;
+        color: #b0b8c8;
+        font-size: 13px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .img-empty i {
+            font-size: 3.3rem;
+            display: block;
+            margin-bottom: 10px;
+            opacity: .25;
+        }
+
+    .img-actual {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        padding: 7px 11px;
+        font-size: 12px;
+        color: #166534;
+    }
+
+    .form-actions {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .actions-left,
+    .actions-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .sticky-side {
+        position: sticky;
+        top: 18px;
+    }
+
+    @@media (max-width: 1100px) {
+        .cp-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sticky-side {
+            position: static;
+        }
+
+        .img-preview {
+            min-height: 260px;
+            aspect-ratio: 16/9;
+        }
+    }
+
+    @@media (max-width: 720px) {
+        .field-row-3 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 560px) {
+        .field-row-2,
+        .field-row-3 {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .actions-left,
+        .actions-right {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+</style>
+
+<div class="cp-page">
+
+    @* Encabezado *@
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <div>
-                <div class="cp-kicker">Inventario</div>
-                <h1 class="cp-title m-0">Editar Producto</h1>
-                <div class="cp-sub mt-2">Actualiza la información del producto y guarda los cambios.</div>
+                <div style="font-size:22px;font-weight:700;color:#1a202c">
+                    <i class="fas fa-pen me-2" style="color:#c92a2a"></i> Editar Producto
+                </div>
+                <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+                    Actualiza la información y guarda los cambios
+                </div>
             </div>
+            <span class="id-badge">
+                <i class="fas fa-hashtag" style="font-size:10px"></i> ID: @Model.IdProducto
+            </span>
+        </div>
 
-            <div class="d-flex gap-2 flex-wrap">
-                <a asp-action="Index" class="btn btn-outline-dark cp-btn">← Volver</a>
-                <a asp-controller="Categorias" asp-action="Index" class="btn btn-dark cp-btn">Categorías</a>
-            </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a asp-controller="Categorias" asp-action="Index"
+               style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none"
+               onmouseover="this.style.background='#fff';this.style.borderColor='#b8c4d8'"
+               onmouseout="this.style.background='#f4f7fc';this.style.borderColor='#dde3ee'">
+                <i class="fas fa-tags"></i> Categorías
+            </a>
+            <a asp-action="Index"
+               style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none"
+               onmouseover="this.style.background='#fff';this.style.borderColor='#b8c4d8'"
+               onmouseout="this.style.background='#f4f7fc';this.style.borderColor='#dde3ee'">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
         </div>
     </div>
 
-    <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
-        <div class="cp-card-header p-3 px-4">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div class="fw-bold text-white">Editar datos del producto</div>
-                <div class="cp-header-hint">ID: @Model.IdProducto</div>
-            </div>
-        </div>
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input asp-for="IdProducto" type="hidden" />
+        <input asp-for="ImageURL" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size:13px"></div>
 
-        <div class="card-body p-4">
-            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="cp-form">
-                @Html.AntiForgeryToken()
-                <input asp-for="IdProducto" type="hidden" />
-                <input asp-for="ImageURL" type="hidden" /> @* mantiene la url si no cambias imagen *@
+        <div class="cp-layout">
 
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            @* Columna principal *@
+            <div class="left-stack">
 
-                <div class="row g-4">
-                    <div class="col-12 col-lg-7">
-                        <div class="cp-section mb-4">
-                            <div class="cp-section-title">Información básica</div>
-                            <div class="cp-section-sub">Nombre, marca y descripción.</div>
-
-                            <div class="row g-3 mt-1">
-                                <div class="col-12">
-                                    <label asp-for="Nombre" class="form-label cp-label">Nombre *</label>
-                                    <input asp-for="Nombre" class="form-control cp-input" />
-                                    <span asp-validation-for="Nombre" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-12">
-                                    <label asp-for="Marca" class="form-label cp-label">Marca *</label>
-                                    <input asp-for="Marca" class="form-control cp-input" />
-                                    <span asp-validation-for="Marca" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-12">
-                                    <label asp-for="Descripcion" class="form-label cp-label">Descripción (opcional)</label>
-                                    <textarea asp-for="Descripcion" class="form-control cp-input" rows="3"></textarea>
-                                    <span asp-validation-for="Descripcion" class="text-danger"></span>
-                                </div>
-                            </div>
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <div class="hdr-icon" style="background:#fff1f1">
+                            <i class="fas fa-box" style="color:#c92a2a"></i>
                         </div>
-
-                        <div class="cp-section">
-                            <div class="cp-section-title">Precios y stock</div>
-                            <div class="cp-section-sub">Costo, margen, venta, stock y código de barras.</div>
-
-                            <div class="row g-3 mt-1">
-                                <div class="col-12 col-md-3">
-                                    <label asp-for="PrecioCosto" class="form-label cp-label">Precio costo</label>
-
-                                    <input asp-for="PrecioCosto"
-                                           id="PrecioCosto"
-                                           class="form-control cp-input"
-                                           type="text"
-                                           inputmode="numeric"
-                                           asp-format="{0:0}" />
-
-                                    <span asp-validation-for="PrecioCosto" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-12 col-md-3">
-                                    <label asp-for="MargenPorcentaje" class="form-label cp-label">Margen (%)</label>
-
-                                    <input asp-for="MargenPorcentaje"
-                                           id="MargenPorcentaje"
-                                           class="form-control cp-input"
-                                           placeholder="Ej: 30"
-                                           type="text"
-                                           inputmode="decimal" />
-
-                                    <span asp-validation-for="MargenPorcentaje" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-12 col-md-3">
-                                    <label asp-for="PrecioVenta" class="form-label cp-label">Precio venta *</label>
-
-                                    <input asp-for="PrecioVenta"
-                                           id="PrecioVenta"
-                                           class="form-control cp-input"
-                                           type="text"
-                                           inputmode="numeric"
-                                           asp-format="{0:0}" />
-
-                                    <span asp-validation-for="PrecioVenta" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-12 col-md-3">
-                                    <label asp-for="StockActual" class="form-label cp-label">Stock *</label>
-                                    <input asp-for="StockActual" class="form-control cp-input" inputmode="numeric" />
-                                    <span asp-validation-for="StockActual" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-12">
-                                    <label asp-for="CodigoBarras" class="form-label cp-label">Código de barras</label>
-                                    <input asp-for="CodigoBarras" class="form-control cp-input" />
-                                    <span asp-validation-for="CodigoBarras" class="text-danger"></span>
-                                </div>
-                            </div>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:#1a202c">Información básica</div>
+                            <div style="font-size:11px;color:#8a94a6">Nombre y marca del repuesto</div>
                         </div>
                     </div>
-
-                    <div class="col-12 col-lg-5">
-                        <div class="cp-side card border-0 rounded-4 p-3 shadow-sm">
-                            <div class="cp-side-title">Categoría e imagen</div>
-                            <div class="cp-side-sub">Puedes cambiar la categoría y la imagen.</div>
-
-                            <div class="mt-3">
-                                <label asp-for="IdCategoria" class="form-label cp-label">Categoría</label>
-                                <div class="d-flex gap-2">
-                                    <select asp-for="IdCategoria"
-                                            class="form-select cp-input"
-                                            asp-items="(IEnumerable<SelectListItem>)ViewBag.Categorias">
-                                        <option value="">-- Seleccione --</option>
-                                    </select>
-
-                                    <a asp-controller="Categorias" asp-action="Create" class="btn btn-dark cp-btn-sm">Nueva</a>
-                                </div>
-                                <span asp-validation-for="IdCategoria" class="text-danger"></span>
+                    <div class="form-card-body" style="display:flex;flex-direction:column;gap:12px">
+                        <div class="field-row field-row-2">
+                            <div class="field">
+                                <label asp-for="Nombre">Nombre *</label>
+                                <input asp-for="Nombre" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
                             </div>
+                            <div class="field">
+                                <label asp-for="Marca">Marca *</label>
+                                <input asp-for="Marca" />
+                                <span asp-validation-for="Marca" class="text-danger"></span>
+                            </div>
+                        </div>
 
-                            <hr class="cp-hr" />
+                        <div class="field">
+                            <label asp-for="Descripcion">Descripción (opcional)</label>
+                            <textarea asp-for="Descripcion" rows="3" placeholder="Describe el producto..."></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
 
-                            <div>
-                                <label class="form-label cp-label">Imagen (opcional)</label>
-                                <input name="imagen" id="imagenInput" type="file" class="form-control cp-input" accept="image/*" />
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <div class="hdr-icon" style="background:#eff6ff">
+                            <i class="fas fa-dollar-sign" style="color:#1971c2"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:#1a202c">Precios y stock</div>
+                            <div style="font-size:11px;color:#8a94a6">Precio de venta calculado automáticamente</div>
+                        </div>
+                    </div>
+                    <div class="form-card-body" style="display:flex;flex-direction:column;gap:12px">
+                        <div class="field-row field-row-3">
+                            <div class="field">
+                                <label asp-for="PrecioCosto">Costo</label>
+                                <input asp-for="PrecioCosto" id="PrecioCosto" type="text" inputmode="numeric" asp-format="{0:0}" />
+                                <span asp-validation-for="PrecioCosto" class="text-danger"></span>
+                            </div>
+                            <div class="field">
+                                <label asp-for="MargenPorcentaje">Margen (%)</label>
+                                <input asp-for="MargenPorcentaje" id="MargenPorcentaje" type="text" inputmode="decimal" placeholder="Ej: 30" />
+                                <div class="hint"><i class="fas fa-calculator me-1"></i>Auto</div>
+                                <span asp-validation-for="MargenPorcentaje" class="text-danger"></span>
+                            </div>
+                            <div class="field">
+                                <label asp-for="PrecioVenta">Precio venta *</label>
+                                <input asp-for="PrecioVenta" id="PrecioVenta" type="text" inputmode="numeric" asp-format="{0:0}" />
+                                <span asp-validation-for="PrecioVenta" class="text-danger"></span>
+                            </div>
+                        </div>
 
-                                <div class="cp-preview mt-3">
-                                    <div class="cp-preview-label">Vista previa</div>
-                                    <div class="cp-preview-box">
-                                        <img id="previewImg" alt="preview"
-                                             src="@(string.IsNullOrWhiteSpace(Model.ImageURL) ? "" : Model.ImageURL)"
-                                             style="@(string.IsNullOrWhiteSpace(Model.ImageURL) ? "display:none;" : "display:block;")" />
-                                        <div id="previewEmpty" class="cp-preview-empty"
-                                             style="@(string.IsNullOrWhiteSpace(Model.ImageURL) ? "display:flex;" : "display:none;")">
-                                            Sin imagen
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="field-row field-row-2">
+                            <div class="field">
+                                <label asp-for="StockActual">Stock *</label>
+                                <input asp-for="StockActual" inputmode="numeric" />
+                                <span asp-validation-for="StockActual" class="text-danger"></span>
+                            </div>
+                            <div class="field">
+                                <label asp-for="CodigoBarras">Código de barras</label>
+                                <input asp-for="CodigoBarras" />
+                                <span asp-validation-for="CodigoBarras" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
-                    <a asp-action="Index" class="btn btn-dark cp-btn">Cancelar</a>
-                    <button type="submit" class="btn btn-danger cp-btn">Guardar cambios</button>
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <div class="hdr-icon" style="background:#f0fdf4">
+                            <i class="fas fa-layer-group" style="color:#166534"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:#1a202c">Categoría</div>
+                            <div style="font-size:11px;color:#8a94a6">Puedes cambiar la categoría del producto</div>
+                        </div>
+                    </div>
+                    <div class="form-card-body">
+                        <div class="field">
+                            <label asp-for="IdCategoria">Categoría actual</label>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <select asp-for="IdCategoria"
+                                        asp-items="(IEnumerable<SelectListItem>)ViewBag.Categorias"
+                                        style="flex:1;background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:10px 12px">
+                                    <option value="">— Seleccione —</option>
+                                </select>
+                                <a asp-controller="Categorias" asp-action="Index"
+                                   style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;text-decoration:none;flex-shrink:0"
+                                   title="Administrar categorías">
+                                    <i class="fas fa-cog" style="font-size:13px"></i>
+                                </a>
+                            </div>
+                            <span asp-validation-for="IdCategoria" class="text-danger" style="font-size:11px"></span>
+                        </div>
+                    </div>
                 </div>
-            </form>
+
+                <div class="form-actions">
+                    <div class="actions-left">
+                        <a asp-action="Index"
+                           style="display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                    <div class="actions-right">
+                        <button type="submit"
+                                style="display:inline-flex;align-items:center;gap:7px;padding:10px 30px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+                                onmouseover="this.style.background='#a61e1e'"
+                                onmouseout="this.style.background='#c92a2a'">
+                            <i class="fas fa-save"></i> Guardar cambios
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            @* Columna secundaria *@
+            <div class="right-stack sticky-side">
+
+                <div class="tips-panel">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                        <i class="fas fa-lightbulb" style="color:rgba(255,255,255,.82);font-size:14px"></i>
+                        <span style="font-size:13px;font-weight:700;color:#fff">Tips para editar</span>
+                    </div>
+                    <div class="tip-row"><i class="fas fa-lock-open"></i><span>Solo los campos que modifiques serán <strong>actualizados</strong>.</span></div>
+                    <div class="tip-row"><i class="fas fa-calculator"></i><span>Cambia el <strong>costo o margen</strong> para recalcular el precio.</span></div>
+                    <div class="tip-row"><i class="fas fa-image"></i><span>Sin nueva imagen, se <strong>conserva la actual</strong> automáticamente.</span></div>
+                </div>
+
+                <div class="img-card">
+                    <div class="form-card-header">
+                        <div class="hdr-icon" style="background:#fdf4ff">
+                            <i class="fas fa-image" style="color:#7c3aed"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:#1a202c">Imagen del producto</div>
+                            <div style="font-size:11px;color:#8a94a6">
+                                @(tieneImagen ? "Sube una nueva para reemplazar la actual" : "Opcional — JPG, PNG, WEBP")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="img-card-body">
+                        @if (tieneImagen)
+                        {
+                            <div class="img-actual">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Este producto ya tiene imagen.</span>
+                            </div>
+                        }
+
+                        <div class="file-box">
+                            <input name="imagen" id="imagenInput" type="file" accept="image/*"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:13px;padding:9px 12px;width:100%" />
+                        </div>
+
+                        <div class="img-preview">
+                            <img id="previewImg" alt="preview"
+                                 src="@(tieneImagen? Model.ImageURL: "")"
+                                 style="display:@(tieneImagen ? "block" : "none")" />
+                            <div id="previewEmpty" class="img-empty"
+                                 style="display:@(tieneImagen ? "none" : "flex")">
+                                <i class="fas fa-image"></i>
+                                <div style="font-weight:600;color:#8a94a6;margin-bottom:2px">Vista previa</div>
+                                <div>La imagen del producto aparecerá aquí</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-
-            // =========================
-            // PREVIEW IMAGEN
-            // =========================
             const input = document.getElementById('imagenInput');
             const img = document.getElementById('previewImg');
             const empty = document.getElementById('previewEmpty');
 
             if (input) {
                 input.addEventListener('change', () => {
-                    const file = input.files && input.files[0];
+                    const file = input.files?.[0];
                     if (!file || !file.type.startsWith('image/')) return;
 
-                    const url = URL.createObjectURL(file);
-                    img.src = url;
+                    img.src = URL.createObjectURL(file);
                     img.style.display = 'block';
                     empty.style.display = 'none';
                 });
             }
 
-            // =========================
-            // AUTO CÁLCULO PRECIOS (ENTEROS)
-            // =========================
-            const costoEl = document.getElementById("PrecioCosto");
-            const margenEl = document.getElementById("MargenPorcentaje");
-            const ventaEl = document.getElementById("PrecioVenta");
+            const costoEl = document.getElementById("PrecioCosto"),
+                  margenEl = document.getElementById("MargenPorcentaje"),
+                  ventaEl = document.getElementById("PrecioVenta");
 
             if (!costoEl || !margenEl || !ventaEl) return;
 
             let lock = false;
 
-            const toNumber = (v) => {
-                if (v === null || v === undefined) return NaN;
-                v = v.toString().trim();
-                if (!v) return NaN;
-
-                // soporta coma o punto en inputs
-                v = v.replace(/\s/g, "").replace(",", ".");
-                return parseFloat(v);
-            };
-
-            const setInt = (el, num) => {
-                if (!el) return;
-                el.value = Number.isFinite(num) ? Math.round(num).toString() : "";
+            const toNum = v => parseFloat((v ?? "").toString().trim().replace(/\s/g, "").replace(",", "."));
+            const setInt = (el, n) => {
+                if (el) el.value = isFinite(n) ? Math.round(n).toString() : "";
             };
 
             const calcVenta = () => {
                 if (lock) return;
                 lock = true;
 
-                const costo = toNumber(costoEl.value);
-                const margen = toNumber(margenEl.value);
-
-                if (Number.isFinite(costo) && Number.isFinite(margen) && costo >= 0 && margen >= 0) {
-                    const venta = costo * (1 + (margen / 100));
-                    setInt(ventaEl, venta);
+                const c = toNum(costoEl.value), m = toNum(margenEl.value);
+                if (isFinite(c) && isFinite(m) && c >= 0 && m >= 0) {
+                    setInt(ventaEl, c * (1 + m / 100));
                 }
 
                 lock = false;
@@ -246,192 +587,27 @@
                 if (lock) return;
                 lock = true;
 
-                const costo = toNumber(costoEl.value);
-                const venta = toNumber(ventaEl.value);
-
-                if (Number.isFinite(costo) && Number.isFinite(venta) && costo > 0 && venta >= 0) {
-                    const margen = ((venta / costo) - 1) * 100;
-                    // margen con 2 decimales está OK porque es textbox
-                    margenEl.value = Number.isFinite(margen) ? margen.toFixed(2).replace(".", ",") : "";
+                const c = toNum(costoEl.value), v = toNum(ventaEl.value);
+                if (isFinite(c) && isFinite(v) && c > 0 && v >= 0) {
+                    margenEl.value = isFinite(((v / c) - 1) * 100)
+                        ? (((v / c) - 1) * 100).toFixed(2).replace(".", ",")
+                        : "";
                 }
 
                 lock = false;
             };
 
-            // Eventos
-            costoEl.addEventListener("input", () => {
-                const margen = toNumber(margenEl.value);
-                if (Number.isFinite(margen)) calcVenta();
-                else calcMargen();
-            });
-
+            costoEl.addEventListener("input", () => isFinite(toNum(margenEl.value)) ? calcVenta() : calcMargen());
             margenEl.addEventListener("input", calcVenta);
             ventaEl.addEventListener("input", calcMargen);
 
-            // Autocompletar margen al abrir si hay costo y venta y margen vacío
-            const costoIni = toNumber(costoEl.value);
-            const ventaIni = toNumber(ventaEl.value);
-            const margenIni = toNumber(margenEl.value);
+            const ci = toNum(costoEl.value),
+                  vi = toNum(ventaEl.value),
+                  mi = toNum(margenEl.value);
 
-            if (!Number.isFinite(margenIni) && Number.isFinite(costoIni) && Number.isFinite(ventaIni) && costoIni > 0) {
+            if (!isFinite(mi) && isFinite(ci) && isFinite(vi) && ci > 0) {
                 calcMargen();
             }
         });
     </script>
 }
-
-<style>
-    .cp-wrap {
-        padding-bottom: 24px;
-    }
-
-    .cp-hero {
-        background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
-        border: 1px solid rgba(0,0,0,.06);
-    }
-
-    .cp-kicker {
-        color: #6c757d;
-        font-weight: 700;
-        letter-spacing: .06em;
-        text-transform: uppercase;
-        font-size: .8rem;
-    }
-
-    .cp-title {
-        color: #d32f2f;
-        font-weight: 900;
-        letter-spacing: -0.02em;
-    }
-
-    .cp-sub {
-        color: #6c757d;
-    }
-
-    .cp-card-header {
-        background: #222;
-    }
-
-    .cp-header-hint {
-        color: rgba(255,255,255,.75);
-        font-size: .85rem;
-        font-weight: 600;
-    }
-
-    .cp-section-title {
-        font-weight: 900;
-        color: #111;
-        font-size: 1rem;
-    }
-
-    .cp-section-sub {
-        color: #6c757d;
-        font-size: .9rem;
-    }
-
-    .cp-label {
-        font-weight: 700;
-        color: #333;
-    }
-
-    .cp-input {
-        border-radius: 12px;
-        padding: .65rem .85rem;
-        border-color: rgba(0,0,0,.15);
-    }
-
-        .cp-input:focus {
-            border-color: rgba(211,47,47,.45);
-            box-shadow: 0 0 0 .2rem rgba(211,47,47,.15);
-        }
-
-    .cp-btn {
-        border-radius: 12px;
-        padding: .6rem 1rem;
-        font-weight: 800;
-    }
-
-    .cp-btn-sm {
-        border-radius: 12px;
-        font-weight: 800;
-        padding: .55rem .9rem;
-        white-space: nowrap;
-    }
-
-    .btn-danger {
-        background-color: #d32f2f !important;
-        border: none !important;
-    }
-
-        .btn-danger:hover {
-            background-color: #b71c1c !important;
-        }
-
-    .btn-dark {
-        background-color: #222 !important;
-        border: none !important;
-    }
-
-        .btn-dark:hover {
-            background-color: #444 !important;
-        }
-
-    .btn-outline-dark {
-        border-radius: 12px;
-        font-weight: 800;
-    }
-
-    .cp-side {
-        background: #fff;
-        border: 1px solid rgba(0,0,0,.06);
-    }
-
-    .cp-side-title {
-        font-weight: 900;
-        color: #111;
-    }
-
-    .cp-side-sub {
-        color: #6c757d;
-        font-size: .9rem;
-    }
-
-    .cp-hr {
-        margin: 16px 0;
-        border-color: rgba(0,0,0,.08);
-    }
-
-    .cp-preview-label {
-        font-weight: 800;
-        color: #111;
-        margin-bottom: 6px;
-    }
-
-    .cp-preview-box {
-        border: 1px dashed rgba(0,0,0,.18);
-        border-radius: 16px;
-        height: 210px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,.02);
-        overflow: hidden;
-    }
-
-    #previewImg {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .cp-preview-empty {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 900;
-        color: #d32f2f;
-        background: rgba(211,47,47,.06);
-    }
-</style>

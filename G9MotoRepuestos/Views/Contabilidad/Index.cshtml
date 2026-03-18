@@ -5,170 +5,546 @@
     ViewData["Title"] = "Contabilidad";
 }
 
-<div class="container-fluid py-4">
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4">
+<style>
+    /* ── Fondo y superficie para fondo slate ── */
+    .kpi-card {
+        background: #ffffff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        height: 100%;
+        transition: border-color .2s, box-shadow .2s, transform .15s;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
 
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-                <div>
-                    <h2 class="fw-bold text-danger mb-1">Módulo de Contabilidad</h2>
-                    <p class="text-muted mb-0">Consulta movimientos, revisa balances y realiza cierres contables.</p>
-                </div>
+        .kpi-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+            transform: translateY(-1px);
+        }
 
-                <div class="d-flex gap-2 flex-wrap">
-                    <a asp-controller="Contabilidad" asp-action="RegistrarMovimiento" class="btn btn-dark rounded-3">
-                        <i class="bi bi-plus-circle me-1"></i> Registrar movimiento
-                    </a>
-                    <a asp-controller="Contabilidad" asp-action="RealizarCierre" class="btn btn-danger rounded-3">
-                        <i class="bi bi-cash-stack me-1"></i> Realizar cierre
-                    </a>
-                    <a asp-controller="Contabilidad" asp-action="HistorialCierres" class="btn btn-outline-secondary rounded-3">
-                        <i class="bi bi-clock-history me-1"></i> Historial de cierres
-                    </a>
+    .kpi-icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .kpi-value {
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 10px 0 6px;
+    }
+
+    .kpi-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 5px;
+    }
+
+    .prop-section {
+        background: #ffffff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 16px 20px;
+        height: 100%;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .prop-bar {
+        height: 8px;
+        border-radius: 99px;
+        overflow: hidden;
+        display: flex;
+        background: #edf0f7;
+    }
+
+    .chart-card {
+        background: #ffffff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        height: 100%;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 5px;
+        height: 56px;
+        margin-top: 12px;
+    }
+
+    .chart-bar-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .chart-bar {
+        width: 100%;
+        border-radius: 4px 4px 0 0;
+        min-height: 4px;
+        transition: opacity .2s;
+        cursor: default;
+    }
+
+        .chart-bar:hover {
+            opacity: .7;
+        }
+
+    .chart-bar-lbl {
+        font-size: 9px;
+        color: rgba(255,255,255,.22);
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 100%;
+        text-overflow: ellipsis;
+    }
+
+    .table-card {
+        background: #ffffff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .table-card-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .filters-row {
+        padding: 16px 20px;
+        border-bottom: 1px solid #edf0f7;
+    }
+
+    .table-dark-app {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .table-dark-app thead th {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #8a94a6;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-bottom: 1px solid #edf0f7;
+            background: #f8fafd;
+            white-space: nowrap;
+        }
+
+        .table-dark-app tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f3f9;
+            color: #4a5568;
+        }
+
+        .table-dark-app tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-dark-app tbody tr:hover td {
+            background: #f4f7fc;
+            color: #1a202c;
+        }
+
+    .badge-ing {
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 5px;
+        white-space: nowrap;
+        letter-spacing: .02em;
+        border: 1px solid #bbf7d0;
+    }
+
+    .badge-eg {
+        background: #fff1f1;
+        color: #991b1b;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 5px;
+        white-space: nowrap;
+        letter-spacing: .02em;
+        border: 1px solid #fecaca;
+    }
+
+    .origen-pill {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 5px;
+        background: #edf0f7;
+        color: #4a5568;
+        border: 1px solid #dde3ee;
+        white-space: nowrap;
+    }
+
+    .monto-ing {
+        color: #166534;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .monto-eg {
+        color: #991b1b;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .user-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #fee2e2;
+        color: #991b1b;
+        font-size: 10px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .empty-state {
+        padding: 3.5rem 1rem;
+        text-align: center;
+        color: #8a94a6;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: .6rem;
+            opacity: .4;
+        }
+
+    .chart-bar-lbl {
+        font-size: 9px;
+        color: #8a94a6;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 100%;
+        text-overflow: ellipsis;
+    }
+</style>
+
+@* ── Encabezado ───────────────────────────────────────────────── *@
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+    <p class="mb-0" style="font-size:13px;color:rgba(255,255,255,.3)">
+        Consulta movimientos, revisa balances y realiza cierres contables.
+    </p>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-controller="Contabilidad" asp-action="HistorialCierres" class="btn-app-ghost">
+            <i class="fas fa-clock-rotate-left"></i> Historial de cierres
+        </a>
+        <a asp-controller="Contabilidad" asp-action="RegistrarMovimiento" class="btn-app-secondary">
+            <i class="fas fa-plus-circle"></i> Registrar movimiento
+        </a>
+        <a asp-controller="Contabilidad" asp-action="RealizarCierre" class="btn-app-primary">
+            <i class="fas fa-cash-register"></i> Realizar cierre
+        </a>
+    </div>
+</div>
+
+@* ── Alertas ──────────────────────────────────────────────────── *@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+@* ── KPI Cards ────────────────────────────────────────────────── *@
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size:12px;color:rgba(255,255,255,.35)">Total ingresos</span>
+                <div class="kpi-icon-box" style="background:rgba(74,222,128,.1)">
+                    <i class="fas fa-arrow-up" style="color:#4ade80"></i>
                 </div>
             </div>
+            <div class="kpi-value" style="color:#4ade80">₡@Model.Resumen.TotalIngresos.ToString("N2")</div>
+            <span class="kpi-trend" style="background:rgba(74,222,128,.1);color:#86efac">
+                <i class="fas fa-arrow-trend-up"></i> Movimientos de ingreso
+            </span>
+        </div>
+    </div>
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                    @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body">
-                            <div class="text-muted small mb-1">Total ingresos</div>
-                            <div class="fs-3 fw-bold text-success">₡@Model.Resumen.TotalIngresos.ToString("N2")</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body">
-                            <div class="text-muted small mb-1">Total egresos</div>
-                            <div class="fs-3 fw-bold text-danger">₡@Model.Resumen.TotalEgresos.ToString("N2")</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body">
-                            <div class="text-muted small mb-1">Balance total</div>
-                            <div class="fs-3 fw-bold @(Model.Resumen.BalanceTotal >= 0 ? "text-primary" : "text-danger")">
-                                ₡@Model.Resumen.BalanceTotal.ToString("N2")
-                            </div>
-                        </div>
-                    </div>
+    <div class="col-md-4">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size:12px;color:rgba(255,255,255,.35)">Total egresos</span>
+                <div class="kpi-icon-box" style="background:rgba(248,113,113,.1)">
+                    <i class="fas fa-arrow-down" style="color:#f87171"></i>
                 </div>
             </div>
+            <div class="kpi-value" style="color:#f87171">₡@Model.Resumen.TotalEgresos.ToString("N2")</div>
+            <span class="kpi-trend" style="background:rgba(248,113,113,.1);color:#fca5a5">
+                <i class="fas fa-arrow-trend-down"></i> Movimientos de egreso
+            </span>
+        </div>
+    </div>
 
-            <form asp-action="Index" method="get" class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <label class="form-label">Buscar</label>
-                    <input asp-for="TextoBusqueda" class="form-control rounded-3" placeholder="Categoría, descripción, tipo..." />
+    <div class="col-md-4">
+        @{
+            var esPositivo = Model.Resumen.BalanceTotal >= 0;
+            var balColor = esPositivo ? "#60a5fa" : "#f87171";
+            var balBg = esPositivo ? "rgba(96,165,250,.1)" : "rgba(248,113,113,.1)";
+            var balTrendBg = esPositivo ? "rgba(96,165,250,.1)" : "rgba(248,113,113,.1)";
+            var balTrendColor = esPositivo ? "#93c5fd" : "#fca5a5";
+            var balIconClass = esPositivo ? "fa-chart-line" : "fa-chart-line-down";
+            var balTexto = esPositivo ? "Balance positivo" : "Balance negativo";
+        }
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size:12px;color:rgba(255,255,255,.35)">Balance neto</span>
+                <div class="kpi-icon-box" style="background:@balBg">
+                    <i class="fas @balIconClass" style="color:@balColor"></i>
                 </div>
+            </div>
+            <div class="kpi-value" style="color:@balColor">₡@Model.Resumen.BalanceTotal.ToString("N2")</div>
+            <span class="kpi-trend" style="background:@balTrendBg;color:@balTrendColor">
+                @(esPositivo ? "▲" : "▼") @balTexto
+            </span>
+        </div>
+    </div>
+</div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Desde</label>
-                    <input asp-for="Desde" type="date" class="form-control rounded-3" />
+@* ── Barra de proporción + mini gráfico ──────────────────────── *@
+@{
+    var totalMov = Model.Resumen.TotalIngresos + Model.Resumen.TotalEgresos;
+    var pctIng = totalMov > 0 ? (double)(Model.Resumen.TotalIngresos / totalMov * 100) : 0;
+    var pctEg = totalMov > 0 ? (double)(Model.Resumen.TotalEgresos / totalMov * 100) : 0;
+    var movs = Model.Movimientos ?? Enumerable.Empty<MovimientoFinancieroDto>();
+    decimal maxMonto = movs.Any() ? movs.Max(m => Math.Abs(m.Monto)) : 1;
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-md-7">
+        <div class="prop-section">
+            <div style="font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">
+                Proporción ingresos / egresos
+            </div>
+            <div class="prop-bar mb-2">
+                <div style="width:@pctIng.ToString("F1")%;background:#4ade80;border-radius:99px 0 0 99px;transition:width .5s"></div>
+                <div style="width:@pctEg.ToString("F1")%;background:#f87171;border-radius:0 99px 99px 0;transition:width .5s"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+                <span style="font-size:12px;color:#86efac;font-weight:600">
+                    <i class="fas fa-circle me-1" style="font-size:7px"></i>
+                    Ingresos @pctIng.ToString("F1")%
+                </span>
+                <span style="font-size:12px;color:#fca5a5;font-weight:600">
+                    Egresos @pctEg.ToString("F1")%
+                    <i class="fas fa-circle ms-1" style="font-size:7px"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="chart-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <span style="font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em">
+                    Últimos movimientos
+                </span>
+                <div class="d-flex gap-3">
+                    <span style="font-size:10px;color:#86efac;display:flex;align-items:center;gap:4px">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;display:inline-block"></span> Ingreso
+                    </span>
+                    <span style="font-size:10px;color:#fca5a5;display:flex;align-items:center;gap:4px">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#f87171;display:inline-block"></span> Egreso
+                    </span>
                 </div>
+            </div>
+            <div class="chart-bars">
+                @foreach (var m in movs.Take(8))
+                {
+                    var altura = maxMonto > 0 ? (int)((double)Math.Abs(m.Monto) / (double)maxMonto * 52) : 4;
+                    altura = Math.Max(altura, 4);
+                    var esIng = m.Tipo == "Ingreso";
+                    <div class="chart-bar-wrap">
+                        <div class="chart-bar"
+                             style="height:@(altura)px;background:@(esIng ? "#4ade80" : "#f87171");opacity:@(esIng ? "0.85" : "0.9")"
+                             title="@m.Tipo: ₡@m.Monto.ToString("N2")"></div>
+                        <div class="chart-bar-lbl">@m.Fecha.ToString("dd/MM")</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Hasta</label>
-                    <input asp-for="Hasta" type="date" class="form-control rounded-3" />
-                </div>
+@* ── Filtros + Tabla ──────────────────────────────────────────── *@
+@*
+    En el controlador agrega:
+        ViewBag.TiposMovimiento    = new SelectList(new[] { "Ingreso", "Egreso" });
+        ViewBag.OrigenesMovimiento = new SelectList(new[] { "Venta", "Compra", "Servicio", "Manual", "Ajuste" });
+*@
+<div class="table-card">
 
-                <div class="col-md-2">
-                    <label class="form-label">Tipo</label>
-                    <select asp-for="TipoFiltro" class="form-select rounded-3">
-                        <option value="">Todos</option>
-                        <option value="Ingreso">Ingreso</option>
-                        <option value="Egreso">Egreso</option>
-                    </select>
-                </div>
+    <div class="table-card-header">
+        <span style="font-size:14px;font-weight:700;color:#1a202c">
+            <i class="fas fa-list me-2" style="color:rgba(255,255,255,.3)"></i> Movimientos
+        </span>
+        <span style="font-size:12px;color:#8a94a6">
+            @movs.Count() resultado@(movs.Count() != 1 ? "s" : "")
+        </span>
+    </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Origen</label>
-                    <select asp-for="OrigenFiltro" class="form-select rounded-3">
-                        <option value="">Todos</option>
-                        <option value="Venta">Venta</option>
-                        <option value="Compra">Compra</option>
-                        <option value="Servicio">Servicio</option>
-                        <option value="Manual">Manual</option>
-                        <option value="Ajuste">Ajuste</option>
-                    </select>
-                </div>
+    <div class="filters-row">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label asp-for="TextoBusqueda" class="form-label">Buscar</label>
+                <input asp-for="TextoBusqueda" class="form-control" placeholder="Categoría, descripción..." />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Desde" class="form-label">Desde</label>
+                <input asp-for="Desde" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Hasta" class="form-label">Hasta</label>
+                <input asp-for="Hasta" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="TipoFiltro" class="form-label">Tipo</label>
+                <select asp-for="TipoFiltro" asp-items="ViewBag.TiposMovimiento" class="form-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="OrigenFiltro" class="form-label">Origen</label>
+                <select asp-for="OrigenFiltro" asp-items="ViewBag.OrigenesMovimiento" class="form-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-grid">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn-app-primary" style="justify-content:center;padding:8px">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 
-                <div class="col-md-1 d-grid">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-danger rounded-3">Filtrar</button>
-                </div>
-            </form>
+    <div class="table-responsive">
+        <table class="table-dark-app">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Origen</th>
+                    <th>Ref.</th>
+                    <th>Usuario</th>
+                    <th style="text-align:right">Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (movs.Any())
+                {
+                    foreach (var item in movs)
+                    {
+                        var esIngreso = item.Tipo == "Ingreso";
+                        var nombreUsuario = item.UsuarioNombre ?? "";
+                        var iniciales = string.IsNullOrWhiteSpace(nombreUsuario)
+                        ? "U"
+                        : string.Concat(nombreUsuario
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Take(2)
+                        .Select(p => p[0].ToString().ToUpper()));
 
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="table-dark">
                         <tr>
-                            <th>Fecha</th>
-                            <th>Tipo</th>
-                            <th>Categoría</th>
-                            <th>Descripción</th>
-                            <th>Origen</th>
-                            <th>Referencia</th>
-                            <th>Usuario</th>
-                            <th class="text-end">Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Movimientos != null && Model.Movimientos.Any())
-                        {
-                            foreach (var item in Model.Movimientos)
-                            {
-                                <tr>
-                                    <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>
-                                        <span class="badge @(item.Tipo == "Ingreso" ? "bg-success" : "bg-danger")">
-                                            @item.Tipo
-                                        </span>
-                                    </td>
-                                    <td>@item.Categoria</td>
-                                    <td>@item.Descripcion</td>
-                                    <td>@item.Origen</td>
-                                    <td>@(item.IdReferencia?.ToString() ?? "-")</td>
-                                    <td>@item.UsuarioNombre</td>
-                                    <td class="text-end fw-bold @(item.Tipo == "Ingreso" ? "text-success" : "text-danger")">
-                                        @(item.Tipo == "Ingreso"
-                                                                        ? "₡" + item.Monto.ToString("N2")
-                                                                        : "-₡" + item.Monto.ToString("N2"))
+                            <td style="font-size:11px;color:#8a94a6;white-space:nowrap">
+                                @item.Fecha.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                @if (esIngreso)
+                                {
+                                    <span class="badge-ing">Ingreso</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-eg">Egreso</span>
+                                }
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Categoria) ? "—" : item.Categoria)</td>
+                            <td style="color:#1a202c">@item.Descripcion</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.Origen))
+                                {
+                                    <span class="origen-pill">@item.Origen</span>
+                                }
+                                else
+                                {
+                                    <span style="color:#b0b8c8">—</span>
+                                }
+                            </td>
+                            <td style="color:#8a94a6">@(item.IdReferencia?.ToString() ?? "—")</td>
+                            <td>
+                                <div style="display:inline-flex;align-items:center;gap:7px">
+                                    <div class="user-avatar">@iniciales</div>
+                                    <span>@nombreUsuario</span>
+                                </div>
+                            </td>
+                            @* Math.Abs evita "-₡-150.00" si Monto llega negativo *@
+                            <td style="text-align:right">
+                                <span class="@(esIngreso ? "monto-ing" : "monto-eg")">
+                                    @(esIngreso ? "₡" : "-₡")@Math.Abs(item.Monto).ToString("N2")
+                                </span>
                             </td>
                         </tr>
-                                                }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    No hay movimientos registrados para los filtros seleccionados.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                No hay movimientos para los filtros seleccionados.
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

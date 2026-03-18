@@ -5,6 +5,15 @@
     bool esAdmin = string.Equals(userRole, "Admin", StringComparison.OrdinalIgnoreCase);
     bool esVendedor = string.Equals(userRole, "Vendedor", StringComparison.OrdinalIgnoreCase);
     bool esPersonalAdmin = esAdmin || esVendedor;
+
+    var inicialesUsuario = string.IsNullOrWhiteSpace(nombreUsuario)
+        ? "U"
+        : string.Concat((nombreUsuario ?? "")
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(p => p[0].ToString().ToUpper()));
+
+    var controladorActual = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
 }
 
 <!DOCTYPE html>
@@ -21,80 +30,532 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-</head>
+    @if (esPersonalAdmin)
+    {
+        <style>
+            html, body {
+                background: #e8edf5 !important;
+                color: #1a202c;
+            }
 
-<body class="d-flex flex-column min-vh-100 font-main">
+            .admin-shell {
+                display: flex;
+                min-height: 100vh;
+            }
 
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-rojas shadow mb-0 py-2">
-            <div class="container-fluid">
-                @if (!esPersonalAdmin)
-                {
-                    <button class="btn btn-outline-light me-3 border-2 fw-bold"
-                            type="button"
-                            data-bs-toggle="offcanvas"
-                            data-bs-target="#menuCategorias">
-                        <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
-                    </button>
+            /* ── Sidebar ── */
+            .admin-sidebar {
+                width: 240px;
+                min-width: 240px;
+                background: #0f0f16;
+                border-right: 1px solid rgba(255,255,255,.06);
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 1000;
+                overflow-y: auto;
+            }
+
+                .admin-sidebar::-webkit-scrollbar {
+                    width: 4px;
                 }
 
-                <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/LogoLocal.jpeg" alt="Logo" width="45" height="45" class="rounded me-2 border border-white border-1">
-                    <span class="d-none d-sm-inline">MOTO REPUESTOS ROJAS</span>
+                .admin-sidebar::-webkit-scrollbar-thumb {
+                    background: rgba(255,255,255,.1);
+                    border-radius: 99px;
+                }
+
+            .sidebar-brand {
+                padding: 20px;
+                border-bottom: 1px solid rgba(255,255,255,.06);
+                display: flex;
+                align-items: center;
+                gap: 11px;
+                text-decoration: none;
+            }
+
+                .sidebar-brand:hover {
+                    text-decoration: none;
+                }
+
+            .brand-mark {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                overflow: hidden;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #A32D2D;
+            }
+
+                .brand-mark img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+            .b-name {
+                font-size: 13px;
+                font-weight: 700;
+                color: #fff;
+                line-height: 1.2;
+            }
+
+            .b-role {
+                font-size: 10.5px;
+                color: rgba(255,255,255,.3);
+            }
+
+            .nav-section-lbl {
+                font-size: 9.5px;
+                letter-spacing: .1em;
+                text-transform: uppercase;
+                color: rgba(255,255,255,.2);
+                padding: 16px 20px 5px;
+                font-weight: 700;
+            }
+
+            .s-link {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 9px 20px;
+                font-size: 13px;
+                color: rgba(255,255,255,.42);
+                text-decoration: none;
+                border-right: 2px solid transparent;
+                transition: background .15s, color .15s;
+            }
+
+                .s-link i {
+                    font-size: 14px;
+                    width: 17px;
+                    text-align: center;
+                    flex-shrink: 0;
+                }
+
+                .s-link:hover {
+                    background: rgba(255,255,255,.04);
+                    color: rgba(255,255,255,.78);
+                    text-decoration: none;
+                }
+
+                .s-link.active {
+                    background: rgba(163,45,45,.16);
+                    color: #ff8585;
+                    border-right-color: #A32D2D;
+                }
+
+                    .s-link.active i {
+                        color: #ff8585;
+                    }
+
+            .sidebar-footer {
+                margin-top: auto;
+                padding: 14px 20px;
+                border-top: 1px solid rgba(255,255,255,.06);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .s-avatar {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: rgba(163,45,45,.35);
+                color: #ff8585;
+                font-size: 11px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .s-user-name {
+                font-size: 12px;
+                font-weight: 600;
+                color: rgba(255,255,255,.7);
+                line-height: 1.2;
+            }
+
+            .s-user-role {
+                font-size: 10px;
+                color: rgba(255,255,255,.28);
+            }
+
+            .s-logout {
+                margin-left: auto;
+                color: rgba(255,255,255,.22);
+                font-size: 15px;
+                text-decoration: none;
+                transition: color .15s;
+            }
+
+                .s-logout:hover {
+                    color: rgba(255,255,255,.65);
+                }
+
+            /* ── Área principal ── */
+            .admin-main {
+                margin-left: 240px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                background: #e8edf5;
+            }
+
+            .admin-topbar {
+                background: #e8edf5;
+                border-bottom: 1px solid #dde3ee;
+                padding: 13px 26px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 900;
+            }
+
+            .topbar-page-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #1a202c;
+                line-height: 1.2;
+            }
+
+            .topbar-page-date {
+                font-size: 11px;
+                color: #8a94a6;
+            }
+
+            .topbar-icon-btn {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                background: #dde3ee;
+                border: none;
+                color: #4a5568;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background .15s, color .15s;
+            }
+
+                .topbar-icon-btn:hover {
+                    background: #c8d0e0;
+                    color: #1a202c;
+                }
+
+            .admin-content {
+                flex: 1;
+                padding: 22px 26px;
+            }
+
+            /* ── Formularios para fondo claro ── */
+            .form-control, .form-select {
+                background: #ffffff !important;
+                border: 1px solid #dde3ee !important;
+                border-radius: 9px !important;
+                color: #1a202c !important;
+                font-size: 13.5px !important;
+            }
+
+                .form-control::placeholder {
+                    color: #8a94a6 !important;
+                }
+
+                .form-control:focus, .form-select:focus {
+                    background: #ffffff !important;
+                    border-color: rgba(201,42,42,.4) !important;
+                    box-shadow: 0 0 0 3px rgba(201,42,42,.1) !important;
+                    color: #1a202c !important;
+                }
+
+                .form-select option {
+                    background: #fff;
+                    color: #1a202c;
+                }
+
+            .form-label {
+                font-size: 12px !important;
+                color: #8a94a6 !important;
+                margin-bottom: 5px !important;
+            }
+
+            /* ── Alertas para fondo claro ── */
+            .alert-success {
+                background: #f0fdf4 !important;
+                border: 1px solid #86efac !important;
+                color: #166534 !important;
+                border-radius: 10px !important;
+            }
+
+            .alert-danger {
+                background: #fff1f1 !important;
+                border: 1px solid #fca5a5 !important;
+                color: #991b1b !important;
+                border-radius: 10px !important;
+            }
+
+            .btn-close {
+                filter: none;
+            }
+
+            /* ── Botones admin ── */
+            .btn-app-primary {
+                background: #A32D2D;
+                color: #fff;
+                border: none;
+                border-radius: 9px;
+                padding: 8px 16px;
+                font-size: 13.5px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background .15s;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+                .btn-app-primary:hover {
+                    background: #8a2424;
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+            .btn-app-secondary {
+                background: rgba(255,255,255,.08);
+                color: rgba(255,255,255,.75);
+                border: 1px solid rgba(255,255,255,.1);
+                border-radius: 9px;
+                padding: 8px 16px;
+                font-size: 13.5px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background .15s;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+                .btn-app-secondary:hover {
+                    background: rgba(255,255,255,.13);
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+            .btn-app-ghost {
+                background: transparent;
+                color: rgba(255,255,255,.5);
+                border: 1px solid rgba(255,255,255,.1);
+                border-radius: 9px;
+                padding: 8px 16px;
+                font-size: 13.5px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all .15s;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+                .btn-app-ghost:hover {
+                    background: rgba(255,255,255,.06);
+                    color: rgba(255,255,255,.8);
+                    text-decoration: none;
+                }
+
+            /* ── Scrollbar ── */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,.1);
+                border-radius: 99px;
+            }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: rgba(255,255,255,.2);
+                }
+
+            @@media (max-width: 768px) {
+                .admin-sidebar {
+                    transform: translateX(-100%);
+                    transition: transform .25s;
+                }
+
+                    .admin-sidebar.open {
+                        transform: translateX(0);
+                    }
+
+                .admin-main {
+                    margin-left: 0;
+                }
+            }
+        </style>
+    }
+</head>
+
+<body class="@(esPersonalAdmin ? "" : "d-flex flex-column min-vh-100 font-main")">
+
+    @* ══ LAYOUT ADMIN ═══════════════════════════════════════════════ *@
+    @if (esPersonalAdmin)
+    {
+        <div class="admin-shell">
+            <nav class="admin-sidebar">
+
+                <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+                    <div class="brand-mark">
+                        <img src="~/images/LogoLocal.jpeg" alt="Logo">
+                    </div>
+                    <div>
+                        <div class="b-name">Moto Repuestos</div>
+                        <div class="b-role">@(esAdmin ? "Administrador" : "Vendedor")</div>
+                    </div>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <div class="nav-section-lbl">Principal</div>
 
-                <div class="collapse navbar-collapse" id="navMain">
-                    <ul class="navbar-nav me-auto">
-                        @if (esPersonalAdmin)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="PanelControl">PANEL DE CONTROL</a>
-                            </li>
-                        }
-                        else
-                        {
+                <a class="s-link @(controladorActual == "Home" ? "active" : "")"
+                   asp-controller="Home" asp-action="PanelControl">
+                    <i class="fas fa-th-large"></i> Panel de control
+                </a>
+                <a class="s-link @(controladorActual == "Ventas" ? "active" : "")"
+                   asp-controller="Ventas" asp-action="Index">
+                    <i class="fas fa-shopping-bag"></i> Ventas
+                </a>
+                <a class="s-link @(controladorActual == "Clientes" ? "active" : "")"
+                   asp-controller="Clientes" asp-action="Index">
+                    <i class="fas fa-users"></i> Clientes
+                </a>
+                <a class="s-link @(controladorActual == "Inventario" ? "active" : "")"
+                   asp-controller="Inventario" asp-action="Index">
+                    <i class="fas fa-boxes"></i> Inventario
+                </a>
+                <a class="s-link @(controladorActual == "Citas" ? "active" : "")"
+                   asp-controller="Citas" asp-action="Index">
+                    <i class="fas fa-calendar-check"></i> Gestión de citas
+                </a>
+                <a class="s-link @(controladorActual == "Contabilidad" ? "active" : "")"
+                   asp-controller="Contabilidad" asp-action="Index">
+                    <i class="fas fa-chart-line"></i> Contabilidad
+                </a>
+
+                <div class="nav-section-lbl">Análisis</div>
+
+                <a class="s-link @(controladorActual == "Reportes" ? "active" : "")"
+                   asp-controller="Reportes" asp-action="Index">
+                    <i class="fas fa-file-alt"></i> Reportes
+                </a>
+
+                @if (esAdmin)
+                {
+                    <div class="nav-section-lbl">Sistema</div>
+                    <a class="s-link @(controladorActual == "Usuarios" ? "active" : "")"
+                       asp-controller="Usuarios" asp-action="Index">
+                        <i class="fas fa-user-cog"></i> Usuarios
+                    </a>
+                    <a class="s-link @(controladorActual == "Configuracion" ? "active" : "")"
+                       asp-controller="Configuracion" asp-action="Index">
+                        <i class="fas fa-sliders-h"></i> Configuración
+                    </a>
+                }
+
+                <div class="sidebar-footer">
+                    <div class="s-avatar">@inicialesUsuario</div>
+                    <div>
+                        <div class="s-user-name">@(nombreUsuario ?? "Usuario")</div>
+                        <div class="s-user-role">@(esAdmin ? "Admin" : "Vendedor")</div>
+                    </div>
+                    <a asp-controller="Account" asp-action="Logout" class="s-logout" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="admin-main">
+                <header class="admin-topbar">
+                    <div>
+                        <div class="topbar-page-date">
+                            @DateTime.Now.ToString("dd 'de' MMMM, yyyy", new System.Globalization.CultureInfo("es-CR"))
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="topbar-icon-btn" title="Notificaciones">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <div class="s-avatar ms-1" style="cursor:default" title="@nombreUsuario">
+                            @inicialesUsuario
+                        </div>
+                    </div>
+                </header>
+
+                <main class="admin-content">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    }
+
+    @* ══ LAYOUT CLIENTE (original intacto) ══════════════════════════ *@
+    else
+    {
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-rojas shadow mb-0 py-2">
+                <div class="container-fluid">
+                    <button class="btn btn-outline-light me-3 border-2 fw-bold"
+                            type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCategorias">
+                        <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
+                    </button>
+
+                    <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                        <img src="~/images/LogoLocal.jpeg" alt="Logo" width="45" height="45" class="rounded me-2 border border-white border-1">
+                        <span class="d-none d-sm-inline">MOTO REPUESTOS ROJAS</span>
+                    </a>
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navMain">
+                        <ul class="navbar-nav me-auto">
                             <li class="nav-item">
                                 <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Servicios">SERVICIOS</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>                          
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
-                            </li>
-                        }
-
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="@(esPersonalAdmin ? "Index" : "MisCitas")">
-                                    @(esPersonalAdmin ? "GESTIÓN CITAS" : "MIS CITAS")
-                                </a>
-                            </li>
-                            }
-                            else
-                            {
                                 <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>
-                            }
-                        </li>
-                        @if (User.Identity.IsAuthenticated)
-                        {
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="MisCitas">Mis Citas</a>
-                            </li>
-                        }
-                    </ul>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="MisCitas">MIS CITAS</a>
+                                </li>
+                            }
+                        </ul>
 
-                    @if (!esPersonalAdmin)
-                    {
-                        <form class="d-flex mx-auto my-2 my-lg-0" asp-controller="Home" asp-action="Catalogo" method="get" style="flex: 1; max-width: 450px;">
+                        <form class="d-flex mx-auto my-2 my-lg-0" asp-controller="Home" asp-action="Catalogo" method="get" style="flex:1;max-width:450px">
                             <div class="input-group">
                                 <input name="buscar" class="form-control border-0" type="search" placeholder="¿Qué repuesto buscas?">
                                 <button class="btn btn-white text-danger border-0 bg-white" type="submit">
@@ -102,132 +563,128 @@
                                 </button>
                             </div>
                         </form>
-                    }
 
-                    <div class="ms-auto">
-                        <partial name="_LoginPartial" />
+                        <div class="ms-auto">
+                            <partial name="_LoginPartial" />
+                        </div>
                     </div>
                 </div>
+            </nav>
+        </header>
+
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="menuCategorias"
+             style="background-color:#212121 !important;color:white !important;">
+            <div class="offcanvas-header border-bottom border-secondary py-3">
+                <h5 class="offcanvas-title fw-bold text-danger" style="font-family:'Oswald',sans-serif !important;">
+                    <i class="fas fa-motorcycle me-2"></i> EXPLORAR
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
-        </nav>
-    </header>
-
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="menuCategorias"
-         style="background-color: #212121 !important; color: white !important;">
-
-        <div class="offcanvas-header border-bottom border-secondary py-3">
-            <h5 class="offcanvas-title fw-bold text-danger" style="font-family: 'Oswald', sans-serif !important;">
-                <i class="fas fa-motorcycle me-2"></i> EXPLORAR
-            </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-
-        <div class="offcanvas-body p-0 d-flex flex-column">
-            <div class="list-group list-group-flush flex-grow-1">
-                <a asp-action="Servicios" asp-controller="Home"
-                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom bg-danger text-white fw-bold"
-                   style="font-family: 'Oswald', sans-serif !important;">
-                    <i class="fas fa-wrench me-2"></i> NUESTROS SERVICIOS
-                </a>
-                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Motor"
-                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
-                    Repuestos de Motor
-                </a>
-                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Accesorios"
-                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
-                    Accesorios
-                </a>
-                <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Aceites"
-                   class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
-                    Aceites y Lubricantes
-                </a>
-            </div>
-
-            <div class="sidebar-footer p-3 border-top border-secondary mt-auto" style="background-color: rgba(0,0,0,0.3) !important;">
-                <a asp-controller="Home" asp-action="Nosotros"
-                   class="list-group-item list-group-item-action border-0 rounded"
-                   style="background-color: transparent !important; color: white !important; font-family: 'Oswald', sans-serif !important;">
-                    <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <main role="main" class="flex-shrink-0">
-        @RenderBody()
-    </main>
-
-    <footer class="bg-dark text-white pt-4 pb-2 border-top border-danger border-4 mt-auto">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                    <h6 class="text-uppercase fw-bold text-danger mb-1 small">Moto Repuestos Rojas</h6>
-                    <p class="small text-secondary mb-0" style="font-size: 0.75rem;">Calidad y asesoría honesta en Mercedes Norte desde 2024.</p>
+            <div class="offcanvas-body p-0 d-flex flex-column">
+                <div class="list-group list-group-flush flex-grow-1">
+                    <a asp-action="Servicios" asp-controller="Home"
+                       class="list-group-item list-group-item-action py-3 border-secondary border-bottom bg-danger text-white fw-bold"
+                       style="font-family:'Oswald',sans-serif !important;">
+                        <i class="fas fa-wrench me-2"></i> NUESTROS SERVICIOS
+                    </a>
+                    <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Motor"
+                       class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
+                       style="background-color:transparent !important;color:white !important;font-family:'Oswald',sans-serif !important;">
+                        Repuestos de Motor
+                    </a>
+                    <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Accesorios"
+                       class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
+                       style="background-color:transparent !important;color:white !important;font-family:'Oswald',sans-serif !important;">
+                        Accesorios
+                    </a>
+                    <a asp-action="Catalogo" asp-controller="Home" asp-route-categoria="Aceites"
+                       class="list-group-item list-group-item-action py-3 border-secondary border-bottom"
+                       style="background-color:transparent !important;color:white !important;font-family:'Oswald',sans-serif !important;">
+                        Aceites y Lubricantes
+                    </a>
                 </div>
-                <div class="col-md-5 text-center mb-3 mb-md-0">
-                    <div class="d-inline-block text-start">
-                        <p class="small mb-0" style="font-size: 0.8rem;"><i class="fas fa-map-marker-alt text-danger me-2"></i>Mercedes Norte, Heredia</p>
-                        <p class="small mb-0" style="font-size: 0.8rem;"><i class="fab fa-whatsapp text-success me-2"></i>+506 7243-2805</p>
+                <div class="p-3 border-top border-secondary mt-auto" style="background-color:rgba(0,0,0,0.3) !important;">
+                    <a asp-controller="Home" asp-action="Nosotros"
+                       class="list-group-item list-group-item-action border-0 rounded"
+                       style="background-color:transparent !important;color:white !important;font-family:'Oswald',sans-serif !important;">
+                        <i class="fas fa-info-circle me-2 text-info"></i> Sobre Nosotros
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <main role="main" class="flex-shrink-0">
+            @RenderBody()
+        </main>
+
+        <footer class="bg-dark text-white pt-4 pb-2 border-top border-danger border-4 mt-auto">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                        <h6 class="text-uppercase fw-bold text-danger mb-1 small">Moto Repuestos Rojas</h6>
+                        <p class="small text-secondary mb-0" style="font-size:0.75rem">Calidad y asesoría honesta en Mercedes Norte desde 2024.</p>
+                    </div>
+                    <div class="col-md-5 text-center mb-3 mb-md-0">
+                        <div class="d-inline-block text-start">
+                            <p class="small mb-0" style="font-size:0.8rem"><i class="fas fa-map-marker-alt text-danger me-2"></i>Mercedes Norte, Heredia</p>
+                            <p class="small mb-0" style="font-size:0.8rem"><i class="fab fa-whatsapp text-success me-2"></i>+506 7243-2805</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center text-md-end">
+                        <a href="https://wa.me/50672432805" target="_blank" style="color:#25D366;font-size:1.2rem;margin-right:.5rem"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.facebook.com/share/1831P2NdY6/" target="_blank" style="color:#1877F2;font-size:1.2rem;margin-right:.5rem"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/motorepuestosrojas" target="_blank" style="color:#E4405F;font-size:1.2rem"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
-                <div class="col-md-3 text-center text-md-end">
-                    <a href="https://wa.me/50672432805" target="_blank" class="social-icon-sm me-2" style="color: #25D366; font-size: 1.2rem;"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://www.facebook.com/share/1831P2NdY6/" target="_blank" class="social-icon-sm me-2" style="color: #1877F2; font-size: 1.2rem;"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/motorepuestosrojas" target="_blank" class="social-icon-sm" style="color: #E4405F; font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+                <hr class="my-3 border-secondary opacity-25">
+                <div class="text-center">
+                    <p class="mb-0 text-secondary" style="font-size:0.7rem">© 2026 <strong>Moto Repuestos Rojas</strong>. Pasión por las motos.</p>
                 </div>
             </div>
-            <hr class="my-3 border-secondary opacity-25">
-            <div class="row pb-2">
-                <div class="col-12 text-center">
-                    <p class="mb-0 text-secondary" style="font-size: 0.7rem;">© 2026 <strong>Moto Repuestos Rojas</strong>. Pasión por las motos.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+        </footer>
 
-    <div class="offcanvas offcanvas-end border-0 shadow-lg rounded-start-4" tabindex="-1" id="offcanvasChat">
-        <div class="offcanvas-header bg-dark text-white py-4">
-            <h5 class="offcanvas-title fw-bold"><i class="fas fa-robot text-danger me-2"></i>Asistente Rojas</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body d-flex flex-column bg-light">
-            <div class="flex-grow-1 overflow-auto p-3" id="chatMessages">
-                <div class="text-center text-muted small mb-3">Hoy</div>
-                <div class="d-flex mb-3">
-                    <div class="bg-white p-3 rounded-3 shadow-sm border-start border-danger border-3" style="max-width: 85%;">
-                        <p class="mb-0 small">¡Hola! ¿Deseas agendar un servicio o buscas algún repuesto específico?</p>
+        <div class="offcanvas offcanvas-end border-0 shadow-lg rounded-start-4" tabindex="-1" id="offcanvasChat">
+            <div class="offcanvas-header bg-dark text-white py-4">
+                <h5 class="offcanvas-title fw-bold"><i class="fas fa-robot text-danger me-2"></i>Asistente Rojas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body d-flex flex-column bg-light">
+                <div class="flex-grow-1 overflow-auto p-3" id="chatMessages">
+                    <div class="text-center text-muted small mb-3">Hoy</div>
+                    <div class="d-flex mb-3">
+                        <div class="bg-white p-3 rounded-3 shadow-sm border-start border-danger border-3" style="max-width:85%">
+                            <p class="mb-0 small">¡Hola! ¿Deseas agendar un servicio o buscas algún repuesto específico?</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="border-top pt-3 mt-auto">
-                <form id="chatForm" class="d-flex bg-white p-1 rounded-pill shadow-sm border">
-                    <input type="text" id="chatInput" class="form-control border-0 bg-transparent ms-2 shadow-none" placeholder="Escribe un mensaje...">
-                    <button type="submit" class="btn btn-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </form>
+                <div class="border-top pt-3 mt-auto">
+                    <form id="chatForm" class="d-flex bg-white p-1 rounded-pill shadow-sm border">
+                        <input type="text" id="chatInput" class="form-control border-0 bg-transparent ms-2 shadow-none" placeholder="Escribe un mensaje...">
+                        <button type="submit" class="btn btn-danger rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;flex-shrink:0">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <button id="btnAbrirChat" class="chat-float shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
-        <i class="fas fa-comment-dots"></i>
-    </button>
-
-    <a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+        <button id="btnAbrirChat" class="chat-float shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+        <a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/chatbox/ChatBox.js" asp-append-version="true"></script>
+    @if (!esPersonalAdmin)
+    {
+        <script src="~/js/chatbox/ChatBox.js" asp-append-version="true"></script>
+    }
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

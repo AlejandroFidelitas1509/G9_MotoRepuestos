@@ -1,7 +1,6 @@
 ﻿
 using Dapper;
 using G9MotoRepuestos.Models.ViewModels;
-using global::G9MotoRepuestos.Models.ViewModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
