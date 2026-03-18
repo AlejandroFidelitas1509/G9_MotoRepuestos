@@ -3,7 +3,6 @@
 
 @{
     ViewData["Title"] = "Categorías";
-
     var categorias = Model?.ToList() ?? new List<CategoriaDto>();
     var total = categorias.Count;
     var activas = categorias.Count(x => x.Estado == true);
@@ -12,82 +11,376 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="cat-shell">
+<style>
+    /* ── Stats ────────────────────────────────────────────────────── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
 
-    <!-- HEADER -->
-    <div class="cat-header">
-        <div class="cat-title">Categorías</div>
+    .stat-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        transition: border-color .2s, box-shadow .2s;
+    }
 
-        <div class="cat-header-right">
-            <a asp-controller="Inventario" asp-action="Index" class="btn btn-dark cat-btn">
-                Inventario
-            </a>
+        .stat-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
 
-            <button type="button" class="btn btn-danger cat-btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalNuevaCategoria">
-                ＋ Nueva categoría
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .stat-val {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    /* ── Filtros ──────────────────────────────────────────────────── */
+    .filter-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 22px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .f-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .f-input, .f-select {
+        width: 100%;
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 9px;
+        color: #1a202c;
+        font-size: 14px;
+        padding: 9px 13px;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+        .f-input:focus, .f-select:focus {
+            outline: none;
+            background: #fff;
+            border-color: rgba(201,42,42,.4);
+            box-shadow: 0 0 0 3px rgba(201,42,42,.08);
+        }
+
+        .f-input::placeholder {
+            color: #b0b8c8;
+        }
+
+    /* ── Tabla ────────────────────────────────────────────────────── */
+    .table-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .table-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .cat-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .cat-table thead th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #8a94a6;
+            font-weight: 600;
+            padding: 12px 18px;
+            border-bottom: 1px solid #edf0f7;
+            background: #f8fafd;
+            white-space: nowrap;
+        }
+
+        .cat-table tbody td {
+            padding: 15px 18px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f3f9;
+            color: #4a5568;
+            font-size: 15px;
+        }
+
+        .cat-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cat-table tbody tr:hover td {
+            background: #f4f7fc;
+        }
+
+    /* ── Badges de estado ─────────────────────────────────────────── */
+    .badge-activa {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-inactiva {
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    /* ── Botón editar (solo icono) ────────────────────────────────── */
+    .btn-ico {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #dde3ee;
+        background: #f8fafd;
+        color: #4a5568;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .btn-ico:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,.08);
+        }
+
+    /* ── Switch ───────────────────────────────────────────────────── */
+    .form-check-input.cat-switch {
+        width: 44px;
+        height: 22px;
+        cursor: pointer;
+    }
+
+        .form-check-input.cat-switch:checked {
+            background-color: #2f9e44;
+            border-color: #2f9e44;
+        }
+
+        .form-check-input.cat-switch:focus {
+            box-shadow: 0 0 0 3px rgba(47,158,68,.15);
+            border-color: rgba(47,158,68,.4);
+        }
+
+    /* ── Modal ────────────────────────────────────────────────────── */
+    .modal-content {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #dde3ee;
+    }
+
+    .modal-header {
+        background: #1a202c;
+        color: #fff;
+        border: none;
+        padding: 16px 20px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        padding: 14px 20px;
+        border-top: 1px solid #edf0f7;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────────── */
+    @@media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 500px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@* ── Encabezado ──────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-tags me-2" style="color:#c92a2a"></i> Categorías
+        </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Administra las categorías de productos del catálogo
+        </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a asp-controller="Inventario" asp-action="Index"
+           style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none"
+           onmouseover="this.style.background='#fff';this.style.borderColor='#b8c4d8';this.style.color='#1a202c'"
+           onmouseout="this.style.background='#f4f7fc';this.style.borderColor='#dde3ee';this.style.color='#4a5568'">
+            <i class="fas fa-boxes"></i> Inventario
+        </a>
+        <button type="button"
+                style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+                data-bs-toggle="modal" data-bs-target="#modalNuevaCategoria"
+                onmouseover="this.style.background='#a61e1e'"
+                onmouseout="this.style.background='#c92a2a'">
+            <i class="fas fa-plus"></i> Nueva categoría
+        </button>
+    </div>
+</div>
+
+@* ── Stats ────────────────────────────────────────────────────────── *@
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f1">
+            <i class="fas fa-tags" style="color:#c92a2a"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total</div>
+            <div class="stat-val" style="color:#c92a2a">@total</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">
+            <i class="fas fa-check-circle" style="color:#166534"></i>
+        </div>
+        <div>
+            <div class="stat-label">Activas</div>
+            <div class="stat-val" style="color:#2f9e44">@activas</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff7ed">
+            <i class="fas fa-ban" style="color:#9a3412"></i>
+        </div>
+        <div>
+            <div class="stat-label">Inactivas</div>
+            <div class="stat-val" style="color:#d97706">@inactivas</div>
+        </div>
+    </div>
+</div>
+
+@* ── Filtros ──────────────────────────────────────────────────────── *@
+<div class="filter-card">
+    <div style="font-size:14px;font-weight:700;color:#1a202c;margin-bottom:14px">
+        <i class="fas fa-filter me-1" style="color:#c92a2a;font-size:12px"></i> Filtros
+    </div>
+    <div class="filter-grid">
+        <div>
+            <span class="f-label">Buscar</span>
+            <input id="catSearch" class="f-input"
+                   placeholder="Buscar categoría..."
+                   oninput="applyCatFilters()" />
+        </div>
+        <div>
+            <span class="f-label">Estado</span>
+            <select id="estadoFilter" class="f-select" onchange="applyCatFilters()">
+                <option value="all">Todas</option>
+                <option value="active">Activas</option>
+                <option value="inactive">Inactivas</option>
+            </select>
+        </div>
+        <div style="padding-top:22px">
+            <button class="btn-ico" style="width:auto;padding:0 14px;font-size:13px;gap:6px;display:inline-flex"
+                    type="button" onclick="clearCatFilters()">
+                <i class="fas fa-times" style="font-size:11px"></i> Limpiar
             </button>
         </div>
     </div>
+</div>
 
-    <!-- STATS -->
-    <div class="cat-stats">
-        <div class="cat-card">
-            <div>Total</div>
-            <strong>@total</strong>
-        </div>
-        <div class="cat-card">
-            <div>Activas</div>
-            <strong>@activas</strong>
-        </div>
-        <div class="cat-card">
-            <div>Inactivas</div>
-            <strong>@inactivas</strong>
-        </div>
+@* ── Tabla ────────────────────────────────────────────────────────── *@
+<div class="table-card">
+    <div class="table-card-header">
+        <span style="font-size:14px;font-weight:700;color:#1a202c">
+            <i class="fas fa-list me-2" style="color:#8a94a6"></i> Lista de categorías
+        </span>
+        <span style="font-size:13px;color:#8a94a6">@total categoría@(total != 1 ? "s" : "")</span>
     </div>
 
-    <!-- FILTROS -->
-    <div class="cat-filters">
-        <input id="catSearch"
-               class="form-control cat-input"
-               placeholder="Buscar categoría..."
-               oninput="applyCatFilters()" />
-
-        <select id="estadoFilter"
-                class="form-select cat-input"
-                onchange="applyCatFilters()">
-            <option value="all">Todas</option>
-            <option value="active">Activas</option>
-            <option value="inactive">Inactivas</option>
-        </select>
-
-        <button class="btn btn-outline-dark cat-btn"
-                type="button"
-                onclick="clearCatFilters()">
-            Limpiar
-        </button>
-    </div>
-
-    <!-- TABLA -->
-    <div class="cat-table-wrap">
-        <table class="table cat-table m-0">
+    <div class="table-responsive">
+        <table class="cat-table">
             <thead>
                 <tr>
-                    <th style="width:80px;">ID</th>
+                    <th style="width:70px">ID</th>
                     <th>Nombre</th>
-                    <th style="width:140px;">Estado</th>
-                    <th style="width:120px;">Editar</th>
-                    <th style="width:150px;">Toggle</th>
+                    <th class="text-center" style="width:120px">Estado</th>
+                    <th class="text-center" style="width:80px">Editar</th>
+                    <th class="text-center" style="width:100px">Activo</th>
                 </tr>
             </thead>
-
             <tbody id="catTbody">
                 @if (!categorias.Any())
                 {
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">
-                            No hay categorías registradas.
+                        <td colspan="5" style="padding:3rem 1rem;text-align:center;color:#8a94a6">
+                            <i class="fas fa-tags" style="font-size:2.5rem;display:block;margin-bottom:.6rem;opacity:.35"></i>
+                            <div style="font-size:15px;font-weight:700;color:#1a202c;margin-bottom:4px">Sin categorías</div>
+                            <div style="font-size:13px">Crea tu primera categoría</div>
                         </td>
                     </tr>
                 }
@@ -96,42 +389,41 @@
                     foreach (var c in categorias)
                     {
                         var isActive = c.Estado == true;
-
                         <tr class="cat-row"
                             data-name="@(c.Nombre ?? "")"
                             data-state="@(isActive ? "active" : "inactive")">
 
-                            <td>@c.IdCategoria</td>
+                            <td style="color:#8a94a6;font-weight:600;font-size:13px">#@c.IdCategoria</td>
 
-                            <td class="text-start">
-                                <strong>@c.Nombre</strong>
-                            </td>
+                            <td style="font-weight:600;color:#1a202c;font-size:15px">@c.Nombre</td>
 
-                            <td>
+                            <td class="text-center">
                                 @if (isActive)
                                 {
-                                    <span class="cat-pill cat-pill-ok">Activa</span>
+                                    <span class="badge-activa">
+                                        <i class="fas fa-circle me-1" style="font-size:7px"></i>Activa
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="cat-pill cat-pill-danger">Inactiva</span>
+                                    <span class="badge-inactiva">
+                                        <i class="fas fa-ban me-1" style="font-size:9px"></i>Inactiva
+                                    </span>
                                 }
                             </td>
 
-                            <!-- EDITAR -->
-                            <td>
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-dark cat-mini-btn"
+                            <td class="text-center">
+                                <button type="button" class="btn-ico"
+                                        title="Editar categoría"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalEditarCategoria"
                                         data-id="@c.IdCategoria"
                                         data-nombre="@c.Nombre">
-                                    Editar
+                                    <i class="fas fa-pen"></i>
                                 </button>
                             </td>
 
-                            <!-- TOGGLE -->
-                            <td>
+                            <td class="text-center">
                                 <div class="form-check form-switch d-flex justify-content-center">
                                     <input class="form-check-input cat-switch"
                                            type="checkbox"
@@ -140,7 +432,6 @@
                                            @(isActive ? "checked" : "") />
                                 </div>
                             </td>
-
                         </tr>
                     }
                 }
@@ -149,374 +440,155 @@
     </div>
 </div>
 
-<!-- FORM ACTIVAR -->
-<form id="formActivar" asp-action="Activar" method="post" style="display:none;">
+@* ── Forms ocultos ────────────────────────────────────────────────── *@
+<form id="formActivar" asp-action="Activar" method="post" style="display:none">
     @Html.AntiForgeryToken()
     <input type="hidden" name="id" id="idActivar" />
 </form>
 
-<!-- FORM DESACTIVAR -->
-<form id="formDesactivar" asp-action="Desactivar" method="post" style="display:none;">
+<form id="formDesactivar" asp-action="Desactivar" method="post" style="display:none">
     @Html.AntiForgeryToken()
     <input type="hidden" name="id" id="idDesactivar" />
 </form>
 
-<!-- MODAL CREAR -->
+@* ── Modal crear ─────────────────────────────────────────────────── *@
 <div class="modal fade" id="modalNuevaCategoria" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content cat-modal">
-            <div class="modal-header cat-modal-header">
-                <h5 class="modal-title">Nueva categoría</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" style="font-weight:700">
+                    <i class="fas fa-plus me-2" style="color:#86efac"></i> Nueva categoría
+                </h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
             <form asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
-                    <input name="Nombre"
-                           class="form-control cat-input"
-                           placeholder="Ej: Frenos..."
-                           required />
+                    <span class="f-label">Nombre de la categoría</span>
+                    <input name="Nombre" class="f-input"
+                           placeholder="Ej: Frenos, Aceites, Accesorios..."
+                           required style="margin-top:5px" />
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Guardar</button>
+                <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end">
+                    <button type="button"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;cursor:pointer"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- MODAL EDITAR -->
+@* ── Modal editar ─────────────────────────────────────────────────── *@
 <div class="modal fade" id="modalEditarCategoria" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content cat-modal">
-            <div class="modal-header cat-modal-header">
-                <h5 class="modal-title">Editar categoría</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" style="font-weight:700">
+                    <i class="fas fa-pen me-2" style="color:#93c5fd"></i> Editar categoría
+                </h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
             <form asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="IdCategoria" id="editIdCategoria" />
-
                 <div class="modal-body">
-                    <input name="Nombre"
-                           id="editNombre"
-                           class="form-control cat-input"
-                           required />
+                    <span class="f-label">Nombre de la categoría</span>
+                    <input name="Nombre" id="editNombre" class="f-input" required style="margin-top:5px" />
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Guardar cambios</button>
+                <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end">
+                    <button type="button"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;cursor:pointer"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+                        <i class="fas fa-save"></i> Guardar cambios
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script>
-    function applyCatFilters() {
-        const q = document.getElementById('catSearch').value.toLowerCase();
-        const estado = document.getElementById('estadoFilter').value;
+@section Scripts {
+    <script>
+        function applyCatFilters() {
+            const q      = document.getElementById('catSearch').value.toLowerCase();
+            const estado = document.getElementById('estadoFilter').value;
 
-        document.querySelectorAll('#catTbody .cat-row').forEach(r => {
-            const name = r.dataset.name.toLowerCase();
-            const state = r.dataset.state;
+            document.querySelectorAll('#catTbody .cat-row').forEach(r => {
+                const name  = r.dataset.name.toLowerCase();
+                const state = r.dataset.state;
 
-            const matchSearch = !q || name.includes(q);
-            const matchState =
-                estado === 'all' ||
-                (estado === 'active' && state === 'active') ||
-                (estado === 'inactive' && state === 'inactive');
+                const okSearch = !q || name.includes(q);
+                const okState  = estado === 'all'
+                    || (estado === 'active'   && state === 'active')
+                    || (estado === 'inactive' && state === 'inactive');
 
-            r.style.display = (matchSearch && matchState) ? '' : 'none';
-        });
-    }
-
-    function clearCatFilters() {
-        document.getElementById('catSearch').value = '';
-        document.getElementById('estadoFilter').value = 'all';
-        applyCatFilters();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-
-        // Rellenar modal editar
-        const editModal = document.getElementById('modalEditarCategoria');
-        editModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            document.getElementById('editIdCategoria').value = button.dataset.id;
-            document.getElementById('editNombre').value = button.dataset.nombre;
-        });
-
-        // Toggle
-        document.addEventListener('change', function (e) {
-            if (!e.target.classList.contains('cat-switch')) return;
-
-            const id = e.target.dataset.id;
-            const nombre = e.target.dataset.name;
-            const checked = e.target.checked;
-
-            Swal.fire({
-                title: checked ? "Activar categoría" : "Desactivar categoría",
-                html: `¿Deseas ${checked ? "activar" : "desactivar"} <b>${nombre}</b>?`,
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonColor: "#d32f2f",
-                cancelButtonColor: "#222",
-                confirmButtonText: "Sí",
-                cancelButtonText: "Cancelar"
-            }).then((result) => {
-                if (!result.isConfirmed) {
-                    e.target.checked = !checked;
-                    return;
-                }
-
-                if (checked) {
-                    document.getElementById('idActivar').value = id;
-                    document.getElementById('formActivar').submit();
-                } else {
-                    document.getElementById('idDesactivar').value = id;
-                    document.getElementById('formDesactivar').submit();
-                }
+                r.style.display = (okSearch && okState) ? '' : 'none';
             });
+        }
+
+        function clearCatFilters() {
+            document.getElementById('catSearch').value    = '';
+            document.getElementById('estadoFilter').value = 'all';
+            applyCatFilters();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Rellenar modal editar
+            document.getElementById('modalEditarCategoria')
+                .addEventListener('show.bs.modal', function (e) {
+                    const btn = e.relatedTarget;
+                    document.getElementById('editIdCategoria').value = btn.dataset.id;
+                    document.getElementById('editNombre').value      = btn.dataset.nombre;
+                });
+
+            // Toggle switch con SweetAlert
+            document.addEventListener('change', function (e) {
+                if (!e.target.classList.contains('cat-switch')) return;
+
+                const id      = e.target.dataset.id;
+                const nombre  = e.target.dataset.name;
+                const checked = e.target.checked;
+
+                Swal.fire({
+                    title: checked ? 'Activar categoría' : 'Desactivar categoría',
+                    html:  `¿Deseas ${checked ? 'activar' : 'desactivar'} <b>${nombre}</b>?`,
+                    icon:  'question',
+                    showCancelButton:  true,
+                    confirmButtonColor: checked ? '#2f9e44' : '#c92a2a',
+                    cancelButtonColor:  '#8a94a6',
+                    confirmButtonText:  'Confirmar',
+                    cancelButtonText:   'Cancelar'
+                }).then(result => {
+                    if (!result.isConfirmed) { e.target.checked = !checked; return; }
+
+                    if (checked) {
+                        document.getElementById('idActivar').value = id;
+                        document.getElementById('formActivar').submit();
+                    } else {
+                        document.getElementById('idDesactivar').value = id;
+                        document.getElementById('formDesactivar').submit();
+                    }
+                });
+            });
+
+            // TempData alerts
+            const okCreate = '@(TempData["CatCreateOk"] ?? "")';
+            const okEdit   = '@(TempData["CatEditOk"] ?? "")';
+
+            if (okCreate) Swal.fire({ icon: 'success', title: okCreate, timer: 1400, showConfirmButton: false });
+            if (okEdit)   Swal.fire({ icon: 'success', title: okEdit,   timer: 1400, showConfirmButton: false });
         });
-
-        // Alerts de TempData
-        const okCreate = '@(TempData["CatCreateOk"] ?? "")';
-        const okEdit = '@(TempData["CatEditOk"] ?? "")';
-
-        if (okCreate)
-            Swal.fire({ icon: 'success', title: okCreate, timer: 1400, showConfirmButton: false });
-
-        if (okEdit)
-            Swal.fire({ icon: 'success', title: okEdit, timer: 1400, showConfirmButton: false });
-    });
-</script>
-
-<style>
-    .cat-shell {
-        padding: 18px 18px 28px;
-    }
-
-    /* Header pro */
-    .cat-header {
-        position: sticky;
-        top: 64px;
-        z-index: 5;
-        background: #fff;
-        border: 1px solid rgba(0,0,0,.06);
-        border-radius: 16px;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
-        padding: 14px 16px;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .cat-title {
-        color: #d32f2f;
-        font-weight: 900;
-        font-size: 1.9rem;
-        line-height: 1.1;
-    }
-
-    .cat-header-right {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    /* Buttons */
-    .cat-btn {
-        border-radius: 12px;
-        font-weight: 900;
-        padding: .55rem 1rem;
-    }
-
-    .btn-danger {
-        background: #d32f2f !important;
-        border: none !important;
-    }
-
-        .btn-danger:hover {
-            background: #b71c1c !important;
-        }
-
-    .btn-dark {
-        background: #222 !important;
-        border: none !important;
-    }
-
-        .btn-dark:hover {
-            background: #444 !important;
-        }
-
-    .btn-outline-dark {
-        border-radius: 12px;
-        font-weight: 900;
-    }
-
-    /* Stats row pro */
-    .cat-stats {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-        margin-bottom: 14px;
-    }
-
-    @@media (min-width: 768px) {
-        .cat-stats {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    .cat-card {
-        background: #fff;
-        border: 1px solid rgba(0,0,0,.06);
-        border-radius: 16px;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
-        padding: 14px 16px;
-    }
-
-        .cat-card div {
-            color: #6c757d;
-            font-weight: 800;
-            font-size: .9rem;
-        }
-
-        .cat-card strong {
-            display: block;
-            margin-top: 2px;
-            color: #111;
-            font-weight: 900;
-            font-size: 1.7rem;
-        }
-
-    /* Filters as card */
-    .cat-filters {
-        background: #fff;
-        border: 1px solid rgba(0,0,0,.06);
-        border-radius: 16px;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
-        padding: 14px 16px;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-        align-items: end;
-        margin-bottom: 14px;
-    }
-
-    @@media (min-width: 992px) {
-        .cat-filters {
-            grid-template-columns: 1.2fr .6fr auto;
-        }
-    }
-
-    .cat-input {
-        border-radius: 12px;
-        border-color: rgba(0,0,0,.15);
-        padding: .6rem .85rem;
-    }
-
-        .cat-input:focus {
-            border-color: rgba(211,47,47,.45);
-            box-shadow: 0 0 0 .2rem rgba(211,47,47,.12);
-        }
-
-    /* Table wrap pro */
-    .cat-table-wrap {
-        background: #fff;
-        border: 1px solid rgba(0,0,0,.06);
-        border-radius: 16px;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.08);
-        overflow: hidden;
-    }
-
-    .cat-table thead th {
-        background: #111;
-        color: #fff;
-        border: none;
-        text-align: center;
-        padding: 14px 12px;
-        font-weight: 900;
-    }
-
-    .cat-table tbody td {
-        border-color: rgba(0,0,0,.06);
-        vertical-align: middle;
-        padding: 14px 12px;
-        text-align: center;
-    }
-
-    .cat-row:hover {
-        background: #fafafa;
-    }
-
-    /* Pills */
-    .cat-pill {
-        padding: .35rem .7rem;
-        border-radius: 999px;
-        font-weight: 900;
-        font-size: .8rem;
-        border: 1px solid transparent;
-        display: inline-block;
-        min-width: 92px;
-    }
-
-    .cat-pill-ok {
-        background: rgba(25,135,84,.12);
-        color: #146c43;
-        border-color: rgba(25,135,84,.25);
-    }
-
-    .cat-pill-danger {
-        background: rgba(211,47,47,.12);
-        color: #b71c1c;
-        border-color: rgba(211,47,47,.25);
-    }
-
-    /* Edit button */
-    .cat-mini-btn {
-        border-radius: 10px;
-        font-weight: 900;
-        padding: .35rem .7rem;
-    }
-
-    /* Switch */
-    .form-check-input.cat-switch {
-        width: 52px;
-        height: 26px;
-        cursor: pointer;
-    }
-
-        .form-check-input.cat-switch:checked {
-            background-color: #d32f2f;
-            border-color: #d32f2f;
-        }
-
-        .form-check-input.cat-switch:focus {
-            box-shadow: 0 0 0 .2rem rgba(211,47,47,.15);
-            border-color: rgba(211,47,47,.45);
-        }
-
-    /* Modal */
-    .cat-modal {
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid rgba(0,0,0,.08);
-    }
-
-    .cat-modal-header {
-        background: #d32f2f;
-        color: #fff;
-        border: none;
-    }
-</style>
+    </script>
+}

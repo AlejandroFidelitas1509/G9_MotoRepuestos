@@ -4,20 +4,505 @@
     bool esVendedor = true;
 }
 
+<style>
+    .pv-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding: 18px;
+    }
+
+    .pv-topbar {
+        background: linear-gradient(135deg, #1a202c 0%, #222b38 100%);
+        border: 1px solid #2d3748;
+        border-radius: 14px;
+        color: #fff;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .pv-shortcuts {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .pv-shortcut {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 10px;
+        padding: 7px 10px;
+        font-size: 13px;
+        color: rgba(255,255,255,.92);
+    }
+
+        .pv-shortcut kbd {
+            background: #c92a2a;
+            color: #fff;
+            border-radius: 7px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            box-shadow: none;
+        }
+
+    .pv-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .pv-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) 360px;
+        gap: 18px;
+        align-items: start;
+    }
+
+    .pv-main,
+    .pv-side {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .pv-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        overflow: hidden;
+    }
+
+    .pv-card-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .pv-card-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pv-card-sub {
+        font-size: 11px;
+        color: #8a94a6;
+        margin-top: 2px;
+    }
+
+    .pv-card-body {
+        padding: 18px;
+    }
+
+    .pv-search-form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0;
+        border: 1px solid #dde3ee;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f8fafd;
+    }
+
+    .pv-search-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 14px;
+        background: #f8fafd;
+    }
+
+        .pv-search-left i {
+            color: #8a94a6;
+            font-size: 15px;
+        }
+
+    .pv-search-input {
+        border: none !important;
+        background: transparent !important;
+        height: 58px;
+        font-size: 14px;
+        color: #1a202c;
+        width: 100%;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+        .pv-search-input::placeholder {
+            color: #a0aec0;
+        }
+
+    .pv-search-btn {
+        border: none;
+        background: #1f2937;
+        color: #fff;
+        font-weight: 700;
+        padding: 0 22px;
+        min-width: 110px;
+        transition: background .15s ease;
+    }
+
+        .pv-search-btn:hover {
+            background: #111827;
+        }
+
+    .pv-table-wrap {
+        overflow: hidden;
+    }
+
+    .pv-table-scroller {
+        max-height: 560px;
+        overflow: auto;
+    }
+
+    .pv-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .pv-table thead th {
+            background: #f8fafd;
+            color: #8a94a6;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: 14px 16px;
+            border-bottom: 1px solid #edf0f7;
+            white-space: nowrap;
+        }
+
+        .pv-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f3f9;
+            vertical-align: middle;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .pv-table tbody tr:hover td {
+            background: #fafcff;
+        }
+
+    .pv-empty {
+        text-align: center;
+        padding: 70px 20px !important;
+        color: #8a94a6;
+    }
+
+        .pv-empty i {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 10px;
+            opacity: .25;
+        }
+
+    .pv-code {
+        font-weight: 700;
+        color: #1a202c;
+        font-size: 13px;
+    }
+
+    .pv-name {
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .pv-meta {
+        font-size: 12px;
+        color: #8a94a6;
+        margin-top: 2px;
+    }
+
+    .pv-qty-form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pv-qty-input {
+        width: 88px;
+        text-align: center;
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 9px;
+        padding: 7px 10px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .pv-ok-btn {
+        border: 1px solid #dde3ee;
+        background: #fff;
+        color: #4a5568;
+        border-radius: 9px;
+        padding: 7px 10px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+        .pv-ok-btn:hover {
+            background: #f8fafd;
+        }
+
+    .pv-remove-btn {
+        border: none;
+        background: transparent;
+        color: #c92a2a;
+        font-size: 18px;
+        padding: 0;
+    }
+
+    .pv-side {
+        position: sticky;
+        top: 18px;
+    }
+
+    .pv-totals {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pv-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+        .pv-total-row .k {
+            color: #8a94a6;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .pv-total-row .v {
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+    .pv-grand-total {
+        background: linear-gradient(135deg, #c92a2a 0%, #b42323 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 18px;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(201,42,42,.18);
+    }
+
+        .pv-grand-total small {
+            display: block;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: .06em;
+            opacity: .82;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .pv-grand-total h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+    .pv-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #8a94a6;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: 10px;
+    }
+
+    .pv-pay-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+        .pv-pay-grid .btn-check + label {
+            border-radius: 11px;
+            border: 1px solid #f1a3a3;
+            background: #fff;
+            color: #c92a2a;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 14px 8px;
+            min-height: 68px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .pv-pay-grid .btn-check:checked + label {
+            background: #c92a2a;
+            border-color: #c92a2a;
+            color: #fff;
+        }
+
+    .pv-field-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a94a6;
+        margin-bottom: 7px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .pv-input-lg {
+        width: 100%;
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a202c;
+        text-align: center;
+    }
+
+    .pv-change-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 10px;
+        padding: 14px;
+    }
+
+        .pv-change-box .k {
+            color: #8a94a6;
+            font-weight: 700;
+        }
+
+        .pv-change-box .v {
+            color: #c92a2a;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+    .pv-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pv-btn-cancel,
+    .pv-btn-finish {
+        width: 100%;
+        border-radius: 11px;
+        font-weight: 800;
+        padding: 14px 16px;
+        border: none;
+    }
+
+    .pv-btn-cancel {
+        background: #fff;
+        border: 1px solid #f0b4b4;
+        color: #d14b4b;
+    }
+
+        .pv-btn-cancel:hover {
+            background: #fff7f7;
+        }
+
+    .pv-btn-finish {
+        background: #57b487;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(87,180,135,.18);
+    }
+
+        .pv-btn-finish:hover {
+            background: #469d73;
+        }
+
+        .pv-btn-cancel:disabled,
+        .pv-btn-finish:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+    .pv-alerts {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    @@media (max-width: 1200px) {
+        .pv-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .pv-side {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .pv-search-form {
+            grid-template-columns: 1fr;
+        }
+
+        .pv-search-btn {
+            height: 50px;
+        }
+
+        .pv-pay-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .pv-table thead th,
+        .pv-table tbody td {
+            padding: 12px 10px;
+        }
+    }
+</style>
+
 @if (esVendedor)
 {
-    <div class="pos-admin-container fade-in">
+    <div class="pv-wrap">
 
-        <div class="px-3 pt-3">
+        <div class="pv-alerts">
             @if (TempData["Ok"] != null)
             {
-                <div class="alert alert-success mb-2">
+                <div class="alert alert-success mb-0 rounded-4 border-0 shadow-sm">
                     @TempData["Ok"]
 
                     @if (TempData["UltimaVentaId"] != null)
                     {
                         <div class="mt-2">
-                            <a class="btn btn-sm btn-outline-success"
+                            <a class="btn btn-sm btn-outline-success rounded-pill px-3"
                                asp-controller="PuntoVenta"
                                asp-action="Factura"
                                asp-route-id="@TempData["UltimaVentaId"]">
@@ -27,189 +512,252 @@
                     }
                 </div>
             }
+
             @if (TempData["Error"] != null)
             {
-                <div class="alert alert-danger mb-2">@TempData["Error"]</div>
+                <div class="alert alert-danger mb-0 rounded-4 border-0 shadow-sm">
+                    @TempData["Error"]
+                </div>
             }
+
             @if (TempData["Warning"] != null)
             {
-                <div class="alert alert-warning mb-2">@TempData["Warning"]</div>
+                <div class="alert alert-warning mb-0 rounded-4 border-0 shadow-sm">
+                    @TempData["Warning"]
+                </div>
             }
         </div>
 
-        <div class="pos-shortcuts bg-dark text-white d-flex align-items-center px-3 py-2 justify-content-between">
-            <div class="d-flex gap-4">
-                <span><kbd class="bg-danger">F1</kbd> Buscar</span>
-                <span><kbd class="bg-danger">F10</kbd> Cobrar</span>
+        <div class="pv-topbar">
+            <div class="pv-shortcuts">
+                <span class="pv-shortcut"><kbd>F1</kbd> Buscar</span>
+                <span class="pv-shortcut"><kbd>F10</kbd> Cobrar</span>
             </div>
-            <div class="text-danger fw-bold">PUNTO DE VENTA - MODO CAJERO</div>
+            <div class="pv-title">Punto de venta · modo cajero</div>
         </div>
 
-        <div class="row g-0 main-pos-height">
-            <div class="col-md-1 pos-sidebar d-flex flex-column align-items-center py-4">
-                <button class="pos-side-btn active" title="Ventas"><i class="fas fa-cash-register"></i></button>
-                <button class="pos-side-btn" title="Inventario"><i class="fas fa-boxes"></i></button>
-                <button class="pos-side-btn" title="Cierre"><i class="fas fa-calculator"></i></button>
-            </div>
+        <div class="pv-layout">
 
-            <div class="col-md-8 bg-white p-4 d-flex flex-column">
+            <div class="pv-main">
 
-                <div class="search-section mb-3">
-                    <form asp-controller="PuntoVenta" asp-action="AddItem" method="post" class="input-group input-group-lg shadow-sm border rounded-3 overflow-hidden">
-                        @Html.AntiForgeryToken()
-                        <span class="input-group-text bg-light border-0"><i class="fas fa-barcode text-muted"></i></span>
-                        <input type="text" name="query" id="CodigoBarras" class="form-control border-0 bg-light"
-                               placeholder="Escanear Código de Barras o Nombre..." autocomplete="off">
-                        <button class="btn btn-dark px-4 border-0" type="submit">Añadir</button>
-                    </form>
+                <div class="pv-card">
+                    <div class="pv-card-header">
+                        <div>
+                            <div class="pv-card-title">
+                                <i class="fas fa-barcode" style="color:#c92a2a"></i>
+                                Buscar y agregar productos
+                            </div>
+                            <div class="pv-card-sub">Escanea el código o busca por nombre del producto</div>
+                        </div>
+                    </div>
+                    <div class="pv-card-body">
+                        <form asp-controller="PuntoVenta" asp-action="AddItem" method="post" class="pv-search-form">
+                            @Html.AntiForgeryToken()
+                            <div class="pv-search-left">
+                                <i class="fas fa-barcode"></i>
+                                <input type="text"
+                                       name="query"
+                                       id="CodigoBarras"
+                                       class="pv-search-input"
+                                       placeholder="Escanear código de barras o escribir nombre..."
+                                       autocomplete="off">
+                            </div>
+                            <button class="pv-search-btn" type="submit">Añadir</button>
+                        </form>
+                    </div>
                 </div>
 
-                <div class="table-responsive flex-grow-1 border rounded-4 bg-light shadow-inner">
-                    <table class="table table-hover align-middle mb-0 bg-white">
-                        <thead class="bg-dark text-white">
-                            <tr>
-                                <th>Cod.</th>
-                                <th>Descripción</th>
-                                <th class="text-center">Cant.</th>
-                                <th class="text-end">Precio</th>
-                                <th class="text-end">Total</th>
-                                <th class="text-center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="listaVenta">
+                <div class="pv-card pv-table-wrap">
+                    <div class="pv-card-header">
+                        <div>
+                            <div class="pv-card-title">
+                                <i class="fas fa-receipt" style="color:#1971c2"></i>
+                                Carrito actual
+                            </div>
+                            <div class="pv-card-sub">
+                                @(Model.Carrito == null ? 0 : Model.Carrito.Count) producto@(Model.Carrito != null && Model.Carrito.Count == 1 ? "" : "s") en la venta
+                            </div>
+                        </div>
+                    </div>
 
-                            @if (Model.Carrito == null || !Model.Carrito.Any())
-                            {
-                                <tr class="border-bottom">
-                                    <td colspan="6" class="text-center py-5 text-muted">
-                                        No hay productos en el carrito.
-                                    </td>
+                    <div class="pv-table-scroller">
+                        <table class="pv-table">
+                            <thead>
+                                <tr>
+                                    <th>Cod.</th>
+                                    <th>Descripción</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Precio</th>
+                                    <th class="text-end">Total</th>
+                                    <th class="text-center">Acción</th>
                                 </tr>
-                            }
-                            else
-                            {
-                                foreach (var item in Model.Carrito)
+                            </thead>
+                            <tbody id="listaVenta">
+                                @if (Model.Carrito == null || !Model.Carrito.Any())
                                 {
-                                    <tr class="border-bottom">
-                                        <td class="fw-bold text-muted">@item.Codigo</td>
-                                        <td>
-                                            <div class="fw-bold text-dark">@item.Nombre</div>
-                                            @if (item.Stock > 0)
-                                            {
-                                                <small class="text-muted">Stock: @item.Stock</small>
-                                            }
-                                            else
-                                            {
-                                                <small class="text-muted">Servicio</small>
-                                            }
-                                        </td>
-
-                                        <td class="text-center" style="width: 170px;">
-                                            <form asp-controller="PuntoVenta" asp-action="UpdateQty" method="post"
-                                                  class="d-flex justify-content-center align-items-center gap-2">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <input type="number" name="qty"
-                                                       class="form-control form-control-sm text-center fw-bold border-2"
-                                                       value="@item.Cantidad" min="1" style="width: 90px;">
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary">OK</button>
-                                            </form>
-                                        </td>
-
-                                        <td class="text-end text-dark">₡ @item.Precio.ToString("N0")</td>
-                                        <td class="text-end fw-bold text-dark">₡ @item.TotalLinea.ToString("N0")</td>
-
-                                        <td class="text-center">
-                                            <form asp-controller="PuntoVenta" asp-action="RemoveItem" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <button type="submit" class="btn btn-link text-danger p-0" title="Quitar">
-                                                    <i class="fas fa-times-circle"></i>
-                                                </button>
-                                            </form>
+                                    <tr>
+                                        <td colspan="6" class="pv-empty">
+                                            <i class="fas fa-shopping-basket"></i>
+                                            <div style="font-size:15px;font-weight:700;color:#1a202c;margin-bottom:4px">No hay productos en el carrito</div>
+                                            <div style="font-size:13px">Busca un repuesto para iniciar la venta</div>
                                         </td>
                                     </tr>
                                 }
-                            }
-                        </tbody>
-                    </table>
+                                else
+                                {
+                                    foreach (var item in Model.Carrito)
+                                    {
+                                        <tr>
+                                            <td class="pv-code">@item.Codigo</td>
+                                            <td>
+                                                <div class="pv-name">@item.Nombre</div>
+                                                @if (item.Stock > 0)
+                                                {
+                                                    <div class="pv-meta">Stock: @item.Stock</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="pv-meta">Servicio</div>
+                                                }
+                                            </td>
+                                            <td class="text-center" style="width:170px">
+                                                <form asp-controller="PuntoVenta"
+                                                      asp-action="UpdateQty"
+                                                      method="post"
+                                                      class="pv-qty-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="number"
+                                                           name="qty"
+                                                           class="pv-qty-input"
+                                                           value="@item.Cantidad"
+                                                           min="1">
+                                                    <button type="submit" class="pv-ok-btn">OK</button>
+                                                </form>
+                                            </td>
+                                            <td class="text-end">₡ @item.Precio.ToString("N0")</td>
+                                            <td class="text-end fw-bold" style="color:#1a202c">₡ @item.TotalLinea.ToString("N0")</td>
+                                            <td class="text-center">
+                                                <form asp-controller="PuntoVenta" asp-action="RemoveItem" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <button type="submit" class="pv-remove-btn" title="Quitar">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-3 bg-light border-start p-4 d-flex flex-column">
+            <div class="pv-side">
 
-                <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
-                    <div class="card-body bg-white">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted small fw-bold">SUBTOTAL</span>
-                            <span class="fw-bold text-dark" id="SubTotal">₡ @Model.Subtotal.ToString("N0")</span>
+                <div class="pv-card">
+                    <div class="pv-card-header">
+                        <div>
+                            <div class="pv-card-title">
+                                <i class="fas fa-file-invoice-dollar" style="color:#166534"></i>
+                                Resumen de cobro
+                            </div>
+                            <div class="pv-card-sub">Totales calculados de la venta actual</div>
                         </div>
-                        <div class="d-flex justify-content-between mb-0">
-                            <span class="text-muted small fw-bold">IVA (13%)</span>
-                            <span class="fw-bold text-dark" id="IVA">₡ @Model.Iva.ToString("N0")</span>
+                    </div>
+                    <div class="pv-card-body">
+                        <div class="pv-totals">
+                            <div class="pv-total-row">
+                                <span class="k">Subtotal</span>
+                                <span class="v" id="SubTotal">₡ @Model.Subtotal.ToString("N0")</span>
+                            </div>
+                            <div class="pv-total-row">
+                                <span class="k">IVA (13%)</span>
+                                <span class="v" id="IVA">₡ @Model.Iva.ToString("N0")</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="total-box-eleventa bg-danger text-white p-4 rounded-4 text-center shadow-lg mb-4">
-                    <small class="text-uppercase fw-bold opacity-75">Total Factura</small>
-                    <h1 class="fw-bolder mb-0" id="Total">₡ @Model.Total.ToString("N0")</h1>
+                <div class="pv-grand-total">
+                    <small>Total factura</small>
+                    <h1 id="Total">₡ @Model.Total.ToString("N0")</h1>
                 </div>
 
-                <div class="payment-methods mb-4">
-                    <label class="form-label small fw-bold text-uppercase text-secondary mb-3">Forma de Pago</label>
-                    <div class="row g-2">
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="efectivo" value="Efectivo" checked onchange="cambiarMetodoPago()">
-                            <label class="btn btn-outline-danger w-100 py-3 rounded-3" for="efectivo">
-                                <i class="fas fa-money-bill-wave d-block mb-1"></i><small>Efectivo</small>
-                            </label>
+                <div class="pv-card">
+                    <div class="pv-card-header">
+                        <div>
+                            <div class="pv-card-title">
+                                <i class="fas fa-credit-card" style="color:#c92a2a"></i>
+                                Forma de pago
+                            </div>
+                            <div class="pv-card-sub">Selecciona cómo se realizará el cobro</div>
                         </div>
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="tarjeta" value="Tarjeta" onchange="cambiarMetodoPago()">
-                            <label class="btn btn-outline-danger w-100 py-3 rounded-3" for="tarjeta">
-                                <i class="fas fa-credit-card d-block mb-1"></i><small>Tarjeta</small>
-                            </label>
-                        </div>
-                        <div class="col-4">
-                            <input type="radio" class="btn-check" name="metodoPago" id="sinpe" value="SINPE" onchange="cambiarMetodoPago()">
-                            <label class="btn btn-outline-danger w-100 py-3 rounded-3" for="sinpe">
-                                <i class="fas fa-mobile-alt d-block mb-1"></i><small>SINPE</small>
-                            </label>
+                    </div>
+                    <div class="pv-card-body">
+                        <div class="pv-pay-grid">
+                            <div>
+                                <input type="radio" class="btn-check" name="metodoPago" id="efectivo" value="Efectivo" checked onchange="cambiarMetodoPago()">
+                                <label for="efectivo">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <small>Efectivo</small>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" class="btn-check" name="metodoPago" id="tarjeta" value="Tarjeta" onchange="cambiarMetodoPago()">
+                                <label for="tarjeta">
+                                    <i class="fas fa-credit-card"></i>
+                                    <small>Tarjeta</small>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" class="btn-check" name="metodoPago" id="sinpe" value="SINPE" onchange="cambiarMetodoPago()">
+                                <label for="sinpe">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <small>SINPE</small>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="fieldEfectivo" class="mb-4">
-                    <label class="form-label small fw-bold text-secondary">Monto Recibido</label>
-                    <input type="number" class="form-control form-control-lg border-2 text-center fw-bold mb-3" id="montoRecibido" placeholder="0">
-                    <div class="d-flex justify-content-between p-3 bg-white rounded-3 border">
-                        <span class="fw-bold text-secondary">Vuelto</span>
-                        <span class="fw-bolder text-danger" id="vueltoMonto">₡ 0</span>
+                <div class="pv-card" id="fieldEfectivo">
+                    <div class="pv-card-body">
+                        <label class="pv-field-label">Monto recibido</label>
+                        <input type="number"
+                               class="pv-input-lg"
+                               id="montoRecibido"
+                               placeholder="0">
+
+                        <div class="pv-change-box mt-3">
+                            <span class="k">Vuelto</span>
+                            <span class="v" id="vueltoMonto">₡ 0</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-auto d-grid gap-2">
+                <div class="pv-actions">
                     <form asp-controller="PuntoVenta" asp-action="ClearCart" method="post">
                         @Html.AntiForgeryToken()
-                        <button class="btn btn-outline-danger w-100 py-2 fw-bold rounded-3"
-                                type="submit" @(Model.Carrito != null && Model.Carrito.Any() ? "" : "disabled")>
+                        <button class="pv-btn-cancel"
+                                type="submit"
+                                @(Model.Carrito != null && Model.Carrito.Any() ? "" : "disabled")>
                             Cancelar operación
                         </button>
                     </form>
 
-                    <!-- ✅ FORM oculto para finalizar (envía a PuntoVenta/Finalizar) -->
                     <form id="formFinalizar" asp-controller="PuntoVenta" asp-action="Finalizar" method="post" style="display:none;">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="formaPago" id="formaPagoFinal" value="Efectivo" />
                         <input type="hidden" name="montoRecibido" id="montoRecibidoFinal" value="0" />
                     </form>
 
-                    <!-- ✅ Botón que DISPARA el POST -->
                     <button id="btnFinalizar"
-                            class="btn btn-success btn-lg w-100 py-3 fw-bold shadow rounded-3"
+                            class="pv-btn-finish"
                             @(Model.Carrito != null && Model.Carrito.Any() ? "" : "disabled")>
-                        <i class="fas fa-cash-register me-2"></i>FINALIZAR (F10)
+                        <i class="fas fa-cash-register me-2"></i> FINALIZAR (F10)
                     </button>
                 </div>
             </div>
@@ -236,7 +784,7 @@ else
                 </div>
 
                 <div class="row g-4">
-                    <!-- (tu vista cliente sigue igual) -->
+                    <!-- tu vista cliente sigue igual -->
                 </div>
             </div>
         </div>
@@ -266,10 +814,7 @@ else
             const recibido = parseFloat(document.getElementById("montoRecibido")?.value || "0") || 0;
 
             document.getElementById("formaPagoFinal").value = metodo;
-
-            // Si no es efectivo, no obligamos monto (el controller no lo exige)66
             document.getElementById("montoRecibidoFinal").value = (metodo === "Efectivo" ? recibido : 0);
-
             document.getElementById("formFinalizar").submit();
         }
 
@@ -294,7 +839,6 @@ else
                 });
             }
 
-            // ✅ Atajo F10
             document.addEventListener("keydown", (e) => {
                 if (e.key === "F10") {
                     e.preventDefault();
@@ -304,28 +848,6 @@ else
             });
         });
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("formFinalizar");
-            if (!form) return;
-
-            form.addEventListener("submit", () => {
-                const metodo = document.querySelector("input[name='metodoPago']:checked")?.value || "Efectivo";
-                document.getElementById("formaPagoHidden").value = metodo;
-
-                // Si es efectivo, mandamos lo que escribió. Si no, mandamos el total como recibido.
-                const totalText = document.getElementById("Total")?.innerText || "₡ 0";
-                const total = parseInt(totalText.replace(/[^\d]/g, "")) || 0;
-
-                const inputEfectivo = document.getElementById("montoRecibido");
-                const recibido = parseInt(inputEfectivo?.value || "0") || 0;
-
-                document.getElementById("montoRecibidoHidden").value =
-                    (metodo === "Efectivo") ? recibido : total;
-            });
-        });
-    </script>
-
 
     <script src="~/js/PuntoVenta.js" asp-append-version="true"></script>
 }

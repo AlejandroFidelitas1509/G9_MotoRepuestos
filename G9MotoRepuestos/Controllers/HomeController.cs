@@ -52,29 +52,30 @@ namespace G9MotoRepuestos.Controllers
             int serviciosTotales = 0;
             int usuariosTotales = 0;
             int usuariosActivos = 0;
+            int totalProductos = 0;
+            var ventasSemana = new int[7];
+            var labSemana = new string[7];
+            var actividad = new List<(string Color, string Icono, string Texto, DateTime Fecha)>();
 
             try
             {
                 serviciosTotales = await _context.Servicios.CountAsync();
                 serviciosActivos = await _context.Servicios.CountAsync(s => s.Estado == true);
 
-
-
-
                 await using var conn = _context.Database.GetDbConnection();
 
                 if (conn.State != ConnectionState.Open)
                     await conn.OpenAsync();
 
-                await using (var cmdVentas = conn.CreateCommand())
+                // ── Ventas de hoy ─────────────────────────────────────────────
+                await using (var cmd = conn.CreateCommand())
                 {
-                    cmdVentas.CommandText = @"
+                    cmd.CommandText = @"
                         SELECT COUNT(*), ISNULL(SUM(Total), 0)
                         FROM dbo.Ventas
                         WHERE CAST(Fecha AS date) = CAST(GETDATE() AS date);";
 
-                    await using var reader = await cmdVentas.ExecuteReaderAsync();
-
+                    await using var reader = await cmd.ExecuteReaderAsync();
                     if (await reader.ReadAsync())
                     {
                         ventasHoyCantidad = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
@@ -82,19 +83,131 @@ namespace G9MotoRepuestos.Controllers
                     }
                 }
 
-                await using (var cmdUsers = conn.CreateCommand())
+                // ── Usuarios totales y activos ────────────────────────────────
+                await using (var cmd = conn.CreateCommand())
                 {
-                    cmdUsers.CommandText = @"
+                    cmd.CommandText = @"
                         SELECT 
                             (SELECT COUNT(*) FROM dbo.Usuarios),
                             (SELECT COUNT(*) FROM dbo.Usuarios WHERE Estado = 1);";
 
-                    await using var reader = await cmdUsers.ExecuteReaderAsync();
-
+                    await using var reader = await cmd.ExecuteReaderAsync();
                     if (await reader.ReadAsync())
                     {
                         usuariosTotales = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
                         usuariosActivos = reader.IsDBNull(1) ? 0 : reader.GetInt32(1);
+                    }
+                }
+
+                // ── Total de productos en catálogo ────────────────────────────
+                await using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT COUNT(*) FROM dbo.Productos;";
+                    var result = await cmd.ExecuteScalarAsync();
+                    totalProductos = result == DBNull.Value ? 0 : Convert.ToInt32(result);
+                }
+
+                // ── Ventas de los últimos 7 días (gráfico) ────────────────────
+                await using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT 
+                            CAST(Fecha AS date) AS Dia,
+                            COUNT(*)            AS Cantidad
+                        FROM dbo.Ventas
+                        WHERE Fecha >= CAST(DATEADD(day, -6, GETDATE()) AS date)
+                        GROUP BY CAST(Fecha AS date)
+                        ORDER BY Dia;";
+
+                    var hoy = DateTime.Today;
+                    var culturaES = new System.Globalization.CultureInfo("es-CR");
+
+                    for (int i = 0; i < 7; i++)
+                    {
+                        var dia = hoy.AddDays(-6 + i);
+                        ventasSemana[i] = 0;
+                        labSemana[i] = i == 6
+                            ? "Hoy"
+                            : dia.ToString("ddd", culturaES)[..1].ToUpper();
+                    }
+
+                    await using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        var dia = reader.GetDateTime(0).Date;
+                        var cantidad = reader.GetInt32(1);
+                        var idx = (dia - hoy.AddDays(-6)).Days;
+                        if (idx >= 0 && idx < 7)
+                            ventasSemana[idx] = cantidad;
+                    }
+                }
+
+                // ── Actividad reciente — últimas ventas ───────────────────────
+                await using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT TOP 3 Fecha, Total, MetodoPago
+                        FROM dbo.Ventas
+                        WHERE Fecha IS NOT NULL
+                        ORDER BY Fecha DESC;";
+
+                    await using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        var fecha = reader.IsDBNull(0) ? DateTime.MinValue : reader.GetDateTime(0);
+                        var total = reader.IsDBNull(1) ? 0m : reader.GetDecimal(1);
+                        var metodo = reader.IsDBNull(2) ? "" : reader.GetString(2);
+                        actividad.Add((
+                            Color: "#2f9e44",
+                            Icono: "fa-shopping-cart",
+                            Texto: $"Nueva venta por ₡{total:N2} — {metodo}",
+                            Fecha: fecha
+                        ));
+                    }
+                }
+
+                // ── Actividad reciente — últimas citas ────────────────────────
+                await using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT TOP 2 Fecha, Modelo, Detalle
+                        FROM dbo.Citas
+                        WHERE Fecha IS NOT NULL
+                        ORDER BY Fecha DESC;";
+
+                    await using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        var fecha = reader.IsDBNull(0) ? DateTime.MinValue : reader.GetDateTime(0);
+                        var modelo = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                        var det = reader.IsDBNull(2) ? "" : reader.GetString(2);
+                        actividad.Add((
+                            Color: "#1971c2",
+                            Icono: "fa-calendar-check",
+                            Texto: $"Cita agendada — {(string.IsNullOrWhiteSpace(modelo) ? det : modelo)}",
+                            Fecha: fecha
+                        ));
+                    }
+                }
+
+                // ── Actividad reciente — últimos usuarios registrados ─────────
+                await using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT TOP 2 NombreCompleto
+                        FROM dbo.Usuarios
+                        ORDER BY IdUsuario DESC;";
+
+                    await using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        var nombre = reader.IsDBNull(0) ? "Usuario" : reader.GetString(0);
+                        actividad.Add((
+                            Color: "#c92a2a",
+                            Icono: "fa-user-plus",
+                            Texto: $"Nuevo usuario registrado: {nombre}",
+                            Fecha: DateTime.MinValue
+                        ));
                     }
                 }
             }
@@ -109,6 +222,14 @@ namespace G9MotoRepuestos.Controllers
             ViewBag.ServiciosTotales = serviciosTotales;
             ViewBag.UsuariosTotales = usuariosTotales;
             ViewBag.UsuariosActivos = usuariosActivos;
+            ViewBag.TotalProductos = totalProductos;
+            ViewBag.VentasSemana = ventasSemana;
+            ViewBag.VentasSemanaLabels = labSemana;
+
+            ViewBag.ActividadReciente = actividad
+                .OrderByDescending(a => a.Fecha)
+                .Take(6)
+                .ToList();
 
             return View();
         }

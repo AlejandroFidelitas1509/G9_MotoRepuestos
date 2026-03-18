@@ -33,9 +33,7 @@ namespace G9MotoRepuestos.Controllers
         {
             var idUsuarioStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             int? idUsuario = int.TryParse(idUsuarioStr, out var n) ? n : (int?)null;
-
             var usuarioNombre = User.FindFirstValue(ClaimTypes.Name) ?? "N/A";
-
             return (idUsuario, usuarioNombre);
         }
 
@@ -46,46 +44,23 @@ namespace G9MotoRepuestos.Controllers
 
             var cambios = new List<string>();
 
-            if (antes.Nombre != despues.Nombre)
-                cambios.Add($"Nombre: {antes.Nombre} → {despues.Nombre}");
+            if (antes.Nombre != despues.Nombre) cambios.Add($"Nombre: {antes.Nombre} → {despues.Nombre}");
+            if (antes.Descripcion != despues.Descripcion) cambios.Add("Descripción modificada");
+            if (antes.Marca != despues.Marca) cambios.Add($"Marca: {antes.Marca} → {despues.Marca}");
+            if (antes.PrecioCosto != despues.PrecioCosto) cambios.Add($"PrecioCosto: {antes.PrecioCosto} → {despues.PrecioCosto}");
+            if (antes.PrecioVenta != despues.PrecioVenta) cambios.Add($"PrecioVenta: {antes.PrecioVenta} → {despues.PrecioVenta}");
+            if (antes.CodigoBarras != despues.CodigoBarras) cambios.Add($"CódigoBarras: {antes.CodigoBarras} → {despues.CodigoBarras}");
+            if (antes.Estado != despues.Estado) cambios.Add($"Estado: {(antes.Estado == true ? "Activo" : "Inactivo")} → {(despues.Estado == true ? "Activo" : "Inactivo")}");
+            if (antes.IdCategoria != despues.IdCategoria) cambios.Add("Categoría cambiada");
+            if (antes.StockActual != despues.StockActual) cambios.Add($"StockActual: {antes.StockActual} → {despues.StockActual}");
+            if (antes.ImageURL != despues.ImageURL) cambios.Add("Imagen actualizada");
 
-            if (antes.Descripcion != despues.Descripcion)
-                cambios.Add($"Descripción modificada");
-
-            if (antes.Marca != despues.Marca)
-                cambios.Add($"Marca: {antes.Marca} → {despues.Marca}");
-
-            if (antes.PrecioCosto != despues.PrecioCosto)
-                cambios.Add($"PrecioCosto: {antes.PrecioCosto} → {despues.PrecioCosto}");
-
-            if (antes.PrecioVenta != despues.PrecioVenta)
-                cambios.Add($"PrecioVenta: {antes.PrecioVenta} → {despues.PrecioVenta}");
-
-            if (antes.CodigoBarras != despues.CodigoBarras)
-                cambios.Add($"CódigoBarras: {antes.CodigoBarras} → {despues.CodigoBarras}");
-
-            if (antes.Estado != despues.Estado)
-                cambios.Add($"Estado: {(antes.Estado == true ? "Activo" : "Inactivo")} → {(despues.Estado == true ? "Activo" : "Inactivo")}");
-
-            if (antes.IdCategoria != despues.IdCategoria)
-                cambios.Add($"Categoría cambiada");
-
-            if (antes.StockActual != despues.StockActual)
-                cambios.Add($"StockActual: {antes.StockActual} → {despues.StockActual}");
-
-            if (antes.ImageURL != despues.ImageURL)
-                cambios.Add($"Imagen actualizada");
-
-            if (!cambios.Any())
-                return "No hubo cambios detectados.";
-
-            return string.Join(" | ", cambios);
+            return cambios.Any() ? string.Join(" | ", cambios) : "No hubo cambios detectados.";
         }
 
         private async Task CargarCategoriasAsync(int? idCategoriaSeleccionada = null)
         {
             var categorias = await _categoriasLN.ListarAsync(soloActivas: true);
-
             ViewBag.Categorias = categorias.Select(c => new SelectListItem
             {
                 Value = c.IdCategoria.ToString(),
@@ -94,22 +69,92 @@ namespace G9MotoRepuestos.Controllers
             }).ToList();
         }
 
-        public async Task<IActionResult> Index()
+        // ══════════════════════════════════════════════════════════════
+        // INDEX — con paginación y filtros server-side
+        // ══════════════════════════════════════════════════════════════
+        public async Task<IActionResult> Index(
+            int pagina = 1,
+            int porPagina = 10,
+            string? buscar = null,
+            string? stock = null,
+            int? categoriaId = null)
         {
-            var data = await _productosLN.ListarAsync(soloActivos: true);
+            if (pagina < 1) pagina = 1;
+            if (porPagina < 1) porPagina = 10;
 
+            // Traer todos los productos activos
+            var todos = await _productosLN.ListarAsync(soloActivos: true);
+
+            // ── Filtros ───────────────────────────────────────────────
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                var q = buscar.Trim().ToLower();
+                todos = todos.Where(p =>
+                    (p.Nombre ?? "").ToLower().Contains(q) ||
+                    (p.Marca ?? "").ToLower().Contains(q) ||
+                    (p.CodigoBarras ?? "").ToLower().Contains(q)
+                ).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(stock))
+            {
+                todos = stock switch
+                {
+                    "zero" => todos.Where(p => (p.StockActual ?? 0) == 0).ToList(),
+                    "low" => todos.Where(p => (p.StockActual ?? 0) >= 1 && (p.StockActual ?? 0) <= 3).ToList(),
+                    "ok" => todos.Where(p => (p.StockActual ?? 0) >= 4).ToList(),
+                    _ => todos
+                };
+            }
+
+            if (categoriaId.HasValue)
+                todos = todos.Where(p => p.IdCategoria == categoriaId.Value).ToList();
+
+            // ── Estadísticas sobre total filtrado ─────────────────────
+            var totalFiltrado = todos.Count();
+            var stockTotalSum = todos.Sum(p => p.StockActual ?? 0);
+            var sinStockCount = todos.Count(p => (p.StockActual ?? 0) == 0);
+            var stockBajoCount = todos.Count(p => (p.StockActual ?? 0) >= 1 && (p.StockActual ?? 0) <= 3);
+
+            // ── Paginación ────────────────────────────────────────────
+            var totalPaginas = (int)Math.Ceiling((double)totalFiltrado / porPagina);
+            if (totalPaginas < 1) totalPaginas = 1;
+            if (pagina > totalPaginas) pagina = totalPaginas;
+
+            var productosEnPagina = todos
+                .Skip((pagina - 1) * porPagina)
+                .Take(porPagina)
+                .ToList();
+
+            // ── Categorías para el filtro ─────────────────────────────
             var categorias = await _categoriasLN.ListarAsync(soloActivas: true);
             ViewBag.CategoriasFiltro = categorias
                 .Select(c => new SelectListItem
                 {
                     Value = c.IdCategoria.ToString(),
-                    Text = c.Nombre
+                    Text = c.Nombre,
+                    Selected = categoriaId.HasValue && c.IdCategoria == categoriaId.Value
                 })
                 .ToList();
 
-            return View(data);
+            // ── ViewBag para la vista ─────────────────────────────────
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.PorPagina = porPagina;
+            ViewBag.TotalFiltrado = totalFiltrado;
+            ViewBag.StockTotal = stockTotalSum;
+            ViewBag.SinStock = sinStockCount;
+            ViewBag.StockBajo = stockBajoCount;
+            ViewBag.FiltroBuscar = buscar ?? "";
+            ViewBag.FiltroStock = stock ?? "";
+            ViewBag.FiltroCategoria = categoriaId?.ToString() ?? "";
+
+            return View(productosEnPagina);
         }
 
+        // ══════════════════════════════════════════════════════════════
+        // CREATE
+        // ══════════════════════════════════════════════════════════════
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -129,7 +174,6 @@ namespace G9MotoRepuestos.Controllers
 
             try
             {
-                // Subida de imagen (igual que lo tenías)
                 if (imagen != null && imagen.Length > 0)
                 {
                     if (string.IsNullOrWhiteSpace(imagen.ContentType) || !imagen.ContentType.StartsWith("image/"))
@@ -165,9 +209,7 @@ namespace G9MotoRepuestos.Controllers
                 var nuevoId = await _productosLN.CrearAsync(model);
                 model.IdProducto = nuevoId;
 
-                // ✅ Bitácora
                 var (idUsuario, usuarioNombre) = GetAuditUser();
-
                 await _bitacora.RegistrarAsync(new BitacoraProductosDto
                 {
                     Accion = "CREAR",
@@ -189,11 +231,10 @@ namespace G9MotoRepuestos.Controllers
                 return View(model);
             }
         }
+
         private void CalcularPrecioVentaDesdeMargen(ProductoDto model)
         {
-            // Si no hay costo o no hay margen, no tocamos PrecioVenta
-            if (!model.PrecioCosto.HasValue || !model.MargenPorcentaje.HasValue)
-                return;
+            if (!model.PrecioCosto.HasValue || !model.MargenPorcentaje.HasValue) return;
 
             var costo = model.PrecioCosto.Value;
             var margen = model.MargenPorcentaje.Value;
@@ -204,7 +245,9 @@ namespace G9MotoRepuestos.Controllers
             model.PrecioVenta = Math.Round(costo * (1m + (margen / 100m)), 2);
         }
 
-
+        // ══════════════════════════════════════════════════════════════
+        // EDIT
+        // ══════════════════════════════════════════════════════════════
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -227,9 +270,7 @@ namespace G9MotoRepuestos.Controllers
 
             try
             {
-                //  Capturar "ANTES"
                 var antes = await _productosLN.ObtenerPorIdAsync(model.IdProducto);
-
                 model.Estado = antes?.Estado;
 
                 if (imagen != null && imagen.Length > 0)
@@ -257,15 +298,13 @@ namespace G9MotoRepuestos.Controllers
                 }
                 else
                 {
-                    // mantener imagen anterior
                     model.ImageURL = antes?.ImageURL;
                 }
+
                 CalcularPrecioVentaDesdeMargen(model);
                 await _productosLN.ActualizarAsync(model);
 
-                // ✅ Bitácora
                 var (idUsuario, usuarioNombre) = GetAuditUser();
-
                 await _bitacora.RegistrarAsync(new BitacoraProductosDto
                 {
                     Accion = "EDITAR",
@@ -288,21 +327,19 @@ namespace G9MotoRepuestos.Controllers
             }
         }
 
+        // ══════════════════════════════════════════════════════════════
+        // DELETE
+        // ══════════════════════════════════════════════════════════════
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-              
                 var antes = await _productosLN.ObtenerPorIdAsync(id);
-
-                
                 await _productosLN.CambiarEstadoAsync(id, false);
 
-
                 var (idUsuario, usuarioNombre) = GetAuditUser();
-
                 await _bitacora.RegistrarAsync(new BitacoraProductosDto
                 {
                     Accion = "ELIMINAR",
@@ -319,12 +356,14 @@ namespace G9MotoRepuestos.Controllers
             }
             catch (Exception ex)
             {
-                // si quieres, puedes mostrar TempData y redirigir
                 TempData["Error"] = $"Error al eliminar/desactivar: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
 
+        // ══════════════════════════════════════════════════════════════
+        // BITÁCORA
+        // ══════════════════════════════════════════════════════════════
         public async Task<IActionResult> BitacoraEventos(
             int page = 1,
             int pageSize = 15,
@@ -336,17 +375,13 @@ namespace G9MotoRepuestos.Controllers
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 15;
 
-            // Para los combos
             ViewBag.Acciones = await _bitacora.ListarAccionesAsync();
             ViewBag.Usuarios = await _bitacora.ListarUsuariosAsync();
-
-            // Guardar filtros en la vista
             ViewBag.Desde = desde?.ToString("yyyy-MM-dd") ?? "";
             ViewBag.Hasta = hasta?.ToString("yyyy-MM-dd") ?? "";
             ViewBag.AccionSel = accion ?? "";
             ViewBag.UsuarioSel = idUsuario?.ToString() ?? "";
 
-            // ✅ Esto es lo importante: TRAE SOLO pageSize registros
             var result = await _bitacora.ListarPaginadoAsync(page, pageSize, desde, hasta, accion, idUsuario);
 
             return View(result);

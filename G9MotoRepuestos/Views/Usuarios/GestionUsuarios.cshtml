@@ -1,25 +1,386 @@
 ﻿@model IEnumerable<G9MotoRepuestos.Models.Usuario>
 @{
-    ViewData["Title"] = "Gestión de Usuarios | Moto Repuestos Rojas";
+    ViewData["Title"] = "Usuarios";
 }
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-<link rel="stylesheet" href="~/css/Usuarios/GestionUsuarios.css" asp-append-version="true" />
 
-<div class="container mt-5 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="titulo-modulo m-0">Gestión de Usuarios</h2>
-        <a asp-action="CrearUsuario" class="btn-rojo px-4 py-2 text-decoration-none">
-            <i class="fas fa-plus me-2"></i>NUEVO USUARIO
-        </a>
+<style>
+    /* ── Stats ────────────────────────────────────────────────────── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .stat-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .stat-val {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    /* ── Card de tabla ────────────────────────────────────────────── */
+    .table-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .table-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* ── DataTables overrides ─────────────────────────────────────── */
+    #tablaUsuarios thead th {
+        font-size: 12px !important;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #8a94a6 !important;
+        font-weight: 600 !important;
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #edf0f7 !important;
+        background: #f8fafd !important;
+        white-space: nowrap;
+        border-top: none !important;
+    }
+
+    #tablaUsuarios tbody td {
+        padding: 16px 16px !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid #f0f3f9 !important;
+        color: #4a5568;
+        font-size: 15px !important;
+    }
+
+    #tablaUsuarios tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    #tablaUsuarios tbody tr:hover td {
+        background: #f4f7fc !important;
+    }
+
+    table.dataTable {
+        border-collapse: collapse !important;
+    }
+
+        table.dataTable thead th {
+            border-bottom: none !important;
+        }
+
+    /* ── DataTables layout: buscador izquierda, paginación derecha ── */
+    .dataTables_wrapper .dataTables_filter {
+        float: left !important;
+        text-align: left !important;
+        padding: 14px 20px !important;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        float: right !important;
+        padding: 14px 20px !important;
+        font-size: 13px !important;
+        color: #8a94a6 !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter label {
+        font-size: 13px !important;
+        color: #8a94a6 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        background: #f8fafd !important;
+        border: 1px solid #dde3ee !important;
+        border-radius: 9px !important;
+        color: #1a202c !important;
+        padding: 7px 12px !important;
+        font-size: 14px !important;
+        width: 260px !important;
+        margin-left: 0 !important;
+    }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            outline: none !important;
+            border-color: rgba(201,42,42,.4) !important;
+            box-shadow: 0 0 0 3px rgba(201,42,42,.08) !important;
+            background: #fff !important;
+        }
+
+    .dataTables_wrapper .dataTables_length select {
+        background: #f8fafd !important;
+        border: 1px solid #dde3ee !important;
+        border-radius: 8px !important;
+        color: #1a202c !important;
+        padding: 5px 10px !important;
+        font-size: 13px !important;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        padding: 14px 20px !important;
+        font-size: 13px !important;
+        color: #8a94a6 !important;
+        float: left !important;
+        clear: both !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        padding: 10px 20px !important;
+        float: right !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            padding: 5px 11px !important;
+            color: #4a5568 !important;
+            border: 1px solid transparent !important;
+            font-weight: 600 !important;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                background: #f4f7fc !important;
+                border-color: #dde3ee !important;
+                color: #1a202c !important;
+            }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                background: #c92a2a !important;
+                border-color: #c92a2a !important;
+                color: #fff !important;
+            }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+                color: #b0b8c8 !important;
+                background: transparent !important;
+                border-color: transparent !important;
+            }
+
+    /* ── Avatar ───────────────────────────────────────────────────── */
+    .user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    /* ── Badges ───────────────────────────────────────────────────── */
+    .badge-admin {
+        background: #fff1f1;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-vendedor {
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-cliente {
+        background: #f8fafd;
+        color: #4a5568;
+        border: 1px solid #dde3ee;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-activo {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-bloq {
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    /* ── Botones de acción ────────────────────────────────────────── */
+    .btn-ico {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #dde3ee;
+        background: #f8fafd;
+        color: #4a5568;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .btn-ico:hover {
+            background: #fff;
+            border-color: #b8c4d8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,.08);
+            text-decoration: none;
+        }
+
+        .btn-ico.edit:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .btn-ico.block:hover {
+            background: #fff1f1;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .btn-ico.unblock:hover {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+</style>
+
+@* ── Encabezado ──────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-users me-2" style="color:#c92a2a"></i> Gestión de Usuarios
+        </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Administra los accesos y roles del sistema
+        </div>
+    </div>
+    <a asp-action="CrearUsuario"
+       style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;text-decoration:none"
+       onmouseover="this.style.background='#a61e1e'"
+       onmouseout="this.style.background='#c92a2a'">
+        <i class="fas fa-plus"></i> Nuevo usuario
+    </a>
+</div>
+
+@* ── Stats ────────────────────────────────────────────────────────── *@
+@{
+    var total = Model.Count();
+    var activos = Model.Count(u => u.Estado == true);
+    var admins = Model.Count(u => u.Rol?.Tipo == "Admin" || u.Rol?.Tipo == "Administrador");
+}
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f1">
+            <i class="fas fa-users" style="color:#c92a2a"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total usuarios</div>
+            <div class="stat-val" style="color:#c92a2a">@total</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">
+            <i class="fas fa-user-check" style="color:#166534"></i>
+        </div>
+        <div>
+            <div class="stat-label">Activos</div>
+            <div class="stat-val" style="color:#2f9e44">@activos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff6ff">
+            <i class="fas fa-user-shield" style="color:#1e40af"></i>
+        </div>
+        <div>
+            <div class="stat-label">Administradores</div>
+            <div class="stat-val" style="color:#1971c2">@admins</div>
+        </div>
+    </div>
+</div>
+
+@* ── Tabla ────────────────────────────────────────────────────────── *@
+<div class="table-card">
+    <div class="table-card-header">
+        <span style="font-size:14px;font-weight:700;color:#1a202c">
+            <i class="fas fa-list me-2" style="color:#8a94a6"></i> Lista de usuarios
+        </span>
+        <span style="font-size:13px;color:#8a94a6">@total registro@(total != 1 ? "s" : "")</span>
     </div>
 
-    <div class="panel-modulo p-4">
-        <table id="tablaUsuarios" class="table table-hover w-100">
+    <div class="table-responsive">
+        <table id="tablaUsuarios" class="table w-100 mb-0">
             <thead>
                 <tr>
-                    <th>Nombre Completo</th>
-                    <th>Correo Electrónico</th>
+                    <th>Usuario</th>
+                    <th>Correo</th>
                     <th class="text-center">Rol</th>
                     <th class="text-center">Estado</th>
                     <th class="text-center">Acciones</th>
@@ -30,34 +391,67 @@
                 {
                     bool estaActivo = item.Estado ?? false;
                     bool esAdmin = item.Rol?.Tipo == "Admin" || item.Rol?.Tipo == "Administrador";
+                    bool esVendedor = item.Rol?.Tipo == "Vendedor";
+
+                    var nombre = item.NombreCompleto ?? "U";
+                    var iniciales = string.Concat(
+                    nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .Take(2).Select(p => p[0].ToString().ToUpper()));
+
+                    var avatarBg = esAdmin ? "#fff1f1" : esVendedor ? "#eff6ff" : "#f4f7fc";
+                    var avatarColor = esAdmin ? "#991b1b" : esVendedor ? "#1e40af" : "#4a5568";
+                    var rolTipo = item.Rol?.Tipo ?? "Cliente";
+                    var badgeRol = esAdmin ? "badge-admin" : esVendedor ? "badge-vendedor" : "badge-cliente";
 
                     <tr>
-                        <td class="align-middle">
-                            <span class="fw-bold @(estaActivo ? "" : "text-muted") text-uppercase">@item.NombreCompleto</span>
+                        <td>
+                            <div style="display:inline-flex;align-items:center;gap:12px">
+                                <div class="user-avatar" style="background:@avatarBg;color:@avatarColor">
+                                    @iniciales
+                                </div>
+                                <div>
+                                    <div style="font-weight:600;color:#1a202c;font-size:15px">@nombre</div>
+                                    @if (!estaActivo)
+                                    {
+                                        <div style="font-size:11px;color:#9a3412;margin-top:1px">Cuenta bloqueada</div>
+                                    }
+                                </div>
+                            </div>
                         </td>
-                        <td class="align-middle text-muted small">@item.Correo</td>
-                        <td class="align-middle text-center">
-                            <span class="badge @(esAdmin ? "bg-danger" : "bg-dark")">
-                                @(item.Rol?.Tipo ?? "Cliente")
-                            </span>
+                        <td style="color:#8a94a6;font-size:14px">@item.Correo</td>
+                        <td class="text-center">
+                            <span class="@badgeRol">@rolTipo</span>
                         </td>
-                        <td class="align-middle text-center">
-                            <span class="badge @(estaActivo ? "bg-success" : "bg-dark")">
-                                @(estaActivo ? "Activo" : "Bloqueado")
-                            </span>
+                        <td class="text-center">
+                            @if (estaActivo)
+                            {
+                                <span class="badge-activo">
+                                    <i class="fas fa-circle me-1" style="font-size:7px"></i>Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge-bloq">
+                                    <i class="fas fa-ban me-1" style="font-size:10px"></i>Bloqueado
+                                </span>
+                            }
                         </td>
-                        <td class="text-center align-middle">
-                            <div class="btn-group">
-                                <a asp-action="EditarUsuario" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-dark rounded-0 me-1">
-                                    <i class="fas fa-edit"></i>
+                        <td class="text-center">
+                            <div style="display:inline-flex;gap:6px;justify-content:center">
+                                <a asp-action="EditarUsuario" asp-route-id="@item.IdUsuario"
+                                   class="btn-ico edit" title="Editar usuario">
+                                    <i class="fas fa-pen"></i>
                                 </a>
                                 @if (!esAdmin)
                                 {
-                                    <form asp-action="CambiarEstado" asp-route-id="@item.IdUsuario" method="post" class="d-inline ms-1">
+                                    <form asp-action="CambiarEstado" asp-route-id="@item.IdUsuario"
+                                          method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
-                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-0 btn-cambiar-estado"
-                                                data-nombre="@item.NombreCompleto"
-                                                data-accion="@(estaActivo ? "BLOQUEAR" : "ACTIVAR")">
+                                        <button type="button"
+                                                class="btn-ico @(estaActivo ? "block" : "unblock") btn-cambiar-estado"
+                                                data-nombre="@nombre"
+                                                data-accion="@(estaActivo ? "BLOQUEAR" : "ACTIVAR")"
+                                                title="@(estaActivo ? "Bloquear usuario" : "Activar usuario")">
                                             <i class="fas @(estaActivo ? "fa-ban" : "fa-check-circle")"></i>
                                         </button>
                                     </form>
@@ -71,45 +465,88 @@
     </div>
 </div>
 
-
+@if (TempData["Mensaje"] != null)
+{
+    <input type="hidden" id="mensajeTempData" value="@TempData["Mensaje"]" />
+}
 
 @section Scripts {
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function () {
             $('#tablaUsuarios').DataTable({
-                "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
-                "pageLength": 10,
-                "responsive": true,
-                "columnDefs": [{ "orderable": false, "targets": 4 }]
+                language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
+                pageLength: 10,
+                responsive: true,
+                dom: '<"dt-top"fl>t<"dt-bottom"ip>',
+                columnDefs: [{ orderable: false, targets: 4 }]
             });
 
             $(".btn-cambiar-estado").on("click", function () {
                 var btn = $(this);
+                var accion = btn.data("accion").toLowerCase();
+                var nombre = btn.data("nombre");
+
                 Swal.fire({
                     title: '¿Confirmar acción?',
-                    text: "¿Deseas " + btn.data("accion").toLowerCase() + " al usuario: " + btn.data("nombre") + "?",
+                    text: `¿Deseas ${accion} al usuario: ${nombre}?`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#B01E1E',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Confirmar'
-                }).then((result) => { if (result.isConfirmed) btn.closest("form").submit(); });
+                    confirmButtonColor: accion === 'bloquear' ? '#c92a2a' : '#2f9e44',
+                    cancelButtonColor: '#8a94a6',
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        btn.closest("form").submit();
+                    }
+                });
             });
 
-            @if (TempData["Mensaje"] != null)
-            {
-                    <text>
-                    Swal.fire({ icon: 'success', title: '¡Listo!', text: '@TempData["Mensaje"]', timer: 2500, showConfirmButton: false });
-                    </text>
+            var mensajeTemp = $("#mensajeTempData").val();
+
+            if (mensajeTemp) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Listo!',
+                    text: mensajeTemp,
+                    timer: 2500,
+                    showConfirmButton: false
+                });
             }
         });
     </script>
+
+    <style>
+        .dt-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #edf0f7;
+        }
+
+            .dt-top .dataTables_filter,
+            .dt-top .dataTables_length {
+                float: none !important;
+                padding: 0 !important;
+            }
+
+        .dt-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-top: 1px solid #edf0f7;
+        }
+
+            .dt-bottom .dataTables_info,
+            .dt-bottom .dataTables_paginate {
+                float: none !important;
+                padding: 0 !important;
+                clear: none !important;
+            }
+    </style>
 }
-        
-        
-        
-        

@@ -2,139 +2,660 @@
     ViewData["Title"] = "Panel de Control";
 }
 
-<link rel="stylesheet" href="~/css/Panel.css" asp-append-version="true" />
+<style>
+    /* ── Variables — slate azulado ──────────────────────────────── */
+    :root {
+        --red: #c92a2a;
+        --red-dim: rgba(201,42,42,.09);
+        --red-glow: rgba(201,42,42,.15);
+        --green: #2f9e44;
+        --green-dim: rgba(47,158,68,.09);
+        --blue: #1971c2;
+        --blue-dim: rgba(25,113,194,.09);
+        --amber: #e67700;
+        --amber-dim: rgba(230,119,0,.09);
+        --purple: #6741d9;
+        --purple-dim: rgba(103,65,217,.09);
+        --surface: #ffffff;
+        --border: #dde3ee;
+        --text-muted: #8a94a6;
+        --text-dim: #4a5568;
+        --text-main: #1a202c;
+    }
 
-<div class="container my-5 py-4 fade-in">
+    .admin-content {
+        background: #e8edf5 !important;
+    }
 
-    <div class="mb-5">
-        <h2 class="fw-bold text-uppercase section-title">
-            PANEL DE CONTROL <i class="fas fa-tachometer-alt text-danger ms-2"></i>
-        </h2>
-        <p class="text-muted">Bienvenido, <span class="fw-bold text-dark">@User.Identity?.Name</span>. Resumen administrativo .</p>
-        <hr class="border-danger opacity-100" style="width: 60px; height: 4px; border-radius: 2px;">
+    html, body {
+        background: #e8edf5 !important;
+        color: #1a202c;
+    }
+
+    .pc-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: auto;
+        gap: 14px;
+    }
+
+    .pc-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px 22px;
+        transition: border-color .2s, transform .15s, box-shadow .2s;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+        .pc-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            transform: translateY(-1px);
+        }
+
+        .pc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 0 0 80px 0;
+            opacity: 0;
+            transition: opacity .3s;
+        }
+
+        .pc-card:hover::before {
+            opacity: 1;
+        }
+
+    .glow-red::before {
+        background: var(--red-glow);
+    }
+
+    .glow-green::before {
+        background: rgba(47,158,68,.12);
+    }
+
+    .glow-blue::before {
+        background: rgba(25,113,194,.12);
+    }
+
+    .glow-amber::before {
+        background: rgba(230,119,0,.1);
+    }
+
+    .glow-purple::before {
+        background: rgba(103,65,217,.1);
+    }
+
+    .pc-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .pc-card-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .pc-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .pc-val {
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+        letter-spacing: -.5px;
+    }
+
+    .pc-val-sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+    }
+
+    .pc-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 12px 0;
+    }
+
+    .pc-stat-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .pc-stat-label {
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    .pc-stat-val {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .pc-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 99px;
+        margin-top: 8px;
+    }
+
+    .col-span-2 {
+        grid-column: span 2;
+    }
+
+    .col-span-3 {
+        grid-column: span 3;
+    }
+
+    .col-span-4 {
+        grid-column: span 4;
+    }
+
+    .mini-bar-track {
+        height: 5px;
+        border-radius: 99px;
+        background: #edf0f7;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+
+    .mini-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        transition: width .5s ease;
+    }
+
+    .sparkbar-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        height: 48px;
+        margin-top: 10px;
+    }
+
+    .sparkbar {
+        flex: 1;
+        border-radius: 4px 4px 0 0;
+        transition: opacity .2s;
+        min-height: 4px;
+        cursor: default;
+    }
+
+        .sparkbar:hover {
+            opacity: .7;
+        }
+
+    .activity-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 0;
+        border-bottom: 1px solid #edf0f7;
+    }
+
+        .activity-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .activity-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .activity-text {
+        flex: 1;
+        font-size: 12.5px;
+        color: var(--text-dim);
+    }
+
+        .activity-text strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+    .activity-time {
+        font-size: 11px;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    .shortcuts-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 4px;
+    }
+
+    .shortcut-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        padding: 14px 8px;
+        border-radius: 12px;
+        background: #f4f7fc;
+        border: 1px solid #dde3ee;
+        text-decoration: none;
+        color: var(--text-dim);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        transition: all .15s;
+        text-align: center;
+    }
+
+        .shortcut-btn i {
+            font-size: 18px;
+            transition: color .15s;
+        }
+
+        .shortcut-btn:hover {
+            background: #fff;
+            border-color: #b8c4d8;
+            color: var(--text-main);
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+
+        .shortcut-btn.sc-red:hover i {
+            color: var(--red);
+        }
+
+        .shortcut-btn.sc-green:hover i {
+            color: var(--green);
+        }
+
+        .shortcut-btn.sc-blue:hover i {
+            color: var(--blue);
+        }
+
+        .shortcut-btn.sc-amber:hover i {
+            color: var(--amber);
+        }
+
+        .shortcut-btn.sc-purple:hover i {
+            color: var(--purple);
+        }
+
+        .shortcut-btn.sc-teal:hover i {
+            color: #0f9488;
+        }
+
+        .shortcut-btn.sc-orange:hover i {
+            color: #ea6c00;
+        }
+
+        .shortcut-btn.sc-pink:hover i {
+            color: #db2777;
+        }
+
+    .pc-section-hd {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .pc-section-hd::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+    .hero-card {
+        background: linear-gradient(135deg, #c92a2a 0%, #a61e1e 50%, #1e2a4a 100%);
+        border: none;
+        border-radius: 16px;
+        padding: 22px 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(201,42,42,.25);
+    }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+    .hero-greeting {
+        font-size: 13px;
+        color: rgba(255,255,255,.7);
+        margin-bottom: 4px;
+    }
+
+    .hero-name {
+        font-size: 22px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+        margin-bottom: 6px;
+    }
+
+    .hero-date {
+        font-size: 12px;
+        color: rgba(255,255,255,.5);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.25);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 99px;
+        margin-top: 10px;
+    }
+
+    @@media (max-width: 1100px) {
+        .pc-wrap {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .col-span-3, .col-span-4 {
+            grid-column: span 2;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .pc-wrap {
+            grid-template-columns: 1fr;
+        }
+
+        .col-span-2, .col-span-3, .col-span-4 {
+            grid-column: span 1;
+        }
+
+        .shortcuts-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+@{
+    var ahora = DateTime.Now;
+    var hora = ahora.Hour;
+    var saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
+
+    @* Cast de los ViewBag para actividad y gráfico *@
+    var actividad = ViewBag.ActividadReciente as List<(string Color, string Icono, string Texto, DateTime Fecha)>
+                       ?? new List<(string, string, string, DateTime)>();
+    var ventasSemana = ViewBag.VentasSemana as int[] ?? new int[7];
+    var labSemana = ViewBag.VentasSemanaLabels as string[] ?? new[] { "L", "M", "X", "J", "V", "S", "H" };
+    var maxSemana = ventasSemana.Length > 0 ? ventasSemana.Max() : 1;
+    var totalSemana = ventasSemana.Sum();
+}
+
+<div class="pc-wrap">
+
+    @* ══ HERO ═════════════════════════════════════════════════════ *@
+    <div class="hero-card col-span-2">
+        <div class="hero-greeting">@saludo,</div>
+        <div class="hero-name">@(User.Identity?.Name ?? "Administrador") 👋</div>
+        <div class="hero-date">
+            @ahora.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-CR"))
+        </div>
+        <span class="hero-badge">
+            <i class="fas fa-circle" style="font-size:6px"></i>
+            Sistema activo
+        </span>
     </div>
 
-    <div class="row g-4 mb-5">
-
-        <div class="col-md-3">
-            <div class="panel-modulo p-4 text-center border-top border-danger border-4 shadow-sm">
-                <div class="text-danger mb-2"><i class="fas fa-users fa-2x"></i></div>
-                <h6 class="text-muted small text-uppercase fw-bold">Gestión de Usuarios</h6>
-
-                <h3 class="fw-bold mb-1 text-danger">@ViewBag.UsuariosTotales</h3>
-                <small class="text-muted d-block">Usuarios Registrados</small>
-
-                <hr class="my-2" />
-
-                <h5 class="fw-bold mb-0 text-dark">@ViewBag.UsuariosActivos</h5>
-                <small class="text-muted d-block">Usuarios Activos</small>
+    @* ══ VENTAS HOY ═══════════════════════════════════════════════ *@
+    <div class="pc-card glow-green">
+        <div class="pc-card-top">
+            <span class="pc-card-label">Ventas hoy</span>
+            <div class="pc-icon" style="background:var(--green-dim)">
+                <i class="fas fa-cash-register" style="color:var(--green)"></i>
             </div>
         </div>
-
-        <div class="col-md-3">
-            <div class="panel-modulo p-4 text-center border-top border-danger border-4 shadow-sm">
-                <div class="text-danger mb-2"><i class="fas fa-boxes fa-2x"></i></div>
-                <h6 class="text-muted small text-uppercase fw-bold">Productos</h6>
-                <h3 class="fw-bold mb-0">124</h3>
-            </div>
+        <div class="pc-val" style="color:var(--green)">@ViewBag.VentasHoyCantidad</div>
+        <div class="pc-val-sub">transacciones</div>
+        <div class="pc-divider"></div>
+        <div class="pc-stat-row">
+            <span class="pc-stat-label">Monto total</span>
+            <span class="pc-stat-val">₡@(((decimal)ViewBag.VentasHoyMonto).ToString("N2"))</span>
         </div>
-
-        <div class="col-md-3">
-            <div class="panel-modulo p-4 text-center border-top border-danger border-4 shadow-sm">
-                <div class="text-danger mb-2"><i class="fas fa-cash-register fa-2x"></i></div>
-                <h6 class="text-muted small text-uppercase fw-bold">Ventas Hoy</h6>
-
-                <h3 class="fw-bold mb-1 text-danger">@ViewBag.VentasHoyCantidad</h3>
-                <small class="text-muted d-block">Cantidad de ventas</small>
-
-                <hr class="my-2" />
-
-                <h5 class="fw-bold mb-0 text-dark">₡ @(((decimal)ViewBag.VentasHoyMonto).ToString("N2"))</h5>
-                <small class="text-muted d-block">Monto total vendido</small>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="panel-modulo p-4 text-center border-top border-danger border-4 shadow-sm">
-                <div class="text-danger mb-2"><i class="fas fa-calendar-check fa-2x"></i></div>
-                <h6 class="text-muted small text-uppercase fw-bold">Citas</h6>
-                <h3 class="fw-bold mb-0">8</h3>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="panel-modulo p-4 text-center border-top border-danger border-4 shadow-sm">
-                <div class="text-danger mb-2"><i class="fas fa-tools fa-2x"></i></div>
-                <h6 class="text-muted small text-uppercase fw-bold">Gestión de Servicios</h6>
-
-                <h5 class="fw-bold mb-1 text-danger">@ViewBag.ServiciosActivos</h5>
-                <small class="text-muted d-block">Servicios Activos</small>
-
-                <hr class="my-2" />
-
-                <h3 class="fw-bold mb-0 text-dark">@ViewBag.ServiciosTotales</h3>
-                <small class="text-muted d-block">Servicios Registrados</small>
-
-            </div>
-        </div>
-
+        <span class="pc-trend" style="background:var(--green-dim);color:#2f9e44">
+            <i class="fas fa-store" style="font-size:9px"></i> Hoy
+        </span>
     </div>
 
-    <div class="p-4 p-md-5 bg-dark rounded-4 shadow-lg">
-        <h5 class="text-white fw-bold mb-4 border-bottom border-secondary pb-2">
-            <i class="fas fa-th-large me-2 text-danger"></i>GESTIÓN DEL NEGOCIO
-        </h5>
-
-        <div class="row g-4">
-            <div class="col-6 col-md-3">
-                <a asp-controller="Usuarios" asp-action="GestionUsuarios" class="module-link">
-                    <i class="fas fa-user-cog mb-2"></i>
-                    <span>USUARIOS</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Inventario" asp-action="Index" class="module-link">
-                    <i class="fas fa-tools mb-2"></i>
-                    <span>INVENTARIO</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="PuntoVenta" asp-action="Index" class="module-link">
-                    <i class="fas fa-shopping-cart mb-2"></i>
-                    <span>CAJA (POS)</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Citas" asp-action="Index" class="module-link">
-                    <i class="fas fa-calendar-alt mb-2"></i>
-                    <span>CITAS TALLER</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Contabilidad" asp-action="Index" class="module-link">
-                    <i class="fas fa-file-invoice-dollar mb-2"></i>
-                    <span>FINANZAS</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Servicios" asp-action="GestionServicios" class="module-link">
-                    <i class="fas fa-motorcycle mb-2"></i>
-                    <span>SERVICIOS</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Reportes" asp-action="Index" class="module-link">
-                    <i class="fas fa-chart-bar mb-2"></i>
-                    <span>REPORTES</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Home" asp-action="Index" class="module-link btn-tienda">
-                    <i class="fas fa-external-link-alt mb-2"></i>
-                    <span>IR A TIENDA</span>
-                </a>
+    @* ══ CITAS ════════════════════════════════════════════════════ *@
+    <div class="pc-card glow-blue">
+        <div class="pc-card-top">
+            <span class="pc-card-label">Citas</span>
+            <div class="pc-icon" style="background:var(--blue-dim)">
+                <i class="fas fa-calendar-check" style="color:var(--blue)"></i>
             </div>
         </div>
+        <div class="pc-val" style="color:var(--blue)">8</div>
+        <div class="pc-val-sub">agendadas</div>
+        <span class="pc-trend" style="background:var(--blue-dim);color:#1971c2">
+            <i class="fas fa-clock" style="font-size:9px"></i> Pendientes hoy
+        </span>
     </div>
-    
+
+    @* ══ USUARIOS ════════════════════════════════════════════════ *@
+    <div class="pc-card glow-red">
+        <div class="pc-card-top">
+            <span class="pc-card-label">Usuarios</span>
+            <div class="pc-icon" style="background:var(--red-dim)">
+                <i class="fas fa-users" style="color:var(--red)"></i>
+            </div>
+        </div>
+        <div class="pc-val" style="color:var(--red)">@ViewBag.UsuariosTotales</div>
+        <div class="pc-val-sub">registrados</div>
+        <div class="pc-divider"></div>
+        <div class="pc-stat-row">
+            <span class="pc-stat-label">Activos</span>
+            <span class="pc-stat-val" style="color:var(--green)">@ViewBag.UsuariosActivos</span>
+        </div>
+        <div class="mini-bar-track">
+            @{
+                var pctActivos = ViewBag.UsuariosTotales > 0
+                ? (int)((double)ViewBag.UsuariosActivos / (double)ViewBag.UsuariosTotales * 100)
+                : 0;
+            }
+            <div class="mini-bar-fill" style="width:@pctActivos%;background:var(--green)"></div>
+        </div>
+    </div>
+
+    @* ══ INVENTARIO ══════════════════════════════════════════════ *@
+    <div class="pc-card glow-amber">
+        <div class="pc-card-top">
+            <span class="pc-card-label">Inventario</span>
+            <div class="pc-icon" style="background:var(--amber-dim)">
+                <i class="fas fa-boxes" style="color:var(--amber)"></i>
+            </div>
+        </div>
+        <div class="pc-val" style="color:var(--amber)">@ViewBag.TotalProductos</div>
+        <div class="pc-val-sub">productos activos</div>
+        <span class="pc-trend" style="background:var(--amber-dim);color:#e67700">
+            <i class="fas fa-tag" style="font-size:9px"></i> En catálogo
+        </span>
+    </div>
+
+    @* ══ SERVICIOS ════════════════════════════════════════════════ *@
+    <div class="pc-card glow-purple">
+        <div class="pc-card-top">
+            <span class="pc-card-label">Servicios</span>
+            <div class="pc-icon" style="background:var(--purple-dim)">
+                <i class="fas fa-motorcycle" style="color:var(--purple)"></i>
+            </div>
+        </div>
+        <div class="pc-val" style="color:var(--purple)">@ViewBag.ServiciosTotales</div>
+        <div class="pc-val-sub">registrados</div>
+        <div class="pc-divider"></div>
+        <div class="pc-stat-row">
+            <span class="pc-stat-label">Activos</span>
+            <span class="pc-stat-val" style="color:var(--purple)">@ViewBag.ServiciosActivos</span>
+        </div>
+    </div>
+
+    @* ══ ACTIVIDAD RECIENTE — datos reales ═══════════════════════ *@
+    <div class="pc-card col-span-2">
+        <div class="pc-section-hd">
+            <i class="fas fa-bolt" style="color:var(--amber)"></i>
+            Actividad reciente
+        </div>
+
+        @if (actividad.Any())
+        {
+            foreach (var item in actividad)
+            {
+                @* Tiempo transcurrido *@
+                var diff = DateTime.Now - item.Fecha;
+                string tiempo;
+                if (item.Fecha == DateTime.MinValue)
+                    tiempo = "Recientemente";
+                else if (diff.TotalMinutes < 1)
+                    tiempo = "Ahora mismo";
+                else if (diff.TotalMinutes < 60)
+                    tiempo = $"Hace {(int)diff.TotalMinutes} min";
+                else if (diff.TotalHours < 24)
+                    tiempo = $"Hace {(int)diff.TotalHours} hr";
+                else
+                    tiempo = item.Fecha.ToString("dd/MM/yyyy");
+
+                <div class="activity-row">
+                    <div class="activity-dot" style="background:@item.Color"></div>
+                    <div class="activity-text">
+                        <i class="fas @item.Icono me-1" style="font-size:11px;color:@item.Color"></i>
+                        @item.Texto
+                    </div>
+                    <div class="activity-time">@tiempo</div>
+                </div>
+            }
+        }
+        else
+        {
+            <div style="padding:1.5rem 0;text-align:center;color:var(--text-muted);font-size:13px">
+                <i class="fas fa-inbox" style="font-size:1.8rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
+                Sin actividad reciente
+            </div>
+        }
+    </div>
+
+    @* ══ GRÁFICO VENTAS 7 DÍAS — datos reales ════════════════════ *@
+    <div class="pc-card col-span-2">
+        <div class="pc-section-hd">
+            <i class="fas fa-chart-bar" style="color:var(--green)"></i>
+            Ventas — últimos 7 días
+        </div>
+        <div class="sparkbar-row">
+            @for (int i = 0; i < ventasSemana.Length; i++)
+            {
+                var h = maxSemana > 0 ? (int)((double)ventasSemana[i] / maxSemana * 44) : 4;
+                h = Math.Max(h, 4);
+                var isHoy = i == ventasSemana.Length - 1;
+                var bgBar = isHoy ? "var(--green)" : "rgba(47,158,68,.3)";
+                var lbl = labSemana[i];
+                var cant = ventasSemana[i];
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                    <div class="sparkbar"
+                         style="height:@(h)px;background:@bgBar"
+                         title="@lbl: @cant venta@(cant != 1 ? "s" : "")"></div>
+                    <span style="font-size:9px;color:var(--text-muted)">@lbl</span>
+                </div>
+            }
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:var(--text-muted)">Total semana</span>
+            <span style="font-size:13px;font-weight:700;color:var(--green)">
+                @totalSemana venta@(totalSemana != 1 ? "s" : "")
+            </span>
+        </div>
+    </div>
+
+    @* ══ ACCESOS RÁPIDOS ══════════════════════════════════════════ *@
+    <div class="pc-card col-span-4">
+        <div class="pc-section-hd">
+            <i class="fas fa-th" style="color:var(--red)"></i>
+            Accesos rápidos
+        </div>
+        <div class="shortcuts-grid">
+            <a asp-controller="Usuarios" asp-action="GestionUsuarios" class="shortcut-btn sc-red">
+                <i class="fas fa-user-cog"></i>
+                <span>Usuarios</span>
+            </a>
+            <a asp-controller="Inventario" asp-action="Index" class="shortcut-btn sc-amber">
+                <i class="fas fa-boxes"></i>
+                <span>Inventario</span>
+            </a>
+            <a asp-controller="PuntoVenta" asp-action="Index" class="shortcut-btn sc-green">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Caja (POS)</span>
+            </a>
+            <a asp-controller="Citas" asp-action="Index" class="shortcut-btn sc-blue">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Citas taller</span>
+            </a>
+            <a asp-controller="Contabilidad" asp-action="Index" class="shortcut-btn sc-teal">
+                <i class="fas fa-chart-line"></i>
+                <span>Finanzas</span>
+            </a>
+            <a asp-controller="Servicios" asp-action="GestionServicios" class="shortcut-btn sc-purple">
+                <i class="fas fa-motorcycle"></i>
+                <span>Servicios</span>
+            </a>
+            <a asp-controller="Reportes" asp-action="Index" class="shortcut-btn sc-orange">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="shortcut-btn sc-pink">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Ir a tienda</span>
+            </a>
+        </div>
+    </div>
+
 </div>
