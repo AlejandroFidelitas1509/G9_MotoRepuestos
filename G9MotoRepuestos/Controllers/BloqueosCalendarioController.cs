@@ -33,12 +33,16 @@ namespace G9MotoRepuestos.Controllers
                 var respuesta = await _bloqueosCalendarioServicio.AgregarBloqueoAsync(dto);
 
                 if (!respuesta.EsError)
-                    return RedirectToAction(nameof(Index));
+                {
+                    TempData["Mensaje"] = "La fecha fue bloqueada correctamente.";
+                    return RedirectToAction("Index", "Citas");
+                }
 
                 ModelState.AddModelError(string.Empty, respuesta.Mensaje);
             }
 
-            return View(dto);
+            TempData["ErrorMessage"] = "No se pudo registrar el bloqueo.";
+            return RedirectToAction("Index", "Citas");
         }
 
         public async Task<IActionResult> Edit(int id)

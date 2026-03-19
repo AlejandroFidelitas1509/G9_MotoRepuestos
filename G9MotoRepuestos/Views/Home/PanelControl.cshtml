@@ -616,46 +616,40 @@
         </div>
     </div>
 
-    @* ══ ACCESOS RÁPIDOS ══════════════════════════════════════════ *@
     <div class="pc-card col-span-4">
         <div class="pc-section-hd">
             <i class="fas fa-th" style="color:var(--red)"></i>
             Accesos rápidos
         </div>
         <div class="shortcuts-grid">
-            <a asp-controller="Usuarios" asp-action="GestionUsuarios" class="shortcut-btn sc-red">
-                <i class="fas fa-user-cog"></i>
-                <span>Usuarios</span>
+            <a asp-controller="PuntoVenta" asp-action="Index" class="shortcut-btn sc-green">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Caja (POS)</span>
             </a>
             <a asp-controller="Inventario" asp-action="Index" class="shortcut-btn sc-amber">
                 <i class="fas fa-boxes"></i>
                 <span>Inventario</span>
             </a>
-            <a asp-controller="PuntoVenta" asp-action="Index" class="shortcut-btn sc-green">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Caja (POS)</span>
-            </a>
             <a asp-controller="Citas" asp-action="Index" class="shortcut-btn sc-blue">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Citas taller</span>
-            </a>
-            <a asp-controller="Contabilidad" asp-action="Index" class="shortcut-btn sc-teal">
-                <i class="fas fa-chart-line"></i>
-                <span>Finanzas</span>
             </a>
             <a asp-controller="Servicios" asp-action="GestionServicios" class="shortcut-btn sc-purple">
                 <i class="fas fa-motorcycle"></i>
                 <span>Servicios</span>
             </a>
+            <a asp-controller="Contabilidad" asp-action="Index" class="shortcut-btn sc-teal">
+                <i class="fas fa-chart-line"></i>
+                <span>Contabilidad</span>
+            </a>
             <a asp-controller="Reportes" asp-action="Index" class="shortcut-btn sc-orange">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reportes</span>
             </a>
-            <a asp-controller="Home" asp-action="Index" class="shortcut-btn sc-pink">
-                <i class="fas fa-external-link-alt"></i>
-                <span>Ir a tienda</span>
+            <a asp-controller="Usuarios" asp-action="GestionUsuarios" class="shortcut-btn sc-red">
+                <i class="fas fa-user-cog"></i>
+                <span>Usuarios</span>
             </a>
         </div>
     </div>
-
 </div>
