@@ -1,55 +1,412 @@
 ﻿@model IEnumerable<G9MotoRepuestos.Models.Servicios>
 @{
-    ViewData["Title"] = "Gestión de Servicios | Moto Repuestos Rojas";
+    ViewData["Title"] = "Servicios";
+    var items = Model?.ToList() ?? new List<G9MotoRepuestos.Models.Servicios>();
+    var total = items.Count;
+    var activos = items.Count(x => x.Estado);
+    var inactivos = total - activos;
 }
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-<link rel="stylesheet" href="~/css/Servicios/GestionServicios.css" asp-append-version="true" />
 
-<div class="container mt-5 mb-5">
-    @* --- HEADER --- *@
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="titulo-modulo m-0">Gestión de Servicios</h2>
-        <a asp-action="AgregarServicio" class="btn-rojo px-4 py-2 text-decoration-none">
-            <i class="fas fa-plus me-2"></i>NUEVO SERVICIO
-        </a>
+<style>
+    /* ── Stats ────────────────────────────────────────────────────── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .stat-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .stat-val {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    /* ── Card de tabla ────────────────────────────────────────────── */
+    .table-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .table-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* ── DataTables overrides ─────────────────────────────────────── */
+    #tablaServicios thead th {
+        font-size: 11px !important;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #8a94a6 !important;
+        font-weight: 600 !important;
+        padding: 11px 16px !important;
+        border-bottom: 1px solid #edf0f7 !important;
+        background: #f8fafd !important;
+        white-space: nowrap;
+        border-top: none !important;
+    }
+
+    #tablaServicios tbody td {
+        padding: 14px 16px !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid #f0f3f9 !important;
+        color: #4a5568;
+        font-size: 14px !important;
+    }
+
+    #tablaServicios tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    #tablaServicios tbody tr:hover td {
+        background: #f4f7fc !important;
+    }
+
+    table.dataTable {
+        border-collapse: collapse !important;
+    }
+
+        table.dataTable thead th {
+            border-bottom: none !important;
+        }
+
+    /* DataTables controles */
+    .dt-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid #edf0f7;
+    }
+
+        .dt-top .dataTables_filter,
+        .dt-top .dataTables_length {
+            float: none !important;
+            padding: 0 !important;
+        }
+
+    .dt-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        border-top: 1px solid #edf0f7;
+    }
+
+        .dt-bottom .dataTables_info,
+        .dt-bottom .dataTables_paginate {
+            float: none !important;
+            padding: 0 !important;
+            clear: none !important;
+        }
+
+    .dataTables_wrapper .dataTables_filter label {
+        font-size: 13px !important;
+        color: #8a94a6 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        background: #f8fafd !important;
+        border: 1px solid #dde3ee !important;
+        border-radius: 9px !important;
+        color: #1a202c !important;
+        padding: 7px 12px !important;
+        font-size: 13px !important;
+        width: 220px !important;
+        margin-left: 0 !important;
+    }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            outline: none !important;
+            border-color: rgba(201,42,42,.4) !important;
+            box-shadow: 0 0 0 3px rgba(201,42,42,.08) !important;
+            background: #fff !important;
+        }
+
+    .dataTables_wrapper .dataTables_length select {
+        background: #f8fafd !important;
+        border: 1px solid #dde3ee !important;
+        border-radius: 8px !important;
+        color: #1a202c !important;
+        padding: 5px 10px !important;
+        font-size: 13px !important;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        font-size: 12px !important;
+        color: #8a94a6 !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 8px !important;
+        font-size: 12px !important;
+        padding: 5px 10px !important;
+        color: #4a5568 !important;
+        border: 1px solid transparent !important;
+        font-weight: 600 !important;
+    }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #f4f7fc !important;
+            border-color: #dde3ee !important;
+            color: #1a202c !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #c92a2a !important;
+            border-color: #c92a2a !important;
+            color: #fff !important;
+        }
+
+    /* ── Thumb imagen ─────────────────────────────────────────────── */
+    .svc-thumb {
+        width: 46px;
+        height: 46px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #edf0f7;
+        background: #f8fafd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .svc-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .svc-thumb-ph {
+        font-size: 11px;
+        font-weight: 700;
+        color: #c92a2a;
+    }
+
+    /* ── Badges ───────────────────────────────────────────────────── */
+    .badge-activo {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-inactivo {
+        background: #f4f7fc;
+        color: #4a5568;
+        border: 1px solid #dde3ee;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    /* ── Botones acción ───────────────────────────────────────────── */
+    .btn-ico {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #dde3ee;
+        background: #f8fafd;
+        color: #4a5568;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .btn-ico:hover {
+            background: #fff;
+            border-color: #b8c4d8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,.08);
+            text-decoration: none;
+        }
+
+        .btn-ico.edit:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .btn-ico.del:hover {
+            background: #fff1f1;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+</style>
+
+@* ── Encabezado ──────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-motorcycle me-2" style="color:#c92a2a"></i> Gestión de Servicios
+        </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Administra los servicios del taller
+        </div>
+    </div>
+    <a asp-action="AgregarServicio"
+       style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;text-decoration:none"
+       onmouseover="this.style.background='#a61e1e'"
+       onmouseout="this.style.background='#c92a2a'">
+        <i class="fas fa-plus"></i> Nuevo servicio
+    </a>
+</div>
+
+@* ── Stats ────────────────────────────────────────────────────────── *@
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f1">
+            <i class="fas fa-motorcycle" style="color:#c92a2a"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total servicios</div>
+            <div class="stat-val" style="color:#c92a2a">@total</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">
+            <i class="fas fa-check-circle" style="color:#166534"></i>
+        </div>
+        <div>
+            <div class="stat-label">Activos</div>
+            <div class="stat-val" style="color:#2f9e44">@activos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f4f7fc">
+            <i class="fas fa-ban" style="color:#4a5568"></i>
+        </div>
+        <div>
+            <div class="stat-label">Inactivos</div>
+            <div class="stat-val" style="color:#4a5568">@inactivos</div>
+        </div>
+    </div>
+</div>
+
+@* ── Tabla ────────────────────────────────────────────────────────── *@
+<div class="table-card">
+    <div class="table-card-header">
+        <span style="font-size:14px;font-weight:700;color:#1a202c">
+            <i class="fas fa-list me-2" style="color:#8a94a6"></i> Lista de servicios
+        </span>
+        <span style="font-size:13px;color:#8a94a6">@total servicio@(total != 1 ? "s" : "")</span>
     </div>
 
-    @* --- PANEL --- *@
-    <div class="panel-modulo p-4">
-        <table id="tablaServicios" class="table table-hover w-100">
+    <div class="table-responsive">
+        <table id="tablaServicios" class="table w-100 mb-0">
             <thead>
                 <tr>
-                    <th>Imagen</th>
+                    <th style="width:70px">Imagen</th>
                     <th>Nombre</th>
-                    <th>Precio</th>
-                    <th class="text-center">Estado</th>
-                    <th class="text-center">Acciones</th>
+                    <th style="width:130px">Precio</th>
+                    <th class="text-center" style="width:100px">Estado</th>
+                    <th class="text-center" style="width:90px">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in items)
                 {
                     <tr>
-                        <td class="align-middle">
-                            <img src="@item.ImagenUrl" alt="Servicio" style="width: 50px; height: 50px; object-fit: cover;" class="border rounded-0" />
+                        <td>
+                            <div class="svc-thumb">
+                                @if (!string.IsNullOrWhiteSpace(item.ImagenUrl))
+                                {
+                                    <img src="@item.ImagenUrl" alt="@item.Nombre" />
+                                }
+                                else
+                                {
+                                    <span class="svc-thumb-ph">MR</span>
+                                }
+                            </div>
                         </td>
-                        <td class="align-middle">
-                            <span class="fw-bold text-uppercase">@item.Nombre</span>
+                        <td style="font-weight:600;color:#1a202c;font-size:15px">
+                            @item.Nombre
                         </td>
-                        <td class="align-middle fw-bold text-danger">₡@item.Precio.ToString("N0")</td>
-                        <td class="align-middle text-center">
-                            <span class="badge @(item.Estado ? "bg-success" : "bg-dark")">
-                                @(item.Estado ? "Activo" : "Inactivo")
-                            </span>
+                        <td style="font-weight:700;color:#c92a2a;font-size:15px">
+                            ₡@item.Precio.ToString("N0")
                         </td>
-                        <td class="text-center align-middle">
-                            <div class="btn-group">
-                                <a asp-action="EditarServicio" asp-route-id="@item.IdServicio" class="btn btn-sm btn-dark rounded-0 me-1">
-                                    <i class="fas fa-edit"></i>
+                        <td class="text-center">
+                            @if (item.Estado)
+                            {
+                                <span class="badge-activo">
+                                    <i class="fas fa-circle me-1" style="font-size:7px"></i>Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge-inactivo">
+                                    <i class="fas fa-ban me-1" style="font-size:9px"></i>Inactivo
+                                </span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div style="display:inline-flex;gap:6px">
+                                <a asp-action="EditarServicio" asp-route-id="@item.IdServicio"
+                                   class="btn-ico edit" title="Editar servicio">
+                                    <i class="fas fa-pen"></i>
                                 </a>
-                                @* Aquí podrías aplicar SweetAlert en el futuro *@
-                                <a asp-action="EliminarServicio" asp-route-id="@item.IdServicio" class="btn btn-sm btn-outline-danger rounded-0">
+                                <a asp-action="EliminarServicio" asp-route-id="@item.IdServicio"
+                                   class="btn-ico del" title="Eliminar servicio">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>
@@ -64,18 +421,14 @@
 @section Scripts {
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
     <script>
         $(document).ready(function () {
             $('#tablaServicios').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-                },
-                "pageLength": 10,
-                "responsive": true,
-                "columnDefs": [
-                    { "orderable": false, "targets": [0, 4] }
-                ]
+                language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
+                pageLength: 10,
+                responsive: true,
+                dom: '<"dt-top"fl>t<"dt-bottom"ip>',
+                columnDefs: [{ orderable: false, targets: [0, 4] }]
             });
         });
     </script>

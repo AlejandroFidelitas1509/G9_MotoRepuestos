@@ -50,6 +50,13 @@
         flex-wrap: wrap;
     }
 
+    .ct-toolbar-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
     .ct-btn-main {
         display: inline-flex;
         align-items: center;
@@ -63,11 +70,35 @@
         font-weight: 700;
         border: none;
         transition: background .15s ease, transform .15s ease;
+        cursor: pointer;
     }
 
         .ct-btn-main:hover {
             background: #a61e1e;
             color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .ct-btn-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border-radius: 10px;
+        background: #f8fafd;
+        color: #4a5568;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        border: 1px solid #dde3ee;
+        transition: all .15s ease;
+        cursor: pointer;
+    }
+
+        .ct-btn-soft:hover {
+            background: #fff;
+            color: #1a202c;
+            border-color: #b8c4d8;
             transform: translateY(-1px);
         }
 
@@ -321,6 +352,26 @@
             box-shadow: 0 0 0 3px rgba(201,42,42,.08);
         }
 
+    .ct-textarea {
+        width: 100%;
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 10px;
+        color: #1a202c;
+        font-size: 14px;
+        padding: 11px 12px;
+        transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+        .ct-textarea:focus {
+            background: #fff;
+            outline: none;
+            border-color: rgba(201,42,42,.4);
+            box-shadow: 0 0 0 3px rgba(201,42,42,.08);
+        }
+
     .ct-modal-note {
         font-size: 14px;
         color: #6b7280;
@@ -351,6 +402,7 @@
         text-decoration: none;
         font-size: 14px;
         font-weight: 700;
+        cursor: pointer;
     }
 
         .ct-btn-secondary:hover {
@@ -371,6 +423,7 @@
         text-decoration: none;
         font-size: 14px;
         font-weight: 700;
+        cursor: pointer;
     }
 
         .ct-btn-save:hover {
@@ -392,12 +445,19 @@
         text-decoration: none;
         font-size: 14px;
         font-weight: 700;
+        cursor: pointer;
     }
 
         .ct-btn-delete-confirm:hover {
             background: #fee2e2;
             color: #7f1d1d;
         }
+
+    .ct-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
 
     .dataTables_wrapper .row:first-child {
         display: flex !important;
@@ -515,13 +575,23 @@
             align-items: stretch;
         }
 
-        .ct-btn-main {
+        .ct-toolbar-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .ct-btn-main,
+        .ct-btn-soft {
             justify-content: center;
             width: 100%;
         }
 
         .ct-actions {
             flex-direction: row;
+        }
+
+        .ct-grid-2 {
+            grid-template-columns: 1fr;
         }
 
         .dataTables_wrapper .row:first-child {
@@ -561,10 +631,22 @@
                 <div class="ct-sub">Consulta, edita o elimina las citas registradas en el sistema.</div>
             </div>
 
-            <button type="button" class="ct-btn-main" data-bs-toggle="modal" data-bs-target="#modalNuevaCita">
-                <i class="fas fa-plus"></i>
-                Nueva cita
-            </button>
+            <div class="ct-toolbar-actions">
+                <a asp-controller="BloqueosCalendario" asp-action="Index" class="ct-btn-soft">
+                    <i class="fas fa-calendar-alt"></i>
+                    Fechas bloqueadas
+                </a>
+
+                <button type="button" class="ct-btn-soft" data-bs-toggle="modal" data-bs-target="#modalBloquearFechas">
+                    <i class="fas fa-calendar-times"></i>
+                    Bloquear fechas
+                </button>
+
+                <button type="button" class="ct-btn-main" data-bs-toggle="modal" data-bs-target="#modalNuevaCita">
+                    <i class="fas fa-plus"></i>
+                    Nueva cita
+                </button>
+            </div>
         </div>
     </div>
 
@@ -708,6 +790,55 @@
                     <button type="submit" class="ct-btn-save">
                         <i class="fas fa-save"></i>
                         Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade ct-modal" id="modalBloquearFechas" tabindex="-1" aria-labelledby="modalBloquearFechasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="ct-modal-title" id="modalBloquearFechasLabel">
+                    <i class="fas fa-calendar-times" style="color:#86efac;"></i>
+                    Realizar bloqueo de fechas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <form asp-controller="Citas" asp-action="BloquearFecha" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+                    <div class="ct-modal-note">
+                        Selecciona el rango de fechas que deseas bloquear para impedir nuevas citas en ese periodo.
+                    </div>
+
+                    <div class="ct-grid-2" style="margin-bottom:15px;">
+                        <div class="ct-field">
+                            <label class="ct-label" for="FechaInicioBloqueo">Fecha inicio</label>
+                            <input name="FechaInicio" id="FechaInicioBloqueo" type="date" class="ct-input" required />
+                        </div>
+
+                        <div class="ct-field">
+                            <label class="ct-label" for="FechaFinBloqueo">Fecha fin</label>
+                            <input name="FechaFin" id="FechaFinBloqueo" type="date" class="ct-input" required />
+                        </div>
+                    </div>
+
+                    <div class="ct-field">
+                        <label class="ct-label" for="MotivoBloqueo">Motivo</label>
+                        <textarea name="Motivo" id="MotivoBloqueo" class="ct-textarea" placeholder="Ej: feriado, mantenimiento, capacitación, no disponibilidad..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="ct-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="ct-btn-save">
+                        <i class="fas fa-ban"></i>
+                        Guardar bloqueo
                     </button>
                 </div>
             </form>

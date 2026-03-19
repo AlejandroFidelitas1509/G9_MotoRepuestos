@@ -3,149 +3,554 @@
 
 @{
     ViewData["Title"] = "Bloqueos de Citas";
+    var items = Model?.ToList() ?? new List<BloqueosCalendarioDto>();
+    var total = items.Count;
+    var activos = items.Count(x => x.Activo);
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Bloqueos de Citas</h2>
+<style>
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
 
-    <button class="btn btn-danger"
-            data-bs-toggle="modal"
-            data-bs-target="#modalNuevoBloqueo">
-        + Nuevo bloqueo
+    .stat-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .stat-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .stat-val {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .table-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .table-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .blq-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .blq-table thead th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #8a94a6;
+            font-weight: 600;
+            padding: 11px 18px;
+            border-bottom: 1px solid #edf0f7;
+            background: #f8fafd;
+            white-space: nowrap;
+        }
+
+        .blq-table tbody td {
+            padding: 14px 18px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f3f9;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .blq-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .blq-table tbody tr:hover td {
+            background: #f4f7fc;
+        }
+
+    .badge-activo {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-inactivo {
+        background: #f4f7fc;
+        color: #4a5568;
+        border: 1px solid #dde3ee;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
+    }
+
+    .btn-ico {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border-radius: 8px;
+        border: 1px solid #dde3ee;
+        background: #f8fafd;
+        color: #4a5568;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .btn-ico:hover {
+            background: #fff;
+            border-color: #b8c4d8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,.08);
+        }
+
+        .btn-ico.edit:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .btn-ico.del:hover {
+            background: #fff1f1;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+    /* Modal */
+    .modal-content {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #dde3ee;
+    }
+
+    .modal-header {
+        background: #1a202c;
+        color: #fff;
+        border: none;
+        padding: 16px 22px;
+    }
+
+    .modal-body {
+        padding: 22px;
+    }
+
+    .modal-footer {
+        padding: 14px 22px;
+        border-top: 1px solid #edf0f7;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .f-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .f-input, .f-select {
+        width: 100%;
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 9px;
+        color: #1a202c;
+        font-size: 14px;
+        padding: 9px 12px;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+        .f-input:focus, .f-select:focus {
+            outline: none;
+            background: #fff;
+            border-color: rgba(201,42,42,.4);
+            box-shadow: 0 0 0 3px rgba(201,42,42,.08);
+        }
+
+    .field-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .empty-state {
+        padding: 3.5rem 1rem;
+        text-align: center;
+        color: #8a94a6;
+    }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: .6rem;
+            opacity: .35;
+        }
+</style>
+
+@* ── Encabezado ──────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-calendar-times me-2" style="color:#c92a2a"></i> Bloqueos de Citas
+        </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Administra los períodos bloqueados para la agenda de citas
+        </div>
+    </div>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#modalNuevoBloqueo"
+            style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+            onmouseover="this.style.background='#a61e1e'"
+            onmouseout="this.style.background='#c92a2a'">
+        <i class="fas fa-plus"></i> Nuevo bloqueo
     </button>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
-            <th>Motivo</th>
-            <th>Activo</th>
-            <th>Editar</th>
-            <th>Eliminar</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.IdBloqueo</td>
-                <td>@item.FechaInicio</td>
-                <td>@item.FechaFin</td>
-                <td>@item.Motivo</td>
-                <td>
-                    @(item.Activo ? "Sí" : "No")
-                </td>
-
-                <td>
-                    <a asp-action="Edit"
-                       asp-route-id="@item.IdBloqueo"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-                </td>
-
-                <td>
-                    <a asp-action="Delete"
-                       asp-route-id="@item.IdBloqueo"
-                       class="btn btn-danger btn-sm">
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-
-<!-- MODAL NUEVO BLOQUEO -->
-
-<div class="modal fade"
-     id="modalNuevoBloqueo"
-     tabindex="-1"
-     aria-labelledby="modalNuevoBloqueoLabel"
-     aria-hidden="true">
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="modalNuevoBloqueoLabel">
-                    Nuevo Bloqueo de Citas
-                </h5>
-
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
-                </button>
-            </div>
-
-
-            <form asp-action="Create" method="post">
-
-                <div class="modal-body">
-
-                    <div class="mb-3">
-                        <label class="form-label">Fecha Inicio</label>
-
-                        <input name="FechaInicio"
-                               type="datetime-local"
-                               class="form-control"
-                               required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Fecha Fin</label>
-
-                        <input name="FechaFin"
-                               type="datetime-local"
-                               class="form-control"
-                               required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Motivo</label>
-
-                        <input name="Motivo"
-                               class="form-control"
-                               placeholder="Ej: Día feriado, mantenimiento..." />
-                    </div>
-
-                    <div class="form-check">
-                        <input name="Activo"
-                               type="checkbox"
-                               class="form-check-input"
-                               checked />
-
-                        <label class="form-check-label">
-                            Bloqueo activo
-                        </label>
-                    </div>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-
-                    <button type="submit"
-                            class="btn btn-danger">
-                        Guardar
-                    </button>
-
-                </div>
-
-            </form>
-
+@* ── Stats ────────────────────────────────────────────────────────── *@
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f1">
+            <i class="fas fa-calendar-times" style="color:#c92a2a"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total bloqueos</div>
+            <div class="stat-val" style="color:#c92a2a">@total</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">
+            <i class="fas fa-lock" style="color:#166534"></i>
+        </div>
+        <div>
+            <div class="stat-label">Activos</div>
+            <div class="stat-val" style="color:#2f9e44">@activos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f4f7fc">
+            <i class="fas fa-lock-open" style="color:#4a5568"></i>
+        </div>
+        <div>
+            <div class="stat-label">Inactivos</div>
+            <div class="stat-val" style="color:#4a5568">@(total - activos)</div>
         </div>
     </div>
 </div>
+
+@* ── Tabla ────────────────────────────────────────────────────────── *@
+<div class="table-card">
+    <div class="table-card-header">
+        <span style="font-size:14px;font-weight:700;color:#1a202c">
+            <i class="fas fa-list me-2" style="color:#8a94a6"></i> Lista de bloqueos
+        </span>
+        <span style="font-size:13px;color:#8a94a6">@total bloqueo@(total != 1 ? "s" : "")</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="blq-table">
+            <thead>
+                <tr>
+                    <th style="width:60px">ID</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Motivo</th>
+                    <th class="text-center" style="width:100px">Estado</th>
+                    <th class="text-center" style="width:90px">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!items.Any())
+                {
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-check"></i>
+                                <div style="font-size:15px;font-weight:700;color:#1a202c;margin-bottom:4px">Sin bloqueos registrados</div>
+                                <div style="font-size:13px">Crea un bloqueo para restringir la agenda</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in items)
+                    {
+                        @* Formatear fechas para datetime-local (yyyy-MM-ddTHH:mm) *@
+                        var inicioStr = item.FechaInicio is DateTime fi ? fi.ToString("yyyy-MM-ddTHH:mm") : "";
+                        var finStr = item.FechaFin is DateTime ff ? ff.ToString("yyyy-MM-ddTHH:mm") : "";
+
+                        <tr>
+                            <td style="color:#8a94a6;font-weight:600;font-size:13px">#@item.IdBloqueo</td>
+                            <td style="font-size:15px;white-space:nowrap">
+                                <i class="fas fa-calendar me-1" style="color:#8a94a6;font-size:11px"></i>
+                                @item.FechaInicio
+                            </td>
+                            <td style="font-size:15px;white-space:nowrap">
+                                <i class="fas fa-calendar me-1" style="color:#8a94a6;font-size:11px"></i>
+                                @item.FechaFin
+                            </td>
+                            <td style="color:#1a202c;font-weight:500;font-size:15px">
+                                @(string.IsNullOrWhiteSpace(item.Motivo?.ToString()) ? "—" : item.Motivo)
+                            </td>
+                            <td class="text-center">
+                                @if (item.Activo)
+                                {
+                                    <span class="badge-activo"><i class="fas fa-lock me-1" style="font-size:9px"></i>Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactivo"><i class="fas fa-lock-open me-1" style="font-size:9px"></i>Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div style="display:inline-flex;gap:6px">
+                                    <button type="button" class="btn-ico edit" title="Editar bloqueo"
+                                            data-bs-toggle="modal" data-bs-target="#modalEditarBloqueo"
+                                            data-id="@item.IdBloqueo"
+                                            data-inicio="@inicioStr"
+                                            data-fin="@finStr"
+                                            data-motivo="@item.Motivo"
+                                            data-activo="@item.Activo.ToString().ToLower()">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="btn-ico del" title="Eliminar bloqueo"
+                                            data-bs-toggle="modal" data-bs-target="#modalEliminarBloqueo"
+                                            data-id="@item.IdBloqueo"
+                                            data-motivo="@item.Motivo">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* ══ MODAL: Nuevo Bloqueo ════════════════════════════════════════════ *@
+<div class="modal fade" id="modalNuevoBloqueo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:520px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" style="font-weight:700;color:#fff">
+                    <i class="fas fa-plus me-2" style="color:#86efac"></i> Nuevo Bloqueo
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+                    <div class="field-row-2">
+                        <div>
+                            <span class="f-label">Fecha inicio *</span>
+                            <input name="FechaInicio" type="datetime-local" class="f-input" required />
+                        </div>
+                        <div>
+                            <span class="f-label">Fecha fin *</span>
+                            <input name="FechaFin" type="datetime-local" class="f-input" required />
+                        </div>
+                    </div>
+                    <div>
+                        <span class="f-label">Motivo</span>
+                        <input name="Motivo" type="text" class="f-input"
+                               placeholder="Ej: Día feriado, mantenimiento..." />
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f8fafd;border-radius:10px;border:1px solid #edf0f7">
+                        <input type="hidden" name="Activo" value="false" />
+                        <input name="Activo" type="checkbox" id="activoNuevo" value="true" checked
+                               style="width:18px;height:18px;accent-color:#2f9e44;cursor:pointer" />
+                        <label for="activoNuevo" style="font-size:14px;color:#1a202c;font-weight:500;cursor:pointer;margin:0">
+                            Bloqueo activo
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;cursor:pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ══ MODAL: Editar Bloqueo ═══════════════════════════════════════════ *@
+<div class="modal fade" id="modalEditarBloqueo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:520px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" style="font-weight:700;color:#fff">
+                    <i class="fas fa-pen me-2" style="color:#93c5fd"></i> Editar Bloqueo
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="IdBloqueo" id="editId" />
+                <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+                    <div class="field-row-2">
+                        <div>
+                            <span class="f-label">Fecha inicio *</span>
+                            <input name="FechaInicio" id="editInicio" type="datetime-local" class="f-input" required />
+                        </div>
+                        <div>
+                            <span class="f-label">Fecha fin *</span>
+                            <input name="FechaFin" id="editFin" type="datetime-local" class="f-input" required />
+                        </div>
+                    </div>
+                    <div>
+                        <span class="f-label">Motivo</span>
+                        <input name="Motivo" id="editMotivo" type="text" class="f-input"
+                               placeholder="Ej: Día feriado, mantenimiento..." />
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f8fafd;border-radius:10px;border:1px solid #edf0f7">
+                        <input type="hidden" id="editActivoHidden" name="Activo" value="false" />
+                        <input type="checkbox" id="editActivo"
+                               style="width:18px;height:18px;accent-color:#2f9e44;cursor:pointer" />
+                        <label for="editActivo" style="font-size:14px;color:#1a202c;font-weight:500;cursor:pointer;margin:0">
+                            Bloqueo activo
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;cursor:pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+                        <i class="fas fa-save"></i> Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ══ MODAL: Confirmar Eliminar ═══════════════════════════════════════ *@
+<div class="modal fade" id="modalEliminarBloqueo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" style="font-weight:700;color:#fff">
+                    <i class="fas fa-trash me-2" style="color:#fca5a5"></i> Confirmar eliminación
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:14px;color:#4a5568;margin-bottom:14px">
+                    ¿Estás seguro de que deseas eliminar este bloqueo? Esta acción no se puede deshacer.
+                </p>
+                <div style="background:#f8fafd;border:1px solid #edf0f7;border-radius:10px;padding:12px 14px">
+                    <div style="font-size:11px;color:#8a94a6;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Motivo del bloqueo</div>
+                    <div id="eliminarMotivo" style="font-size:14px;font-weight:600;color:#1a202c">—</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-bs-dismiss="modal"
+                        style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;cursor:pointer">
+                    Cancelar
+                </button>
+                <form id="formEliminar" asp-action="Delete" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="eliminarIdInput" />
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ── Rellenar modal Editar ────────────────────────────────────
+        const editActivo       = document.getElementById('editActivo');
+        const editActivoHidden = document.getElementById('editActivoHidden');
+
+        // Sincronizar hidden con checkbox al cambiar
+        editActivo.addEventListener('change', function () {
+            editActivoHidden.value = this.checked ? 'true' : 'false';
+        });
+
+        document.getElementById('modalEditarBloqueo')
+            .addEventListener('show.bs.modal', function (e) {
+                const btn    = e.relatedTarget;
+                const activo = btn.dataset.activo === 'true';
+
+                document.getElementById('editId').value     = btn.dataset.id;
+                document.getElementById('editInicio').value = btn.dataset.inicio;
+                document.getElementById('editFin').value    = btn.dataset.fin;
+                document.getElementById('editMotivo').value = btn.dataset.motivo;
+
+                editActivo.checked       = activo;
+                editActivoHidden.value   = activo ? 'true' : 'false';
+            });
+
+        // ── Rellenar modal Eliminar ──────────────────────────────────
+        document.getElementById('modalEliminarBloqueo')
+            .addEventListener('show.bs.modal', function (e) {
+                const btn = e.relatedTarget;
+                document.getElementById('eliminarMotivo').textContent  = btn.dataset.motivo || '—';
+                document.getElementById('eliminarIdInput').value       = btn.dataset.id;
+            });
+    </script>
+}

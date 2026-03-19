@@ -439,13 +439,9 @@
                    asp-controller="Home" asp-action="PanelControl">
                     <i class="fas fa-th-large"></i> Panel de control
                 </a>
-                <a class="s-link @(controladorActual == "Ventas" ? "active" : "")"
-                   asp-controller="Ventas" asp-action="Index">
-                    <i class="fas fa-shopping-bag"></i> Ventas
-                </a>
-                <a class="s-link @(controladorActual == "Clientes" ? "active" : "")"
-                   asp-controller="Clientes" asp-action="Index">
-                    <i class="fas fa-users"></i> Clientes
+                <a class="s-link @(controladorActual == "PuntoVenta" ? "active" : "")"
+                   asp-controller="PuntoVenta" asp-action="Index">
+                    <i class="fas fa-shopping-cart"></i> Caja
                 </a>
                 <a class="s-link @(controladorActual == "Inventario" ? "active" : "")"
                    asp-controller="Inventario" asp-action="Index">
@@ -453,7 +449,11 @@
                 </a>
                 <a class="s-link @(controladorActual == "Citas" ? "active" : "")"
                    asp-controller="Citas" asp-action="Index">
-                    <i class="fas fa-calendar-check"></i> Gestión de citas
+                    <i class="fas fa-calendar-check"></i> Citas taller
+                </a>
+                <a class="s-link @(controladorActual == "Servicios" ? "active" : "")"
+                   asp-controller="Servicios" asp-action="GestionServicios">
+                    <i class="fas fa-motorcycle"></i> Servicios
                 </a>
                 <a class="s-link @(controladorActual == "Contabilidad" ? "active" : "")"
                    asp-controller="Contabilidad" asp-action="Index">
@@ -471,7 +471,7 @@
                 {
                     <div class="nav-section-lbl">Sistema</div>
                     <a class="s-link @(controladorActual == "Usuarios" ? "active" : "")"
-                       asp-controller="Usuarios" asp-action="Index">
+                       asp-controller="Usuarios" asp-action="GestionUsuarios">
                         <i class="fas fa-user-cog"></i> Usuarios
                     </a>
                     <a class="s-link @(controladorActual == "Configuracion" ? "active" : "")"
