@@ -32,6 +32,28 @@ namespace G9MotoRepuestos.Controllers
             return View(new PuntoVentaVm { Carrito = cart });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> BuscarItems(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
+                return Json(new List<object>());
+
+            var items = await _ventas.BuscarSugerenciasAsync(term.Trim());
+
+            var data = items.Select(x => new
+            {
+                id = x.Id,
+                codigo = x.Codigo,
+                nombre = x.Nombre,
+                precio = x.Precio,
+                stock = x.Stock,
+                imagenUrl = x.ImagenUrl,
+                tipo = x.Tipo
+            });
+
+            return Json(data);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(string query)
@@ -45,7 +67,7 @@ namespace G9MotoRepuestos.Controllers
             var found = await _ventas.BuscarProductoAsync(query);
             if (found == null)
             {
-                TempData["Error"] = "Producto no encontrado.";
+                TempData["Error"] = "Producto o servicio no encontrado.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -67,7 +89,7 @@ namespace G9MotoRepuestos.Controllers
                 cart.Add(found);
 
             SaveCart(cart);
-            TempData["Ok"] = "Producto agregado correctamente.";
+            TempData["Ok"] = $"{found.Tipo} agregado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -80,7 +102,7 @@ namespace G9MotoRepuestos.Controllers
 
             if (item == null)
             {
-                TempData["Error"] = "El producto no existe en el carrito.";
+                TempData["Error"] = "El elemento no existe en el carrito.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -98,7 +120,6 @@ namespace G9MotoRepuestos.Controllers
             }
 
             item.Cantidad = qty;
-
             SaveCart(cart);
 
             TempData["Ok"] = "Cantidad actualizada.";
@@ -116,7 +137,7 @@ namespace G9MotoRepuestos.Controllers
             {
                 cart.Remove(item);
                 SaveCart(cart);
-                TempData["Ok"] = "Producto eliminado del carrito.";
+                TempData["Ok"] = "Elemento eliminado del carrito.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -145,7 +166,7 @@ namespace G9MotoRepuestos.Controllers
 
             if (!vm.Carrito.Any())
             {
-                TempData["Error"] = "No hay productos para procesar.";
+                TempData["Error"] = "No hay productos o servicios para procesar.";
                 return RedirectToAction(nameof(Index));
             }
 
