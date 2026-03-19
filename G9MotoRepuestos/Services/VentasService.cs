@@ -8,6 +8,7 @@ namespace G9MotoRepuestos.Services
     public interface IVentasService
     {
         Task<CartItemVm?> BuscarProductoAsync(string query);
+        Task<List<CartItemVm>> BuscarSugerenciasAsync(string term);
         Task<(bool ok, string? error)> ValidarStockAsync(int idProducto, int cantidad);
 
         Task<int> CrearVentaAsync(
@@ -22,6 +23,7 @@ namespace G9MotoRepuestos.Services
         Task<FacturaVm?> ObtenerFacturaAsync(int idVenta);
         Task<Dictionary<DateTime, decimal>> TotalesDiariosAsync(DateTime desde, DateTime hasta);
     }
+
 
     public class VentasService : IVentasService
     {
@@ -59,10 +61,76 @@ ORDER BY p.IdProducto DESC;";
             item.Cantidad = 1;
             return item;
         }
+        public async Task<List<CartItemVm>> BuscarSugerenciasAsync(string term)
+        {
+            await using var conn = new SqlConnection(_cn);
+            await conn.OpenAsync();
+
+            const string sql = @"
+SELECT TOP 8
+    *
+FROM
+(
+    SELECT
+        p.IdProducto                  AS Id,
+        p.CodigoBarras                AS Codigo,
+        p.Nombre                      AS Nombre,
+        p.PrecioVenta                 AS Precio,
+        ISNULL(i.StockActual, 0)      AS Stock,
+        p.ImageURL                    AS ImagenUrl,
+        CAST('Producto' AS varchar(20)) AS Tipo,
+        CASE
+            WHEN p.CodigoBarras LIKE @like + '%' THEN 1
+            WHEN p.Nombre LIKE @like + '%' THEN 2
+            WHEN p.Nombre LIKE '%' + @term + '%' THEN 3
+            ELSE 99
+        END AS Orden
+    FROM dbo.Productos p
+    LEFT JOIN dbo.Inventario i ON i.IdProducto = p.IdProducto
+    WHERE ISNULL(p.Estado, 0) = 1
+      AND (
+            p.CodigoBarras LIKE '%' + @term + '%' OR
+            p.Nombre LIKE '%' + @term + '%'
+          )
+
+    UNION ALL
+
+    SELECT
+        (s.IdServicio * -1)           AS Id,
+        CONCAT('SRV-', s.IdServicio)  AS Codigo,
+        s.Nombre                      AS Nombre,
+        s.Precio                      AS Precio,
+        0                             AS Stock,
+        s.ImagenUrl                   AS ImagenUrl,
+        CAST('Servicio' AS varchar(20)) AS Tipo,
+        CASE
+            WHEN s.Nombre LIKE @like + '%' THEN 1
+            WHEN s.Nombre LIKE '%' + @term + '%' THEN 2
+            ELSE 99
+        END AS Orden
+    FROM dbo.Servicios s
+    WHERE ISNULL(s.Estado, 0) = 1
+      AND s.Nombre LIKE '%' + @term + '%'
+) q
+ORDER BY Orden, Nombre;";
+
+            var rows = await conn.QueryAsync<CartItemVm>(sql, new
+            {
+                term = (term ?? "").Trim(),
+                like = (term ?? "").Trim()
+            });
+
+            return rows.ToList();
+        }
+
 
         // Validar stock real
         public async Task<(bool ok, string? error)> ValidarStockAsync(int idProducto, int cantidad)
         {
+            // Servicios: no manejan inventario
+            if (idProducto < 0)
+                return (true, null);
+
             await using var conn = new SqlConnection(_cn);
             await conn.OpenAsync();
 
@@ -82,15 +150,16 @@ WHERE IdProducto = @id;";
             return (true, null);
         }
 
+
         // Crear venta + detalle + rebajar inventario
         public async Task<int> CrearVentaAsync(
-            int? idUsuario,
-            string formaPago,
-            decimal subtotal,
-            decimal impuesto,
-            decimal descuento,
-            decimal total,
-            IEnumerable<CartItemVm> items)
+         int? idUsuario,
+         string formaPago,
+         decimal subtotal,
+         decimal impuesto,
+         decimal descuento,
+         decimal total,
+         IEnumerable<CartItemVm> items)
         {
             await using var conn = new SqlConnection(_cn);
             await conn.OpenAsync();
@@ -98,7 +167,6 @@ WHERE IdProducto = @id;";
 
             try
             {
-                // 1) Insertar encabezado de venta
                 var idVenta = await conn.ExecuteScalarAsync<int>(@"
 INSERT INTO dbo.Ventas (Fecha, IdUsuario, MetodoPago, SubTotal, IVA, Total)
 VALUES (GETDATE(), @IdUsuario, @MetodoPago, @SubTotal, @IVA, @Total);
@@ -112,20 +180,24 @@ SELECT CAST(SCOPE_IDENTITY() AS int);",
                         Total = total
                     }, tx);
 
-                // 2) Insertar detalle y rebajar inventario usando la CANTIDAD REAL
                 foreach (var it in items)
                 {
-                    var stock = await conn.ExecuteScalarAsync<int?>(@"
+                    var esServicio = it.Id < 0 || it.EsServicio;
+
+                    if (!esServicio)
+                    {
+                        var stock = await conn.ExecuteScalarAsync<int?>(@"
 SELECT ISNULL(StockActual, 0)
 FROM dbo.Inventario WITH (UPDLOCK, ROWLOCK)
 WHERE IdProducto = @IdProducto;",
-                        new { IdProducto = it.Id }, tx) ?? 0;
+                            new { IdProducto = it.Id }, tx) ?? 0;
 
-                    if (stock <= 0)
-                        throw new InvalidOperationException("Producto no disponible en inventario");
+                        if (stock <= 0)
+                            throw new InvalidOperationException("Producto no disponible en inventario");
 
-                    if (it.Cantidad > stock)
-                        throw new InvalidOperationException($"Stock insuficiente. Máximo disponible: {stock}");
+                        if (it.Cantidad > stock)
+                            throw new InvalidOperationException($"Stock insuficiente. Máximo disponible: {stock}");
+                    }
 
                     await conn.ExecuteAsync(@"
 INSERT INTO dbo.VentaDetalle
@@ -135,28 +207,30 @@ VALUES
                         new
                         {
                             IdVenta = idVenta,
-                            IdProducto = it.Id,
+                            IdProducto = esServicio ? (int?)null : it.Id,
                             NombreProducto = it.Nombre,
-                            Cantidad = it.Cantidad, // ✅ usa la cantidad real
+                            Cantidad = it.Cantidad,
                             PrecioUnitario = it.Precio,
                             SubTotalLinea = it.Precio * it.Cantidad
                         }, tx);
 
-                    var rows = await conn.ExecuteAsync(@"
+                    if (!esServicio)
+                    {
+                        var rows = await conn.ExecuteAsync(@"
 UPDATE dbo.Inventario
 SET StockActual = StockActual - @Cant
 WHERE IdProducto = @IdProducto;",
-                        new
-                        {
-                            Cant = it.Cantidad, // ✅ rebaja la cantidad real
-                            IdProducto = it.Id
-                        }, tx);
+                            new
+                            {
+                                Cant = it.Cantidad,
+                                IdProducto = it.Id
+                            }, tx);
 
-                    if (rows == 0)
-                        throw new InvalidOperationException("No existe registro de inventario para este producto.");
+                        if (rows == 0)
+                            throw new InvalidOperationException("No existe registro de inventario para este producto.");
+                    }
                 }
 
-                // 3) Registrar en finanzas si existe la tabla
                 await conn.ExecuteAsync(@"
 IF OBJECT_ID('dbo.Finanzas', 'U') IS NOT NULL
 BEGIN
@@ -174,6 +248,7 @@ END",
                 throw;
             }
         }
+
 
         // Obtener factura
         public async Task<FacturaVm?> ObtenerFacturaAsync(int idVenta)
@@ -198,7 +273,10 @@ WHERE v.IdVenta = @id;", new { id = idVenta });
 
             var detalle = (await conn.QueryAsync<FacturaLineaVm>(@"
 SELECT
-    p.CodigoBarras AS Codigo,
+    CASE
+        WHEN d.IdProducto IS NULL THEN 'SERVICIO'
+        ELSE p.CodigoBarras
+    END AS Codigo,
     d.NombreProducto,
     d.Cantidad,
     d.PrecioUnitario,
@@ -206,6 +284,7 @@ SELECT
 FROM dbo.VentaDetalle d
 LEFT JOIN dbo.Productos p ON p.IdProducto = d.IdProducto
 WHERE d.IdVenta = @id;", new { id = idVenta })).ToList();
+
 
             header.Detalle = detalle;
             return header;

@@ -83,7 +83,7 @@
         border: 1px solid #dde3ee;
         border-radius: 14px;
         box-shadow: 0 1px 4px rgba(0,0,0,.05);
-        overflow: hidden;
+        overflow: visible;
     }
 
     .pv-card-header {
@@ -121,8 +121,10 @@
         gap: 0;
         border: 1px solid #dde3ee;
         border-radius: 12px;
-        overflow: hidden;
+        overflow: visible;
         background: #f8fafd;
+        position: relative;
+        z-index: 100;
     }
 
     .pv-search-left {
@@ -166,6 +168,96 @@
         .pv-search-btn:hover {
             background: #111827;
         }
+
+    .pv-suggest-box {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 110px;
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+        z-index: 9999;
+        max-height: 380px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .pv-suggest-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-bottom: 1px solid #eef2f7;
+        cursor: pointer;
+        transition: background .15s ease;
+    }
+
+        .pv-suggest-item:last-child {
+            border-bottom: none;
+        }
+
+        .pv-suggest-item:hover,
+        .pv-suggest-item.active {
+            background: #f8fbff;
+        }
+
+    .pv-suggest-thumb {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f1f3f5;
+        border: 1px solid #e9ecef;
+        flex-shrink: 0;
+    }
+
+    .pv-suggest-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .pv-suggest-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a202c;
+        line-height: 1.2;
+    }
+
+    .pv-suggest-meta {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+    .pv-suggest-price {
+        font-weight: 800;
+        color: #c92a2a;
+        white-space: nowrap;
+        margin-left: 8px;
+    }
+
+    .pv-badge-tipo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        margin-left: 8px;
+    }
+
+    .pv-badge-producto {
+        background: #e7f5ff;
+        color: #1971c2;
+    }
+
+    .pv-badge-servicio {
+        background: #f3f0ff;
+        color: #7048e8;
+    }
 
     .pv-table-wrap {
         overflow: hidden;
@@ -234,6 +326,22 @@
         font-size: 12px;
         color: #8a94a6;
         margin-top: 2px;
+    }
+
+    .pv-item-flex {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .pv-item-thumb {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f1f3f5;
+        border: 1px solid #e9ecef;
+        flex-shrink: 0;
     }
 
     .pv-qty-form {
@@ -486,6 +594,10 @@
         .pv-table tbody td {
             padding: 12px 10px;
         }
+
+        .pv-suggest-box {
+            right: 0;
+        }
     }
 </style>
 
@@ -547,11 +659,11 @@
                                 <i class="fas fa-barcode" style="color:#c92a2a"></i>
                                 Buscar y agregar productos
                             </div>
-                            <div class="pv-card-sub">Escanea el código o busca por nombre del producto</div>
+                            <div class="pv-card-sub">Escanea el código o busca por nombre del producto o servicio</div>
                         </div>
                     </div>
                     <div class="pv-card-body">
-                        <form asp-controller="PuntoVenta" asp-action="AddItem" method="post" class="pv-search-form">
+                        <form asp-controller="PuntoVenta" asp-action="AddItem" method="post" class="pv-search-form" id="formBusquedaPv">
                             @Html.AntiForgeryToken()
                             <div class="pv-search-left">
                                 <i class="fas fa-barcode"></i>
@@ -559,10 +671,12 @@
                                        name="query"
                                        id="CodigoBarras"
                                        class="pv-search-input"
-                                       placeholder="Escanear código de barras o escribir nombre..."
+                                       placeholder="Escanear código, producto o servicio..."
                                        autocomplete="off">
                             </div>
                             <button class="pv-search-btn" type="submit">Añadir</button>
+
+                            <div id="pvSuggestBox" class="pv-suggest-box"></div>
                         </form>
                     </div>
                 </div>
@@ -599,7 +713,7 @@
                                         <td colspan="6" class="pv-empty">
                                             <i class="fas fa-shopping-basket"></i>
                                             <div style="font-size:15px;font-weight:700;color:#1a202c;margin-bottom:4px">No hay productos en el carrito</div>
-                                            <div style="font-size:13px">Busca un repuesto para iniciar la venta</div>
+                                            <div style="font-size:13px">Busca un repuesto o servicio para iniciar la venta</div>
                                         </td>
                                     </tr>
                                 }
@@ -610,15 +724,34 @@
                                         <tr>
                                             <td class="pv-code">@item.Codigo</td>
                                             <td>
-                                                <div class="pv-name">@item.Nombre</div>
-                                                @if (item.Stock > 0)
-                                                {
-                                                    <div class="pv-meta">Stock: @item.Stock</div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="pv-meta">Servicio</div>
-                                                }
+                                                <div class="pv-item-flex">
+                                                    <img class="pv-item-thumb"
+                                                         src="@(string.IsNullOrWhiteSpace(item.ImagenUrl) ? "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='100%25' height='100%25' fill='%23f1f3f5'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='%23868e96'>IMG</text></svg>" : item.ImagenUrl)"
+                                                         alt="@item.Nombre" />
+
+                                                    <div>
+                                                        <div class="pv-name">
+                                                            @item.Nombre
+                                                            @if (item.EsServicio)
+                                                            {
+                                                                <span class="pv-badge-tipo pv-badge-servicio">Servicio</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="pv-badge-tipo pv-badge-producto">Producto</span>
+                                                            }
+                                                        </div>
+
+                                                        @if (item.EsServicio)
+                                                        {
+                                                            <div class="pv-meta">Servicio disponible</div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="pv-meta">Stock: @item.Stock</div>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="text-center" style="width:170px">
                                                 <form asp-controller="PuntoVenta"
@@ -821,11 +954,11 @@ else
         document.addEventListener("DOMContentLoaded", () => {
             cambiarMetodoPago();
 
-            const input = document.getElementById("montoRecibido");
-            if (input) {
-                input.addEventListener("input", () => {
+            const inputMonto = document.getElementById("montoRecibido");
+            if (inputMonto) {
+                inputMonto.addEventListener("input", () => {
                     const total = totalActual();
-                    const recibido = parseInt(input.value || "0") || 0;
+                    const recibido = parseInt(inputMonto.value || "0") || 0;
                     const vuelto = Math.max(0, recibido - total);
                     document.getElementById("vueltoMonto").innerText = "₡ " + vuelto.toLocaleString("es-CR");
                 });
@@ -844,6 +977,143 @@ else
                     e.preventDefault();
                     const disabled = document.getElementById("btnFinalizar")?.hasAttribute("disabled");
                     if (!disabled) postFinalizar();
+                }
+            });
+
+            const input = document.getElementById("CodigoBarras");
+            const form = document.getElementById("formBusquedaPv");
+            const box = document.getElementById("pvSuggestBox");
+
+            const placeholderImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='100%25' height='100%25' fill='%23f1f3f5'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='%23868e96'>IMG</text></svg>";
+
+            let currentIndex = -1;
+            let debounceTimer = null;
+
+            function escapeHtml(value) {
+                if (!value) return "";
+                return value
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+            function hideSuggestions() {
+                if (!box) return;
+                box.style.display = "none";
+                box.innerHTML = "";
+                currentIndex = -1;
+            }
+
+            function renderSuggestions(items) {
+                if (!box) return;
+
+                if (!items || items.length === 0) {
+                    hideSuggestions();
+                    return;
+                }
+
+                currentIndex = -1;
+
+                box.innerHTML = items.map((item, index) => {
+                    const img = item.imagenUrl && item.imagenUrl.trim() !== ""
+                        ? item.imagenUrl
+                        : placeholderImg;
+
+                    const badgeClass = item.tipo === "Servicio"
+                        ? "pv-badge-servicio"
+                        : "pv-badge-producto";
+
+                    const stockOrTipo = item.tipo === "Servicio"
+                        ? "Servicio"
+                        : `Stock: ${item.stock ?? 0}`;
+
+                    return `
+                        <div class="pv-suggest-item" data-index="${index}" data-codigo="${escapeHtml(item.codigo || item.nombre || '')}">
+                            <img class="pv-suggest-thumb" src="${img}" alt="${escapeHtml(item.nombre || '')}">
+                            <div class="pv-suggest-info">
+                                <div class="pv-suggest-title">
+                                    ${escapeHtml(item.nombre || 'Sin nombre')}
+                                    <span class="pv-badge-tipo ${badgeClass}">${escapeHtml(item.tipo || '')}</span>
+                                </div>
+                                <div class="pv-suggest-meta">
+                                    ${escapeHtml(item.codigo || '')} · ${stockOrTipo}
+                                </div>
+                            </div>
+                            <div class="pv-suggest-price">₡ ${Number(item.precio || 0).toLocaleString('es-CR')}</div>
+                        </div>
+                    `;
+                }).join("");
+
+                box.style.display = "block";
+
+                box.querySelectorAll(".pv-suggest-item").forEach(item => {
+                    item.addEventListener("click", () => {
+                        input.value = item.dataset.codigo;
+                        hideSuggestions();
+                        form.submit();
+                    });
+                });
+            }
+
+            async function fetchSuggestions(term) {
+                if (!term || term.trim().length < 2) {
+                    hideSuggestions();
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/PuntoVenta/BuscarItems?term=${encodeURIComponent(term)}`);
+                    if (!response.ok) {
+                        hideSuggestions();
+                        return;
+                    }
+
+                    const data = await response.json();
+                    renderSuggestions(data);
+                } catch {
+                    hideSuggestions();
+                }
+            }
+
+            input?.addEventListener("input", () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    fetchSuggestions(input.value);
+                }, 180);
+            });
+
+            input?.addEventListener("keydown", (e) => {
+                const rows = [...box.querySelectorAll(".pv-suggest-item")];
+                if (!rows.length) return;
+
+                if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    currentIndex = (currentIndex + 1) % rows.length;
+                }
+                else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    currentIndex = (currentIndex - 1 + rows.length) % rows.length;
+                }
+                else if (e.key === "Enter" && currentIndex >= 0) {
+                    e.preventDefault();
+                    rows[currentIndex].click();
+                    return;
+                }
+                else if (e.key === "Escape") {
+                    hideSuggestions();
+                    return;
+                }
+
+                rows.forEach((row, idx) => {
+                    row.classList.toggle("active", idx === currentIndex);
+                });
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!form?.contains(e.target)) {
+                    hideSuggestions();
                 }
             });
         });

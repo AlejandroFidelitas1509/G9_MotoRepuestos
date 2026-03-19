@@ -9,6 +9,14 @@
         public int Cantidad { get; set; }
         public int Stock { get; set; }
 
+        public string? ImagenUrl { get; set; }
+
+        // "Producto" o "Servicio"
+        public string Tipo { get; set; } = "Producto";
+
+        public bool EsServicio =>
+            Tipo.Equals("Servicio", StringComparison.OrdinalIgnoreCase);
+
         public decimal TotalLinea => Precio * Cantidad;
     }
 }
