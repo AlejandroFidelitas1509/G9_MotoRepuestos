@@ -2,178 +2,579 @@
     ViewData["Title"] = "Inicio";
 }
 
-<link rel="stylesheet" href="~/css/Index.css" asp-append-version="true" />
+<style>
+    /* ── Solo estilos específicos de esta vista ───────────────────── */
 
-<div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-    </div>
+    .home-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
 
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <div class="d-flex align-items-center w-100" style="height: 60vh; min-height: 450px; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/banner1.jpg') center/cover;">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 text-center text-md-start">
-                            <h1 class="display-4 fw-bold text-uppercase text-white">Pasión por las dos ruedas</h1>
-                            <p class="lead text-white d-none d-md-block">Encuentra los mejores repuestos y accesorios.</p>
-                            <a href="#" class="btn btn-lg rounded-0 mt-3 text-white fw-bold shadow-sm" style="background-color: var(--primary-red); border: none;">VER CATÁLOGO</a>
-                        </div>
-                        <div class="col-md-6 d-none d-md-block text-center">
-                            <img src="/images/repuestos-promo.png" alt="Repuestos" class="img-fluid" style="max-height: 350px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));">
+    /* ── Hero Carousel ────────────────────────────────────────────── */
+    .hero-shell {
+        width: 100%;
+        position: relative;
+    }
+
+    .hero-slide {
+        min-height: 600px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-bg-1 {
+        background-image: linear-gradient(110deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 60%, rgba(201,42,42,.18) 100%), url('/images/banner1.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .hero-bg-2 {
+        background-image: linear-gradient(110deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 60%, rgba(201,42,42,.18) 100%), url('/images/banner2.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .hero-bg-3 {
+        background-image: linear-gradient(110deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 60%, rgba(201,42,42,.18) 100%), url('/images/banner3.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .hero-content {
+        max-width: 620px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(201,42,42,.2);
+        border: 1px solid rgba(201,42,42,.4);
+        color: #fca5a5;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 99px;
+        margin-bottom: 20px;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .hero-title {
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.05;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        letter-spacing: -.01em;
+    }
+
+        .hero-title span {
+            color: #c92a2a;
+        }
+
+    .hero-text {
+        font-size: 18px;
+        color: rgba(255,255,255,.8);
+        line-height: 1.6;
+        margin-bottom: 28px;
+        max-width: 500px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 10px;
+        background: #c92a2a;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        transition: background .15s, transform .15s;
+    }
+
+        .btn-hero-main:hover {
+            background: #a61e1e;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+    .btn-hero-alt {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 10px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background .15s;
+        backdrop-filter: blur(6px);
+    }
+
+        .btn-hero-alt:hover {
+            background: rgba(255,255,255,.14);
+            color: #fff;
+        }
+
+    .hero-img {
+        max-height: 420px;
+        filter: drop-shadow(0 24px 32px rgba(0,0,0,.5));
+        animation: floatHero 3s ease-in-out infinite;
+    }
+
+    /* Indicadores carousel */
+    .carousel-indicators [data-bs-target] {
+        width: 28px;
+        height: 4px;
+        border-radius: 99px;
+        background: rgba(255,255,255,.4);
+        border: none;
+        transition: all .3s;
+    }
+
+    .carousel-indicators .active {
+        background: #c92a2a;
+        width: 48px;
+    }
+
+    /* ── ¿Por qué elegirnos? ──────────────────────────────────────── */
+    .section-why {
+        padding: 80px 0;
+        background: #f8fafd;
+    }
+
+    .section-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: #c92a2a;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-label::before {
+            content: '';
+            width: 28px;
+            height: 3px;
+            background: #c92a2a;
+            border-radius: 99px;
+        }
+
+    .section-title {
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        font-weight: 900;
+        color: #1a202c;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        line-height: 1.1;
+    }
+
+    .section-sub {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 48px;
+        max-width: 500px;
+    }
+
+    .why-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .why-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 18px;
+        padding: 28px 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+        transition: transform .2s, box-shadow .2s, border-color .2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .why-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #c92a2a;
+            transform: scaleX(0);
+            transition: transform .25s;
+            transform-origin: left;
+        }
+
+        .why-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(0,0,0,.08);
+            border-color: #fecaca;
+        }
+
+            .why-card:hover::after {
+                transform: scaleX(1);
+            }
+
+    .why-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff1f1;
+        color: #c92a2a;
+        font-size: 22px;
+        margin-bottom: 18px;
+        transition: background .2s, color .2s;
+    }
+
+    .why-card:hover .why-icon {
+        background: #c92a2a;
+        color: #fff;
+    }
+
+    .why-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1a202c;
+        margin-bottom: 8px;
+    }
+
+    .why-text {
+        font-size: 15px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* ── Banner CTA ───────────────────────────────────────────────── */
+    .cta-banner {
+        background-image: linear-gradient(135deg, #1a202c 0%, #c92a2a 60%, #7f1d1d 100%);
+        padding: 60px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+    .cta-title {
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        font-weight: 900;
+        color: #fff;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        line-height: 1.1;
+    }
+
+    .cta-text {
+        font-size: 16px;
+        color: rgba(255,255,255,.75);
+        margin-bottom: 0;
+    }
+
+    .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 15px 32px;
+        border-radius: 10px;
+        background: #fff;
+        color: #c92a2a;
+        font-size: 15px;
+        font-weight: 800;
+        text-decoration: none;
+        transition: transform .15s, box-shadow .15s;
+        white-space: nowrap;
+    }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.2);
+            color: #a61e1e;
+        }
+
+    .btn-cta-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 15px 32px;
+        border-radius: 10px;
+        background: transparent;
+        border: 2px solid rgba(255,255,255,.4);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: border-color .15s, background .15s;
+        white-space: nowrap;
+    }
+
+        .btn-cta-outline:hover {
+            border-color: #fff;
+            background: rgba(255,255,255,.08);
+            color: #fff;
+        }
+
+    /* ── Brands label ─────────────────────────────────────────────── */
+    .brands-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: #8a94a6;
+        text-transform: uppercase;
+        letter-spacing: .14em;
+        text-align: center;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+    }
+
+        .brands-label::before, .brands-label::after {
+            content: '';
+            flex: 1;
+            max-width: 120px;
+            height: 1px;
+            background: #dde3ee;
+        }
+
+    /* ── Responsive ───────────────────────────────────────────────── */
+    @@media (max-width: 991px) {
+        .why-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hero-slide {
+            min-height: 520px;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .why-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-slide {
+            min-height: 480px;
+        }
+
+        .hero-text {
+            font-size: 16px;
+        }
+
+        .section-why {
+            padding: 56px 0;
+        }
+    }
+
+    @@keyframes floatHero {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+</style>
+
+<div class="home-wrap">
+
+    @* ══ HERO CAROUSEL ══════════════════════════════════════════════ *@
+    <div id="heroCarousel" class="carousel slide hero-shell" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+
+        <div class="carousel-inner">
+
+            <div class="carousel-item active">
+                <div class="hero-slide hero-bg-1">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-6">
+                                <div class="hero-content">
+                                    <div class="hero-badge"><i class="fas fa-motorcycle"></i> Repuestos y accesorios</div>
+                                    <h1 class="hero-title">Pasión por las <span>dos ruedas</span></h1>
+                                    <p class="hero-text">Encuentra repuestos, accesorios y atención especializada para mantener tu moto en excelente estado.</p>
+                                    <div class="hero-actions">
+                                        <a href="#" class="btn-hero-main"><i class="fas fa-box-open"></i> Ver catálogo</a>
+                                        <a href="#" class="btn-hero-alt"><i class="fas fa-tools"></i> Ver servicios</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                                <img src="/images/repuestos-promo.png" alt="Repuestos" class="hero-img img-fluid">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="carousel-item">
-            <div class="d-flex align-items-center w-100" style="height: 60vh; min-height: 450px; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/banner2.jpg') center/cover;">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 text-center text-md-start">
-                            <h1 class="display-4 fw-bold text-uppercase text-white">Taller Mecánico</h1>
-                            <p class="lead text-white d-none d-md-block">Mantenimiento General y Preventivo con expertos.</p>
-                            <a href="#" class="btn btn-lg rounded-0 mt-3 text-white fw-bold shadow-sm" style="background-color: var(--primary-red); border: none;">AGENDAR CITA</a>
-                        </div>
-                        <div class="col-md-6 d-none d-md-block text-center">
-                            <img src="/images/herramientas-taller.png" alt="Taller" class="img-fluid" style="max-height: 350px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="carousel-item">
-            <div class="d-flex align-items-center w-100" style="height: 60vh; min-height: 450px; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/banner3.jpg') center/cover;">
-                <div class="container">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 text-center text-md-start fade-in">
-                            <h1 class="display-4 fw-bold text-uppercase text-white">Nuevos Cascos FTS</h1>
-                            <p class="lead text-white">Protección y estilo aerodinámico.</p>
-                            <a href="#" class="btn btn-lg text-white fw-bold" style="background-color: var(--rojo-rojas); border-radius:0;">VER COLECCIÓN</a>
-                        </div>
-                        <div class="col-md-6 d-none d-md-flex justify-content-center align-items-center">
-                            <img src="/images/casco-fts.png" class="img-producto-carousel" alt="Casco FTS">
+            <div class="carousel-item">
+                <div class="hero-slide hero-bg-2">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-6">
+                                <div class="hero-content">
+                                    <div class="hero-badge"><i class="fas fa-wrench"></i> Taller mecánico</div>
+                                    <h1 class="hero-title">Mantenimiento <span>confiable</span></h1>
+                                    <p class="hero-text">Revisiones, diagnóstico y servicio técnico con atención clara y trabajo profesional.</p>
+                                    <div class="hero-actions">
+                                        <a href="#" class="btn-hero-main"><i class="fas fa-calendar-check"></i> Agendar cita</a>
+                                        <a href="#" class="btn-hero-alt"><i class="fas fa-circle-info"></i> Conocer más</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                                <img src="/images/herramientas-taller.png" alt="Taller" class="hero-img img-fluid">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Anterior</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Siguiente</span>
-    </button>
-</div>
-
-
-
-
-
-
-<div class="container mt-5 mb-5">
-    <div class="d-flex align-items-center mb-4">
-        <div style="width: 5px; height: 35px; background-color: var(--primary-red); margin-right: 15px;"></div>
-        <h2 class="m-0 text-uppercase">Novedades</h2>
-    </div>
-    <div class="row">
-        <div class="col-6 col-md-4 col-lg-3 mb-4">
-            <div class="card h-100 product-card border-0 shadow-sm position-relative">
-                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2" style="background-color: var(--primary-red); z-index: 1;">NUEVO</span>
-                <div class="p-3 text-center">
-                    <img src="/images/casco_ejemplo.jpg" class="img-fluid" alt="Casco" style="height: 180px; object-fit: contain;">
+            <div class="carousel-item">
+                <div class="hero-slide hero-bg-3">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-6">
+                                <div class="hero-content">
+                                    <div class="hero-badge"><i class="fas fa-helmet-safety"></i> Seguridad y estilo</div>
+                                    <h1 class="hero-title">Nuevos cascos <span>FTS</span></h1>
+                                    <p class="hero-text">Protección, comodidad y diseño aerodinámico para cada trayecto.</p>
+                                    <div class="hero-actions">
+                                        <a href="#" class="btn-hero-main"><i class="fas fa-eye"></i> Ver colección</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                                <img src="/images/casco-fts.png" alt="Casco FTS" class="hero-img img-fluid">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <small class="text-muted text-uppercase">Cascos</small>
-                    <h6 class="card-title fw-bold">Casco LS2 Rapid Dead</h6>
-                    <p class="h5 fw-bold mt-auto" style="color: var(--primary-red);">₡68,000</p>
-                    <a href="#" class="btn btn-outline-dark btn-sm mt-2 rounded-0">VER MÁS</a>
+            </div>
+
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
+
+    @* ══ ¿POR QUÉ ELEGIRNOS? ════════════════════════════════════════ *@
+    <section class="section-why">
+        <div class="container">
+            <div class="section-label">Ventajas</div>
+            <h2 class="section-title">¿Por qué elegirnos?</h2>
+            <p class="section-sub">Todo lo que necesitas para tu moto en un solo lugar.</p>
+
+            <div class="why-grid">
+                <div class="why-card">
+                    <div class="why-icon"><i class="fas fa-shield-halved"></i></div>
+                    <div class="why-title">Calidad garantizada</div>
+                    <p class="why-text">Trabajamos con productos y marcas confiables para darte seguridad en cada compra.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+                    <div class="why-title">Servicio técnico</div>
+                    <p class="why-text">Atención mecánica para mantenimiento, diagnóstico y reparación de tu moto.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-icon"><i class="fas fa-tags"></i></div>
+                    <div class="why-title">Buenos precios</div>
+                    <p class="why-text">Opciones competitivas en repuestos, accesorios y consumibles para cada necesidad.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-icon"><i class="fab fa-whatsapp"></i></div>
+                    <div class="why-title">Atención rápida</div>
+                    <p class="why-text">Contáctanos por WhatsApp y recibe apoyo directo para consultas o cotizaciones.</p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="container mt-5 mb-5">
-    <div class="d-flex align-items-center mb-4">
-        <div style="width: 5px; height: 35px; background-color: var(--primary-red); margin-right: 15px;"></div>
-        <h2 class="m-0 text-uppercase">Productos Destacados</h2>
-    </div>
-    <div class="row">
-        <div class="col-6 col-md-4 col-lg-3 mb-4">
-            <div class="card h-100 product-card border-0 shadow-sm position-relative">
-                <span class="badge position-absolute top-0 start-0 m-2 px-3 py-2" style="background-color: var(--primary-red); z-index: 1;">NUEVO</span>
-                <div class="p-3 text-center">
-                    <img src="/images/casco_ejemplo.jpg" class="img-fluid" alt="Casco" style="height: 180px; object-fit: contain;">
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <small class="text-muted text-uppercase">Cascos</small>
-                    <h6 class="card-title fw-bold">Casco LS2 Rapid Dead</h6>
-                    <p class="h5 fw-bold mt-auto" style="color: var(--primary-red);">₡68,000</p>
-                    <a href="#" class="btn btn-outline-dark btn-sm mt-2 rounded-0">VER MÁS</a>
-                </div>
+    @* ══ SLIDER DE MARCAS ════════════════════════════════════════════ *@
+    <section class="brands-section">
+        <div class="container">
+            <div class="brands-label">Marcas que manejamos</div>
+        </div>
+        <div class="slider-container" style="padding:0 20px">
+            <div class="slider-track">
+                <div class="slide"><img src="/images/marcas/LogoFox.png" alt="Fox"></div>
+                <div class="slide"><img src="/images/marcas/LogoVini.png" alt="Vini"></div>
+                <div class="slide"><img src="/images/marcas/LogoFreedom.png" alt="Freedom"></div>
+                <div class="slide"><img src="/images/marcas/LogoKenda.png" alt="Kenda"></div>
+                <div class="slide"><img src="/images/marcas/LogoProTaper.png" alt="ProTaper"></div>
+                <div class="slide"><img src="/images/marcas/LogoRaloy.png" alt="Raloy"></div>
+                <div class="slide"><img src="/images/marcas/LogoRepsol.png" alt="Repsol"></div>
+                <div class="slide"><img src="/images/marcas/LogoTimsun.png" alt="Timsun"></div>
+                <div class="slide"><img src="/images/marcas/LogoFox.png" alt="Fox"></div>
+                <div class="slide"><img src="/images/marcas/LogoVini.png" alt="Vini"></div>
+                <div class="slide"><img src="/images/marcas/LogoFreedom.png" alt="Freedom"></div>
+                <div class="slide"><img src="/images/marcas/LogoKenda.png" alt="Kenda"></div>
+                <div class="slide"><img src="/images/marcas/LogoProTaper.png" alt="ProTaper"></div>
+                <div class="slide"><img src="/images/marcas/LogoRaloy.png" alt="Raloy"></div>
+                <div class="slide"><img src="/images/marcas/LogoRepsol.png" alt="Repsol"></div>
+                <div class="slide"><img src="/images/marcas/LogoTimsun.png" alt="Timsun"></div>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<section class="appointment-section py-5 text-white" style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('/images/taller-bg.jpg') center/cover fixed;">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="display-5 fw-bold mb-3" style="color: var(--primary-red);">¿TU MOTO NECESITA MANTENIMIENTO?</h2>
-                <p class="lead">Agenda tu cita técnica en nuestro taller. Tranparencia y Seguridad garantizada.</p>
-                <ul class="list-unstyled mt-4">
-                    <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--primary-red);"></i> Mantenimiento General</li>
-                    <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--primary-red);"></i> Cambio de Aceite y Filtros</li>
-                    <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--primary-red);"></i> Cambio de Frenos y Fibras</li>
-                    <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--primary-red);"></i> Revisión Eléctrica</li>
-                    <li class="mb-2"><i class="fas fa-check-circle me-2" style="color: var(--primary-red);"></i> Entre muchos otros....</li>
-
-                </ul>
-            </div>
-            <div class="col-lg-5 offset-lg-1">
-                <div class="card border-0 rounded-0 p-4 shadow-lg" style="background-color: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1) !important;">
-                    <h4 class="text-center mb-4 text-white">AGENDAR ESPACIO</h4>
-                    <form>
-                        <div class="mb-3"><input type="text" class="form-control bg-transparent text-white rounded-0" placeholder="Nombre completo"></div>
-                        <div class="mb-3"><input type="tel" class="form-control bg-transparent text-white rounded-0" placeholder="WhatsApp"></div>
-                        <button type="submit" class="btn btn-lg w-100 rounded-0 fw-bold" style="background-color: var(--primary-red); color: white;">ENVIAR SOLICITUD</button>
-                    </form>
+    @* ══ BANNER CTA ══════════════════════════════════════════════════ *@
+    <section class="cta-banner">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <h2 class="cta-title">¿Tu moto necesita mantenimiento?</h2>
+                    <p class="cta-text">Agenda tu cita técnica y recibe atención profesional en nuestro taller.</p>
+                </div>
+                <div class="col-lg-5 d-flex gap-3 flex-wrap justify-content-lg-end">
+                    <a href="#" class="btn-cta"><i class="fas fa-calendar-check"></i> Agendar cita</a>
+                    <a href="#" class="btn-cta-outline"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<div class="brands-section bg-white py-5 border-top border-bottom mt-5">
-    <div class="container text-center mb-4">
-        <h6 class="text-uppercase text-muted fw-bold" style="letter-spacing: 3px;">MARCAS QUE MANEJAMOS</h6>
-    </div>
-    <div class="slider-container">
-        <div class="slider-track">
-            <div class="slide"><img src="/images/marcas/LogoFox.png" alt="Fox"></div>
-            <div class="slide"><img src="/images/marcas/LogoVini.png" alt="Vini"></div>
-            <div class="slide"><img src="/images/marcas/LogoFreedom.png" alt="Freedom"></div>
-            <div class="slide"><img src="/images/marcas/LogoKenda.png" alt="Kenda"></div>
-            <div class="slide"><img src="/images/marcas/LogoProTaper.png" alt="ProTaper"></div>
-            <div class="slide"><img src="/images/marcas/LogoRaloy.png" alt="Raloy"></div>
-            <div class="slide"><img src="/images/marcas/LogoRepsol.png" alt="Repsol"></div>
-            <div class="slide"><img src="/images/marcas/LogoTimsun.png" alt="Timsun"></div>
-            <div class="slide"><img src="/images/marcas/LogoFox.png" alt="Fox"></div>
-            <div class="slide"><img src="/images/marcas/LogoVini.png" alt="Vini"></div>
-        </div>
-    </div>
 </div>
-
-<a href="https://wa.me/50672432805" class="whatsapp-float shadow-lg" target="_blank">
-    <i class="fab fa-whatsapp"></i>
-</a>

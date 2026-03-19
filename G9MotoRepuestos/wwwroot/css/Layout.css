@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap');
 
 :root {
     --rojo-rojas: #B01E1E;
@@ -24,11 +24,17 @@ body {
     overflow-x: hidden;
 }
 
-main {
+/* ── CORRECCIÓN CLAVE: main sin padding para hero full width ─────── */
+/* Solo aplica al layout cliente — el admin usa .admin-content con su propio padding */
+main:not(.admin-content) {
     flex: 1 0 auto;
     width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-x: hidden;
 }
 
+/* ── Navbar ──────────────────────────────────────────────────────── */
 .bg-rojas {
     background-color: var(--primary-red) !important;
 }
@@ -38,44 +44,49 @@ main {
     text-transform: uppercase;
 }
 
-.nav-link:hover {
-    color: #ffca28 !important;
-    transform: scale(1.05);
-    text-shadow: 0 0 10px rgba(255, 202, 40, 0.5);
-}
+    .nav-link:hover {
+        color: #ffca28 !important;
+        transform: scale(1.05);
+        text-shadow: 0 0 10px rgba(255, 202, 40, 0.5);
+    }
 
+/* ── Offcanvas de categorías ─────────────────────────────────────── */
 #menuCategorias {
     background-color: #212121 !important;
     box-shadow: 5px 0 15px rgba(0,0,0,0.5);
 }
 
-#menuCategorias .list-group-item {
-    background-color: transparent !important;
-    color: white !important;
-    border-color: rgba(255,255,255,0.1) !important;
+    #menuCategorias .list-group-item {
+        background-color: transparent !important;
+        color: white !important;
+        border-color: rgba(255,255,255,0.1) !important;
+        transition: all 0.3s ease-in-out !important;
+        position: relative;
+    }
+
+        #menuCategorias .list-group-item:hover {
+            background-color: var(--primary-red) !important;
+            color: white !important;
+            padding-left: 2rem !important;
+            box-shadow: inset 6px 0 0px #ffca28, 0 0 15px rgba(176, 30, 30, 0.5) !important;
+            border-color: transparent !important;
+            z-index: 10;
+        }
+
+/* ── Tarjetas de producto ────────────────────────────────────────── */
+.product-card-hover,
+.product-card-client {
     transition: all 0.3s ease-in-out !important;
-    position: relative;
 }
 
-#menuCategorias .list-group-item:hover {
-    background-color: var(--primary-red) !important;
-    color: white !important;
-    padding-left: 2rem !important;
-    box-shadow: inset 6px 0 0px #ffca28, 0 0 15px rgba(176, 30, 30, 0.5) !important;
-    border-color: transparent !important;
-    z-index: 10;
-}
+    .product-card-hover:hover,
+    .product-card-client:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3) !important;
+        border: 1px solid var(--primary-red) !important;
+    }
 
-.product-card-hover, .product-card-client {
-    transition: all 0.3s ease-in-out !important;
-}
-
-.product-card-hover:hover, .product-card-client:hover {
-    transform: translateY(-10px) !important;
-    box-shadow: 0 15px 30px rgba(211, 47, 47, 0.3) !important; 
-    border: 1px solid var(--primary-red) !important;
-}
-
+/* ── Footer ──────────────────────────────────────────────────────── */
 footer {
     background-color: #212121 !important;
     border-top: 4px solid var(--primary-red) !important;
@@ -84,31 +95,53 @@ footer {
     margin-top: auto;
 }
 
+/* ── Iconos sociales ─────────────────────────────────────────────── */
 .social-icon-sm {
     transition: all 0.3s ease !important;
     display: inline-flex;
     text-decoration: none;
 }
 
-.social-icon-sm:hover {
-    transform: translateY(-5px) rotate(10deg) !important;
-    filter: drop-shadow(0 0 8px var(--primary-red)); 
-    color: white !important;
-}
+    .social-icon-sm:hover {
+        transform: translateY(-5px) rotate(10deg) !important;
+        filter: drop-shadow(0 0 8px var(--primary-red));
+        color: white !important;
+    }
 
+/* ── Botones ─────────────────────────────────────────────────────── */
 .btn-danger {
     transition: all 0.3s ease !important;
 }
 
-.btn-danger:hover {
-    box-shadow: 0 0 15px rgba(211, 47, 47, 0.6) !important;
-    filter: brightness(1.2) !important;
+    .btn-danger:hover {
+        box-shadow: 0 0 15px rgba(211, 47, 47, 0.6) !important;
+        filter: brightness(1.2) !important;
+    }
+
+/* ── WhatsApp y Chat flotantes ───────────────────────────────────── */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25d366;
+    color: #fff;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    z-index: 1000;
+    text-decoration: none;
+    transition: all 0.3s ease !important;
 }
 
-.whatsapp-float:hover {
-    transform: scale(1.2) !important;
-    box-shadow: 0 0 20px #25d366 !important;
-}
+    .whatsapp-float:hover {
+        transform: scale(1.2) !important;
+        box-shadow: 0 0 20px #25d366 !important;
+        color: #fff;
+    }
 
 .chat-float {
     position: fixed;
@@ -117,7 +150,7 @@ footer {
     bottom: 105px;
     right: 30px;
     background-color: var(--primary-red);
-    color: #FFF;
+    color: #fff;
     border-radius: 50px;
     display: flex;
     align-items: center;
