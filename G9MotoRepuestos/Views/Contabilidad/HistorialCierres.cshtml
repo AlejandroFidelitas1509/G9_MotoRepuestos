@@ -3,78 +3,374 @@
 
 @{
     ViewData["Title"] = "Historial de Cierres";
+
+    var cierres = Model?.ToList() ?? new List<CierreContableDto>();
+    var total = cierres.Count;
+    var positivos = cierres.Count(x => x.BalanceTotal >= 0);
+    var negativos = cierres.Count(x => x.BalanceTotal < 0);
 }
 
-<div class="container-fluid py-4">
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4">
+<style>
+    /* ── Stats ────────────────────────────────────────────────────── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
 
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-                <div>
-                    <h2 class="fw-bold text-danger mb-1">Historial de cierres</h2>
-                    <p class="text-muted mb-0">Consulta los cierres contables registrados en el sistema.</p>
-                </div>
+    .stat-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        transition: border-color .2s, box-shadow .2s;
+    }
 
-                <div>
-                    <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-outline-secondary rounded-3">
-                        Volver
-                    </a>
-                </div>
-            </div>
+        .stat-card:hover {
+            border-color: #b8c4d8;
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
 
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Fecha inicio</th>
-                            <th>Fecha fin</th>
-                            <th>Fecha registro</th>
-                            <th>Tipo</th>
-                            <th>Ingresos</th>
-                            <th>Egresos</th>
-                            <th>Balance</th>
-                            <th>Usuario</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.FechaFin.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>@item.Tipo</td>
-                                    <td class="text-success fw-bold">₡@item.TotalIngresos.ToString("N2")</td>
-                                    <td class="text-danger fw-bold">₡@item.TotalEgresos.ToString("N2")</td>
-                                    <td class="fw-bold @(item.BalanceTotal >= 0 ? "text-primary" : "text-danger")">
-                                        ₡@item.BalanceTotal.ToString("N2")
-                                    </td>
-                                    <td>@item.UsuarioNombre</td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    No hay cierres contables registrados.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+    .stat-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
 
+    .stat-val {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    /* ── Card de tabla ────────────────────────────────────────────── */
+    .table-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .table-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* ── Tabla ────────────────────────────────────────────────────── */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .custom-table thead th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #8a94a6;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 1px solid #edf0f7;
+            background: #f8fafd;
+            white-space: nowrap;
+        }
+
+        .custom-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f3f9;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tbody tr:hover td {
+            background: #f4f7fc;
+        }
+
+    .fecha-main {
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    .fecha-sub {
+        font-size: 12px;
+        color: #8a94a6;
+        margin-top: 2px;
+    }
+
+    .tipo-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        background: #f8fafd;
+        color: #4a5568;
+        border: 1px solid #dde3ee;
+    }
+
+    .money-ingreso {
+        font-weight: 700;
+        color: #166534;
+    }
+
+    .money-egreso {
+        font-weight: 700;
+        color: #991b1b;
+    }
+
+    .money-balance-positive {
+        font-weight: 800;
+        color: #1971c2;
+    }
+
+    .money-balance-negative {
+        font-weight: 800;
+        color: #c92a2a;
+    }
+
+    .user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .empty-state {
+        padding: 38px 20px;
+        text-align: center;
+        color: #8a94a6;
+    }
+
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        border-radius: 9px;
+        border: 1px solid #dde3ee;
+        background: #fff;
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all .15s;
+    }
+
+        .page-btn:hover {
+            background: #f8fafd;
+            border-color: #b8c4d8;
+            color: #1a202c;
+            text-decoration: none;
+        }
+
+    .alert-soft-success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+    }
+
+    @@media (max-width: 992px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@* ── Encabezado ──────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-book me-2" style="color:#c92a2a"></i> Historial de Cierres
         </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Consulta los cierres contables registrados en el sistema
+        </div>
+    </div>
+
+    <a asp-controller="Contabilidad"
+       asp-action="Index"
+       class="page-btn">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+</div>
+
+@* ── Stats ───────────────────────────────────────────────────────── *@
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f1">
+            <i class="fas fa-folder-open" style="color:#c92a2a"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total cierres</div>
+            <div class="stat-val" style="color:#c92a2a">@total</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff6ff">
+            <i class="fas fa-chart-line" style="color:#1971c2"></i>
+        </div>
+        <div>
+            <div class="stat-label">Balances positivos</div>
+            <div class="stat-val" style="color:#1971c2">@positivos</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff7ed">
+            <i class="fas fa-chart-line-down" style="color:#9a3412"></i>
+        </div>
+        <div>
+            <div class="stat-label">Balances negativos</div>
+            <div class="stat-val" style="color:#9a3412">@negativos</div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert-soft-success">
+        <i class="fas fa-circle-check me-2"></i>@TempData["Success"]
+    </div>
+}
+
+@* ── Tabla ───────────────────────────────────────────────────────── *@
+<div class="table-card">
+    <div class="table-card-header">
+        <span style="font-size:14px;font-weight:700;color:#1a202c">
+            <i class="fas fa-list me-2" style="color:#8a94a6"></i> Lista de cierres contables
+        </span>
+        <span style="font-size:13px;color:#8a94a6">@total registro@(total != 1 ? "s" : "")</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Periodo inicio</th>
+                    <th>Periodo fin</th>
+                    <th>Fecha registro</th>
+                    <th class="text-center">Tipo</th>
+                    <th>Ingresos</th>
+                    <th>Egresos</th>
+                    <th>Balance</th>
+                    <th>Usuario</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (cierres.Any())
+                {
+                    foreach (var item in cierres)
+                    {
+                        var usuario = string.IsNullOrWhiteSpace(item.UsuarioNombre) ? "Sistema" : item.UsuarioNombre;
+                        var iniciales = string.Concat(
+                        usuario.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Take(2)
+                        .Select(x => x[0].ToString().ToUpper())
+                        );
+
+                        <tr>
+                            <td>
+                                <div class="fecha-main">@item.FechaInicio.ToString("dd/MM/yyyy")</div>
+                                <div class="fecha-sub">Inicio del cierre</div>
+                            </td>
+
+                            <td>
+                                <div class="fecha-main">@item.FechaFin.ToString("dd/MM/yyyy")</div>
+                                <div class="fecha-sub">Fin del periodo</div>
+                            </td>
+
+                            <td>
+                                <div class="fecha-main">@item.FechaRegistro.ToString("dd/MM/yyyy")</div>
+                                <div class="fecha-sub">@item.FechaRegistro.ToString("HH:mm")</div>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="tipo-badge">@item.Tipo</span>
+                            </td>
+
+                            <td>
+                                <span class="money-ingreso">₡@item.TotalIngresos.ToString("N2")</span>
+                            </td>
+
+                            <td>
+                                <span class="money-egreso">₡@item.TotalEgresos.ToString("N2")</span>
+                            </td>
+
+                            <td>
+                                <span class="@(item.BalanceTotal >= 0 ? "money-balance-positive" : "money-balance-negative")">
+                                    ₡@item.BalanceTotal.ToString("N2")
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="user-chip">
+                                    <div class="user-avatar">@iniciales</div>
+                                    <div style="font-weight:600;color:#1a202c">@usuario</div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox mb-2" style="font-size:28px;color:#cbd5e1"></i>
+                                <div style="font-weight:700;color:#4a5568">No hay cierres contables registrados</div>
+                                <div style="font-size:13px;margin-top:4px">Cuando registres cierres, aparecerán aquí.</div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>

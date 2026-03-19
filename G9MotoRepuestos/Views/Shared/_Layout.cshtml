@@ -519,54 +519,337 @@
     @* ══ LAYOUT CLIENTE (original intacto) ══════════════════════════ *@
     else
     {
+        <style>
+            /* ── Navbar mejorada ──────────────────────────────────────── */
+            .navbar-cliente {
+                background: #c92a2a !important;
+                padding: 0 !important;
+                min-height: 64px;
+                box-shadow: 0 2px 12px rgba(0,0,0,.2);
+                position: sticky;
+                top: 0;
+                z-index: 1030;
+            }
+
+                .navbar-cliente .container-fluid {
+                    padding: 0 20px;
+                    min-height: 64px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0;
+                }
+
+            /* Botón categorías */
+            .btn-categorias {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 14px;
+                border-radius: 8px;
+                background: rgba(0,0,0,.18);
+                border: 1px solid rgba(255,255,255,.15);
+                color: #fff;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: background .15s;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+                .btn-categorias:hover {
+                    background: rgba(0,0,0,.28);
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+            /* Logo */
+            .navbar-brand-custom {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+                padding: 0 14px;
+                flex-shrink: 0;
+            }
+
+                .navbar-brand-custom img {
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 8px;
+                    border: 2px solid rgba(255,255,255,.3);
+                    object-fit: cover;
+                }
+
+            .brand-text {
+                font-size: 14px;
+                font-weight: 900;
+                color: #fff;
+                letter-spacing: .02em;
+                text-transform: uppercase;
+                line-height: 1.1;
+            }
+
+            .brand-sub {
+                font-size: 10px;
+                color: rgba(255,255,255,.55);
+                font-weight: 400;
+                text-transform: none;
+            }
+
+            /* Separador vertical */
+            .nav-divider {
+                width: 1px;
+                height: 28px;
+                background: rgba(255,255,255,.18);
+                flex-shrink: 0;
+                margin: 0 4px;
+            }
+
+            /* Links */
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 0;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                flex-shrink: 0;
+            }
+
+            .nav-link-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                padding: 0 14px;
+                min-height: 64px;
+                color: rgba(255,255,255,.85);
+                font-size: 13px;
+                font-weight: 700;
+                text-decoration: none;
+                letter-spacing: .03em;
+                text-transform: uppercase;
+                position: relative;
+                transition: color .15s;
+                white-space: nowrap;
+            }
+
+                .nav-link-item::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 10px;
+                    right: 10px;
+                    height: 3px;
+                    background: #fff;
+                    border-radius: 3px 3px 0 0;
+                    transform: scaleX(0);
+                    transition: transform .2s;
+                }
+
+                .nav-link-item:hover {
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+                    .nav-link-item:hover::after {
+                        transform: scaleX(1);
+                    }
+
+                .nav-link-item.active-link {
+                    color: #fff;
+                }
+
+                    .nav-link-item.active-link::after {
+                        transform: scaleX(1);
+                    }
+
+            /* Buscador — ocupa el espacio restante en el centro */
+            .search-form {
+                flex: 1;
+                max-width: 380px;
+                margin: 0 16px;
+            }
+
+            .search-wrap {
+                display: flex;
+                align-items: center;
+                background: rgba(0,0,0,.18);
+                border: 1px solid rgba(255,255,255,.15);
+                border-radius: 8px;
+                overflow: hidden;
+                transition: background .15s, border-color .15s;
+            }
+
+                .search-wrap:focus-within {
+                    background: rgba(0,0,0,.28);
+                    border-color: rgba(255,255,255,.35);
+                }
+
+            .search-input {
+                flex: 1;
+                background: transparent !important;
+                border: none !important;
+                color: #fff !important;
+                font-size: 13px !important;
+                padding: 9px 12px !important;
+                box-shadow: none !important;
+                min-width: 0;
+            }
+
+                .search-input::placeholder {
+                    color: rgba(255,255,255,.55) !important;
+                }
+
+            .search-btn {
+                background: transparent;
+                border: none;
+                color: rgba(255,255,255,.7);
+                padding: 0 12px;
+                cursor: pointer;
+                font-size: 13px;
+                transition: color .15s;
+                flex-shrink: 0;
+            }
+
+                .search-btn:hover {
+                    color: #fff;
+                }
+
+            /* Auth */
+            .auth-area {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+                padding-left: 12px;
+                border-left: 1px solid rgba(255,255,255,.18);
+            }
+
+            /* Toggler móvil */
+            .navbar-toggler-custom {
+                background: rgba(0,0,0,.18);
+                border: 1px solid rgba(255,255,255,.2);
+                border-radius: 8px;
+                padding: 7px 11px;
+                cursor: pointer;
+                color: #fff;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            @@media (max-width: 991px) {
+                .nav-links, .search-form, .nav-divider {
+                    display: none !important;
+                }
+
+                .navbar-toggler-custom {
+                    display: flex;
+                }
+
+                .auth-area {
+                    border-left: none;
+                    margin-left: auto;
+                }
+            }
+        </style>
+
         <header>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-rojas shadow mb-0 py-2">
+            <nav class="navbar-cliente">
                 <div class="container-fluid">
-                    <button class="btn btn-outline-light me-3 border-2 fw-bold"
+
+                    @* Botón categorías *@
+                    <button class="btn-categorias"
                             type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCategorias">
-                        <i class="fas fa-bars"></i> <span class="d-none d-md-inline ms-1">Categorías</span>
+                        <i class="fas fa-bars"></i>
+                        <span class="d-none d-md-inline">Categorías</span>
                     </button>
 
-                    <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                        <img src="~/images/LogoLocal.jpeg" alt="Logo" width="45" height="45" class="rounded me-2 border border-white border-1">
-                        <span class="d-none d-sm-inline">MOTO REPUESTOS ROJAS</span>
+                    @* Logo *@
+                    <a class="navbar-brand-custom" asp-controller="Home" asp-action="Index">
+                        <img src="~/images/LogoLocal.jpeg" alt="Logo">
+                        <div class="d-none d-lg-block">
+                            <div class="brand-text">Moto Repuestos Rojas</div>
+                            <div class="brand-sub">Calidad y asesoría honesta</div>
+                        </div>
                     </a>
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-                        <span class="navbar-toggler-icon"></span>
+                    <div class="nav-divider d-none d-lg-block"></div>
+
+                    @* Links de navegación *@
+                    <ul class="nav-links">
+                        <li>
+                            <a class="nav-link-item" asp-controller="Home" asp-action="Servicios">
+                                <i class="fas fa-wrench" style="font-size:11px;opacity:.7"></i> Servicios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link-item" asp-controller="Home" asp-action="Catalogo">
+                                <i class="fas fa-box-open" style="font-size:11px;opacity:.7"></i> Catálogo
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link-item" asp-controller="Citas" asp-action="Index">
+                                <i class="fas fa-calendar-check" style="font-size:11px;opacity:.7"></i> Citas
+                            </a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li>
+                                <a class="nav-link-item" asp-controller="Citas" asp-action="MisCitas">
+                                    <i class="fas fa-clock" style="font-size:11px;opacity:.7"></i> Mis citas
+                                </a>
+                            </li>
+                        }
+                    </ul>
+
+                    @* Buscador — empuja hacia la derecha con flex:1 *@
+                    <form class="search-form" asp-controller="Home" asp-action="Catalogo" method="get">
+                        <div class="search-wrap">
+                            <input name="buscar" class="search-input" type="search"
+                                   placeholder="¿Qué repuesto buscas?">
+                            <button class="search-btn" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    @* Auth *@
+                    <div class="auth-area">
+                        <partial name="_LoginPartial" />
+                    </div>
+
+                    @* Toggler móvil *@
+                    <button class="navbar-toggler-custom ms-2"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#navMobile">
+                        <i class="fas fa-bars"></i>
                     </button>
 
-                    <div class="collapse navbar-collapse" id="navMain">
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Servicios">SERVICIOS</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Home" asp-action="Catalogo">CATÁLOGO</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="Index">CITAS</a>
-                            </li>
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-white fw-bold" asp-controller="Citas" asp-action="MisCitas">MIS CITAS</a>
-                                </li>
-                            }
-                        </ul>
+                </div>
 
-                        <form class="d-flex mx-auto my-2 my-lg-0" asp-controller="Home" asp-action="Catalogo" method="get" style="flex:1;max-width:450px">
-                            <div class="input-group">
-                                <input name="buscar" class="form-control border-0" type="search" placeholder="¿Qué repuesto buscas?">
-                                <button class="btn btn-white text-danger border-0 bg-white" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                @* Menú móvil *@
+                <div class="collapse" id="navMobile">
+                    <div style="background:rgba(0,0,0,.2);padding:10px 20px;display:flex;flex-direction:column;gap:0">
+                        <a asp-controller="Home" asp-action="Servicios"
+                           style="color:rgba(255,255,255,.9);text-decoration:none;padding:11px 0;font-size:13px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px">
+                            <i class="fas fa-wrench" style="opacity:.7;font-size:12px"></i> Servicios
+                        </a>
+                        <a asp-controller="Home" asp-action="Catalogo"
+                           style="color:rgba(255,255,255,.9);text-decoration:none;padding:11px 0;font-size:13px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px">
+                            <i class="fas fa-box-open" style="opacity:.7;font-size:12px"></i> Catálogo
+                        </a>
+                        <a asp-controller="Citas" asp-action="Index"
+                           style="color:rgba(255,255,255,.9);text-decoration:none;padding:11px 0;font-size:13px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px">
+                            <i class="fas fa-calendar-check" style="opacity:.7;font-size:12px"></i> Citas
+                        </a>
+                        <form asp-controller="Home" asp-action="Catalogo" method="get" style="padding:10px 0">
+                            <div class="search-wrap">
+                                <input name="buscar" class="search-input" type="search" placeholder="¿Qué repuesto buscas?">
+                                <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
                             </div>
                         </form>
-
-                        <div class="ms-auto">
-                            <partial name="_LoginPartial" />
-                        </div>
                     </div>
                 </div>
             </nav>

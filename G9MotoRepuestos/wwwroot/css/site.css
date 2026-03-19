@@ -1,4 +1,4 @@
-/* --- CONFIGURACI�N BASE --- */
+﻿/* ── Variables y fuente ──────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap');
 
 :root {
@@ -17,7 +17,7 @@ body {
     font-family: var(--font-main);
 }
 
-/* --- UTILIDADES Y ANIMACIONES --- */
+/* ── Animaciones generales ───────────────────────────────────────── */
 .fade-in {
     animation: fadeIn 0.8s ease-in-out;
 }
@@ -34,8 +34,9 @@ body {
     }
 }
 
-/* --- PANELES DE ADMINISTRACI�N (KPI CARDS) --- */
-.panel-modulo, .kpi-card {
+/* ── KPI Cards del panel admin ───────────────────────────────────── */
+.panel-modulo,
+.kpi-card {
     background: white;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     border-top: 5px solid var(--rojo-rojas) !important;
@@ -43,13 +44,14 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-    .panel-modulo:hover, .kpi-card:hover {
+    .panel-modulo:hover,
+    .kpi-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
         border-top-width: 8px !important;
     }
 
-/* --- CARRUSEL PRINCIPAL (HERO) --- */
+/* ── Carousel / Hero ─────────────────────────────────────────────── */
 .carousel-item {
     overflow: hidden;
 }
@@ -58,7 +60,6 @@ body {
     max-height: 480px;
     width: auto;
     object-fit: contain;
-    /* Sombra que sigue la forma del producto */
     filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
     animation: floating 3.5s ease-in-out infinite;
 }
@@ -77,17 +78,19 @@ body {
     }
 }
 
-/* --- TARJETAS DE PRODUCTO (TIENDA) --- */
+/* ── Tarjetas de producto (tienda cliente) ───────────────────────── */
 .product-card-hover {
     transition: transform 0.2s ease-in-out, box-shadow 0.2s;
     border-radius: 10px;
     background: white;
+    border-bottom: 3px solid transparent !important;
 }
 
     .product-card-hover:hover {
-        transform: translateY(-5px);
+        transform: translateY(-10px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
         border: 1px solid var(--rojo-rojas);
+        border-bottom: 3px solid var(--rojo-rojas) !important;
     }
 
     .product-card-hover img {
@@ -96,21 +99,36 @@ body {
         padding: 10px;
     }
 
-/* --- MARCAS SLIDER INFINITO --- */
+/* ── Slider de marcas ────────────────────────────────────────────── */
 .brands-section {
     background-color: #ffffff;
-    padding: 40px 0;
+    padding: 60px 0;
     overflow: hidden;
+    border-top: 1px solid #edf0f7;
+    border-bottom: 1px solid #edf0f7;
+}
+
+.slider-container {
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
 }
 
 .slider-track {
     display: flex;
+    gap: 48px;
+    align-items: center;
     width: max-content;
-    animation: scrollInfinite 25s linear infinite;
+    animation: scrollBrands 22s linear infinite;
 }
 
+    .slider-track:hover {
+        animation-play-state: paused;
+    }
+
     .slider-track .slide {
-        width: 220px;
+        width: 130px;
         flex-shrink: 0;
         display: flex;
         justify-content: center;
@@ -118,10 +136,12 @@ body {
     }
 
         .slider-track .slide img {
-            max-height: 50px;
+            max-height: 44px;
+            max-width: 110px;
+            object-fit: contain;
             filter: grayscale(100%);
             opacity: 0.5;
-            transition: 0.3s;
+            transition: opacity 0.3s, filter 0.3s;
         }
 
             .slider-track .slide img:hover {
@@ -129,17 +149,17 @@ body {
                 opacity: 1;
             }
 
-@keyframes scrollInfinite {
-    0% {
+@keyframes scrollBrands {
+    from {
         transform: translateX(0);
     }
 
-    100% {
+    to {
         transform: translateX(-50%);
     }
 }
 
-/* --- WHATSAPP --- */
+/* ── WhatsApp flotante ───────────────────────────────────────────── */
 .whatsapp-float {
     position: fixed;
     width: 60px;
@@ -147,26 +167,17 @@ body {
     bottom: 30px;
     right: 30px;
     background-color: #25d366;
-    color: #FFF;
+    color: #fff;
     border-radius: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
     z-index: 1000;
+    text-decoration: none;
 }
 
+/* ── Utilidades ──────────────────────────────────────────────────── */
 .bg-light-danger {
     background-color: #fff0f0;
 }
-
-/* Efecto para las tarjetas de servicios */
-.product-card-hover {
-    transition: all 0.3s ease;
-    border-bottom: 3px solid transparent !important;
-}
-
-    .product-card-hover:hover {
-        transform: translateY(-10px);
-        border-bottom: 3px solid var(--rojo-rojas) !important;
-    }

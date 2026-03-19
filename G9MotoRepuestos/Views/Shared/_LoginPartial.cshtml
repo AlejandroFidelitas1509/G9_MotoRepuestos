@@ -1,34 +1,45 @@
 ﻿@using System.Security.Claims
-<ul class="navbar-nav align-items-center">
+
+<div style="display:flex;align-items:center;gap:8px">
     @if (User?.Identity != null && User.Identity.IsAuthenticated)
     {
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-white fw-bold px-3"
-               href="javascript:void(0)"
-               id="userMenu"
-               data-bs-toggle="dropdown"
-               aria-expanded="false">
-                <i class="fas fa-user-circle me-1"></i> @User.Identity.Name
-            </a>
+        <div class="dropdown">
+            <button style="display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:8px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:13px;font-weight:700;cursor:pointer"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle"></i>
+                <span class="d-none d-md-inline">@User.Identity.Name</span>
+                <i class="fas fa-chevron-down" style="font-size:10px;opacity:.7"></i>
+            </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
-                <li><a class="dropdown-item py-2" asp-controller="Usuarios" asp-action="VerPerfil">Mi Perfil</a></li>
+                <li>
+                    <a class="dropdown-item py-2" asp-controller="Usuarios" asp-action="VerPerfil">
+                        <i class="fas fa-user me-2" style="color:#8a94a6;font-size:12px"></i> Mi Perfil
+                    </a>
+                </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item py-2 text-danger fw-bold" asp-controller="Usuarios" asp-action="Logout">Cerrar Sesión</a></li>
+                <li>
+                    <a class="dropdown-item py-2 text-danger fw-bold" asp-controller="Usuarios" asp-action="Logout">
+                        <i class="fas fa-sign-out-alt me-2" style="font-size:12px"></i> Cerrar Sesión
+                    </a>
+                </li>
             </ul>
-        </li>
+        </div>
     }
     else
     {
-        <li class="nav-item">
-            <a class="nav-link text-white fw-bold px-3" asp-controller="Usuarios" asp-action="Login">Iniciar Sesión</a>
-        </li>
-        <li class="nav-item">
-            @* Se eliminó el borde blanco usando border-0 y se aplicó tu variable de color *@
-            <a class="nav-link fw-bold bg-white rounded-pill px-4 ms-lg-2 shadow-sm border-0"
-               asp-controller="Usuarios" asp-action="Registro"
-               style="color: var(--rojo-rojas) !important; border: none !important;">
-                Registrarse
-            </a>
-        </li>
+        <a asp-controller="Usuarios" asp-action="Login"
+           style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .15s"
+           onmouseover="this.style.background='rgba(0,0,0,.18)'"
+           onmouseout="this.style.background='transparent'">
+            <i class="fas fa-sign-in-alt" style="font-size:12px;opacity:.8"></i>
+            Iniciar sesión
+        </a>
+
+        <a asp-controller="Usuarios" asp-action="Registro"
+           style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:#fff;border:none;color:#c92a2a;font-size:13px;font-weight:800;text-decoration:none;white-space:nowrap;transition:all .15s"
+           onmouseover="this.style.background='#f4f4f4';this.style.transform='translateY(-1px)'"
+           onmouseout="this.style.background='#fff';this.style.transform='translateY(0)'">
+            Registrarse
+        </a>
     }
-</ul>
+</div>

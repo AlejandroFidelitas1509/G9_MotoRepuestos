@@ -5,87 +5,391 @@
     ViewData["Title"] = "Registrar Movimiento";
 }
 
-<div class="container-fluid py-4">
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold text-danger mb-1">Registrar movimiento</h2>
-                    <p class="text-muted mb-0">Agrega un ingreso o egreso manual al módulo contable.</p>
-                </div>
+<style>
+    .cp-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+        align-items: start;
+    }
 
-                <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-outline-secondary rounded-3">
-                    Volver
-                </a>
-            </div>
+    .form-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        margin-bottom: 16px;
+    }
 
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                    @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+        .form-card:last-child {
+            margin-bottom: 0;
+        }
+
+    .form-card-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #edf0f7;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .hdr-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .form-card-body {
+        padding: 18px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .field label {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            color: #4a5568 !important;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .field input, .field select, .field textarea {
+            background: #f8fafd !important;
+            border: 1px solid #dde3ee !important;
+            border-radius: 9px !important;
+            color: #1a202c !important;
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+            transition: border-color .15s, box-shadow .15s;
+            width: 100%;
+        }
+
+            .field input:focus, .field select:focus, .field textarea:focus {
+                background: #fff !important;
+                outline: none !important;
+                border-color: rgba(201,42,42,.4) !important;
+                box-shadow: 0 0 0 3px rgba(201,42,42,.08) !important;
             }
 
-            <form asp-action="RegistrarMovimiento" method="post">
-                @Html.AntiForgeryToken()
+            .field input::placeholder, .field textarea::placeholder {
+                color: #b0b8c8 !important;
+            }
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label asp-for="Tipo" class="form-label">Tipo</label>
-                        <select asp-for="Tipo" class="form-select rounded-3">
-                            <option value="">Seleccione...</option>
-                            <option value="Ingreso">Ingreso</option>
-                            <option value="Egreso">Egreso</option>
-                        </select>
-                    </div>
+        .field .text-danger {
+            font-size: 11px !important;
+            color: #c92a2a !important;
+        }
 
-                    <div class="col-md-4">
-                        <label asp-for="Categoria" class="form-label">Categoría</label>
-                        <input asp-for="Categoria" class="form-control rounded-3" placeholder="Ej: Caja chica, Gasto operativo, Ajuste..." />
-                    </div>
+    .field-row {
+        display: grid;
+        gap: 12px;
+    }
 
-                    <div class="col-md-4">
-                        <label asp-for="Monto" class="form-label">Monto</label>
-                        <input asp-for="Monto" type="number" step="0.01" min="0.01" class="form-control rounded-3" />
-                    </div>
+    .field-row-2 {
+        grid-template-columns: 1fr 1fr;
+    }
 
-                    <div class="col-md-4">
-                        <label asp-for="Fecha" class="form-label">Fecha</label>
-                        <input asp-for="Fecha" type="datetime-local" class="form-control rounded-3"
-                               value="@Model.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
-                    </div>
+    .field-row-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 
-                    <div class="col-md-4">
-                        <label asp-for="Origen" class="form-label">Origen</label>
-                        <select asp-for="Origen" class="form-select rounded-3">
-                            <option value="Manual">Manual</option>
-                            <option value="Ajuste">Ajuste</option>
-                        </select>
-                    </div>
+    /* Tips panel */
+    .tips-panel {
+        background: linear-gradient(135deg, #c92a2a 0%, #a61e1e 55%, #1e2a4a 100%);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(201,42,42,.18);
+        position: relative;
+        overflow: hidden;
+    }
 
-                    <div class="col-md-4">
-                        <label asp-for="IdReferencia" class="form-label">Id de referencia</label>
-                        <input asp-for="IdReferencia" type="number" class="form-control rounded-3" placeholder="Opcional" />
-                    </div>
+        .tips-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -28px;
+            right: -28px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);
+            pointer-events: none;
+        }
 
-                    <div class="col-12">
-                        <label asp-for="Descripcion" class="form-label">Descripción</label>
-                        <textarea asp-for="Descripcion" rows="4" class="form-control rounded-3"
-                                  placeholder="Describe el movimiento..."></textarea>
-                    </div>
+    .tip-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 12px;
+        color: rgba(255,255,255,.88);
+        line-height: 1.5;
+        margin-bottom: 7px;
+    }
 
-                    <div class="col-12 d-flex gap-2 pt-2">
-                        <button type="submit" class="btn btn-danger rounded-3">
-                            Guardar movimiento
-                        </button>
+        .tip-row:last-child {
+            margin-bottom: 0;
+        }
 
-                        <a asp-controller="Contabilidad" asp-action="Index" class="btn btn-secondary rounded-3">
-                            Cancelar
-                        </a>
-                    </div>
-                </div>
-            </form>
+        .tip-row i {
+            font-size: 11px;
+            margin-top: 2px;
+            opacity: .75;
+            flex-shrink: 0;
+        }
+
+    /* Resumen visual */
+    .resumen-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .form-actions {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        margin-top: 16px;
+    }
+
+    @@media (max-width: 900px) {
+        .cp-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .field-row-3 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 560px) {
+        .field-row-2, .field-row-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@* ── Encabezado ───────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-plus-circle me-2" style="color:#c92a2a"></i> Registrar Movimiento
+        </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Agrega un ingreso o egreso manual al módulo contable
         </div>
     </div>
+    <a asp-controller="Contabilidad" asp-action="Index"
+       style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none"
+       onmouseover="this.style.background='#fff';this.style.borderColor='#b8c4d8'"
+       onmouseout="this.style.background='#f4f7fc';this.style.borderColor='#dde3ee'">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
 </div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<form asp-action="RegistrarMovimiento" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="cp-layout">
+
+        @* ══ IZQUIERDA: formulario ══════════════════════════════ *@
+        <div>
+
+            @* Tipo, categoría y monto *@
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="hdr-icon" style="background:#fff1f1">
+                        <i class="fas fa-exchange-alt" style="color:#c92a2a"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#1a202c">Datos del movimiento</div>
+                        <div style="font-size:11px;color:#8a94a6">Tipo, categoría y monto</div>
+                    </div>
+                </div>
+                <div class="form-card-body" style="display:flex;flex-direction:column;gap:12px">
+                    <div class="field-row field-row-3">
+                        <div class="field">
+                            <label asp-for="Tipo">Tipo *</label>
+                            <select asp-for="Tipo" id="selectTipo">
+                                <option value="">Seleccione...</option>
+                                <option value="Ingreso">Ingreso</option>
+                                <option value="Egreso">Egreso</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label asp-for="Origen">Origen</label>
+                            <select asp-for="Origen">
+                                <option value="Manual">Manual</option>
+                                <option value="Ajuste">Ajuste</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label asp-for="Monto">Monto *</label>
+                            <input asp-for="Monto" id="inputMonto" type="number" step="0.01" min="0.01" placeholder="₡0.00" />
+                        </div>
+                    </div>
+                    <div class="field-row field-row-2">
+                        <div class="field">
+                            <label asp-for="Categoria">Categoría</label>
+                            <input asp-for="Categoria" placeholder="Ej: Caja chica, Gasto operativo..." />
+                        </div>
+                        <div class="field">
+                            <label asp-for="Fecha">Fecha y hora *</label>
+                            <input asp-for="Fecha" type="datetime-local"
+                                   value="@Model.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Descripción y referencia *@
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="hdr-icon" style="background:#eff6ff">
+                        <i class="fas fa-file-alt" style="color:#1971c2"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#1a202c">Detalle</div>
+                        <div style="font-size:11px;color:#8a94a6">Descripción y referencia opcional</div>
+                    </div>
+                </div>
+                <div class="form-card-body" style="display:flex;flex-direction:column;gap:12px">
+                    <div class="field">
+                        <label asp-for="Descripcion">Descripción</label>
+                        <textarea asp-for="Descripcion" rows="3"
+                                  placeholder="Describe el movimiento..."></textarea>
+                    </div>
+                    <div class="field" style="max-width:220px">
+                        <label asp-for="IdReferencia">ID de referencia (opcional)</label>
+                        <input asp-for="IdReferencia" type="number" placeholder="Ej: 42" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* ══ DERECHA: tips + resumen visual ═════════════════════ *@
+        <div>
+
+            <div class="tips-panel">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <i class="fas fa-lightbulb" style="color:rgba(255,255,255,.8);font-size:14px"></i>
+                    <span style="font-size:13px;font-weight:700;color:#fff">Tips</span>
+                </div>
+                <div class="tip-row">
+                    <i class="fas fa-arrow-up"></i>
+                    <span><strong>Ingreso</strong> — dinero que entra al negocio (ventas, servicios, ajustes positivos).</span>
+                </div>
+                <div class="tip-row">
+                    <i class="fas fa-arrow-down"></i>
+                    <span><strong>Egreso</strong> — dinero que sale del negocio (gastos, compras, ajustes negativos).</span>
+                </div>
+                <div class="tip-row">
+                    <i class="fas fa-hashtag"></i>
+                    <span>El <strong>ID de referencia</strong> es opcional — úsalo para vincular con una venta o servicio.</span>
+                </div>
+            </div>
+
+            @* Resumen visual *@
+            <div class="resumen-card">
+                <div style="font-size:12px;font-weight:700;color:#8a94a6;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">
+                    Resumen
+                </div>
+                <div id="resumenTipo" style="display:flex;align-items:center;gap:10px;padding:12px;background:#f8fafd;border-radius:10px;border:1px solid #edf0f7;margin-bottom:10px">
+                    <div id="resumenIcono" style="width:36px;height:36px;border-radius:9px;background:#f4f7fc;display:flex;align-items:center;justify-content:center;font-size:16px;color:#8a94a6">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div>
+                        <div id="resumenTipoLabel" style="font-size:13px;font-weight:700;color:#8a94a6">Sin tipo seleccionado</div>
+                        <div id="resumenMonto" style="font-size:20px;font-weight:800;color:#8a94a6">₡0.00</div>
+                    </div>
+                </div>
+                <div style="font-size:12px;color:#8a94a6;text-align:center">
+                    Completa el formulario para ver el resumen
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    @* ── Acciones ─────────────────────────────────────────────────── *@
+    <div class="form-actions">
+        <a asp-controller="Contabilidad" asp-action="Index"
+           style="display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+        <button type="submit"
+                style="display:inline-flex;align-items:center;gap:7px;padding:10px 30px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+                onmouseover="this.style.background='#a61e1e'"
+                onmouseout="this.style.background='#c92a2a'">
+            <i class="fas fa-save"></i> Guardar movimiento
+        </button>
+    </div>
+
+</form>
+
+@section Scripts {
+    <script>
+        const selectTipo  = document.getElementById('selectTipo');
+        const inputMonto  = document.getElementById('inputMonto');
+        const iconoEl     = document.getElementById('resumenIcono');
+        const labelEl     = document.getElementById('resumenTipoLabel');
+        const montoEl     = document.getElementById('resumenMonto');
+
+        function actualizarResumen() {
+            const tipo  = selectTipo.value;
+            const monto = parseFloat(inputMonto.value) || 0;
+            const fmt   = '₡' + monto.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            if (tipo === 'Ingreso') {
+                iconoEl.style.background = '#f0fdf4';
+                iconoEl.innerHTML = '<i class="fas fa-arrow-up" style="color:#166534"></i>';
+                labelEl.style.color = '#166534';
+                labelEl.textContent = 'Ingreso';
+                montoEl.style.color = '#166534';
+            } else if (tipo === 'Egreso') {
+                iconoEl.style.background = '#fff1f1';
+                iconoEl.innerHTML = '<i class="fas fa-arrow-down" style="color:#991b1b"></i>';
+                labelEl.style.color = '#991b1b';
+                labelEl.textContent = 'Egreso';
+                montoEl.style.color = '#991b1b';
+            } else {
+                iconoEl.style.background = '#f4f7fc';
+                iconoEl.innerHTML = '<i class="fas fa-question" style="color:#8a94a6"></i>';
+                labelEl.style.color = '#8a94a6';
+                labelEl.textContent = 'Sin tipo seleccionado';
+                montoEl.style.color = '#8a94a6';
+            }
+
+            montoEl.textContent = fmt;
+        }
+
+        selectTipo.addEventListener('change', actualizarResumen);
+        inputMonto.addEventListener('input',  actualizarResumen);
+    </script>
+}

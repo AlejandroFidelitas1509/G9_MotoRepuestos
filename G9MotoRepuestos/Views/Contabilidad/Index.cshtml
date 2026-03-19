@@ -3,94 +3,133 @@
 
 @{
     ViewData["Title"] = "Contabilidad";
+    var movs = Model.Movimientos ?? Enumerable.Empty<MovimientoFinancieroDto>();
+    var totalMov = Model.Resumen.TotalIngresos + Model.Resumen.TotalEgresos;
+    var pctIng = totalMov > 0 ? (double)(Model.Resumen.TotalIngresos / totalMov * 100) : 0;
+    var pctEg = totalMov > 0 ? (double)(Model.Resumen.TotalEgresos / totalMov * 100) : 0;
+    decimal maxMonto = movs.Any() ? movs.Max(m => Math.Abs(m.Monto)) : 1;
+
+    var esPositivo = Model.Resumen.BalanceTotal >= 0;
+    var balColor = esPositivo ? "#1971c2" : "#991b1b";
+    var balBg = esPositivo ? "#eff6ff" : "#fff1f1";
+    var balIconColor = esPositivo ? "#1971c2" : "#991b1b";
+    var balTexto = esPositivo ? "Balance positivo" : "Balance negativo";
 }
 
 <style>
-    /* ── Fondo y superficie para fondo slate ── */
-    .kpi-card {
-        background: #ffffff;
+    /* ── Stats ────────────────────────────────────────────────────── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        background: #fff;
         border: 1px solid #dde3ee;
         border-radius: 14px;
         padding: 18px 20px;
-        height: 100%;
-        transition: border-color .2s, box-shadow .2s, transform .15s;
+        display: flex;
+        align-items: center;
+        gap: 16px;
         box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        transition: border-color .2s, box-shadow .2s;
     }
 
-        .kpi-card:hover {
+        .stat-card:hover {
             border-color: #b8c4d8;
-            box-shadow: 0 4px 16px rgba(0,0,0,.08);
-            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
         }
 
-    .kpi-icon-box {
-        width: 36px;
-        height: 36px;
-        border-radius: 9px;
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
+        font-size: 18px;
         flex-shrink: 0;
     }
 
-    .kpi-value {
-        font-size: 26px;
-        font-weight: 700;
-        line-height: 1.1;
-        margin: 10px 0 6px;
+    .stat-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
     }
 
-    .kpi-trend {
+    .stat-val {
+        font-size: 26px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin: 4px 0;
+    }
+
+    .stat-trend {
         display: inline-flex;
         align-items: center;
         gap: 5px;
         font-size: 11px;
         font-weight: 600;
-        padding: 2px 8px;
+        padding: 4px 9px;
         border-radius: 5px;
     }
 
-    .prop-section {
-        background: #ffffff;
+    /* ── Barra proporción + mini chart ───────────────────────────── */
+    .analytics-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .analytics-card {
+        background: #fff;
         border: 1px solid #dde3ee;
         border-radius: 14px;
-        padding: 16px 20px;
-        height: 100%;
+        padding: 18px 20px;
         box-shadow: 0 1px 4px rgba(0,0,0,.05);
     }
 
+    .analytics-label {
+        font-size: 12px;
+        color: #8a94a6;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin-bottom: 12px;
+    }
+
     .prop-bar {
-        height: 8px;
+        height: 10px;
         border-radius: 99px;
         overflow: hidden;
         display: flex;
         background: #edf0f7;
-    }
-
-    .chart-card {
-        background: #ffffff;
-        border: 1px solid #dde3ee;
-        border-radius: 14px;
-        padding: 18px 20px;
-        height: 100%;
-        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        margin-bottom: 10px;
     }
 
     .chart-bars {
         display: flex;
         align-items: flex-end;
         gap: 5px;
-        height: 56px;
-        margin-top: 12px;
+        height: 70px;
+        margin-top: 8px;
+        padding-bottom: 20px;
+        position: relative;
     }
 
     .chart-bar-wrap {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: flex-end;
         gap: 4px;
         flex: 1;
+        height: 100%;
     }
 
     .chart-bar {
@@ -99,6 +138,7 @@
         min-height: 4px;
         transition: opacity .2s;
         cursor: default;
+        flex-shrink: 0;
     }
 
         .chart-bar:hover {
@@ -106,16 +146,60 @@
         }
 
     .chart-bar-lbl {
-        font-size: 9px;
-        color: rgba(255,255,255,.22);
+        font-size: 10px;
+        color: #8a94a6;
         white-space: nowrap;
-        overflow: hidden;
-        max-width: 100%;
-        text-overflow: ellipsis;
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        line-height: 1;
     }
 
+    /* ── Filtros ──────────────────────────────────────────────────── */
+    .filter-card {
+        background: #fff;
+        border: 1px solid #dde3ee;
+        border-radius: 14px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    .f-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .f-input, .f-select {
+        width: 100%;
+        background: #f8fafd;
+        border: 1px solid #dde3ee;
+        border-radius: 9px;
+        color: #1a202c;
+        font-size: 14px;
+        padding: 9px 12px;
+        transition: border-color .15s, box-shadow .15s;
+    }
+
+        .f-input:focus, .f-select:focus {
+            outline: none;
+            background: #fff;
+            border-color: rgba(201,42,42,.4);
+            box-shadow: 0 0 0 3px rgba(201,42,42,.08);
+        }
+
+        .f-input::placeholder {
+            color: #b0b8c8;
+        }
+
+    /* ── Tabla ────────────────────────────────────────────────────── */
     .table-card {
-        background: #ffffff;
+        background: #fff;
         border: 1px solid #dde3ee;
         border-radius: 14px;
         overflow: hidden;
@@ -123,108 +207,99 @@
     }
 
     .table-card-header {
-        padding: 16px 20px;
+        padding: 15px 20px;
         border-bottom: 1px solid #edf0f7;
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
 
-    .filters-row {
-        padding: 16px 20px;
-        border-bottom: 1px solid #edf0f7;
-    }
-
-    .table-dark-app {
+    .cont-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 13px;
+        font-size: 14px;
     }
 
-        .table-dark-app thead th {
-            font-size: 10px;
+        .cont-table thead th {
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: .08em;
+            letter-spacing: .06em;
             color: #8a94a6;
             font-weight: 600;
-            padding: 10px 16px;
+            padding: 12px 16px;
             border-bottom: 1px solid #edf0f7;
             background: #f8fafd;
             white-space: nowrap;
         }
 
-        .table-dark-app tbody td {
-            padding: 12px 16px;
+        .cont-table tbody td {
+            padding: 14px 16px;
             vertical-align: middle;
             border-bottom: 1px solid #f0f3f9;
             color: #4a5568;
+            font-size: 14px;
         }
 
-        .table-dark-app tbody tr:last-child td {
+        .cont-table tbody tr:last-child td {
             border-bottom: none;
         }
 
-        .table-dark-app tbody tr:hover td {
+        .cont-table tbody tr:hover td {
             background: #f4f7fc;
             color: #1a202c;
         }
 
+    /* ── Badges ───────────────────────────────────────────────────── */
     .badge-ing {
         background: #f0fdf4;
         color: #166534;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 5px;
-        white-space: nowrap;
-        letter-spacing: .02em;
         border: 1px solid #bbf7d0;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
     }
 
     .badge-eg {
         background: #fff1f1;
         color: #991b1b;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 5px;
-        white-space: nowrap;
-        letter-spacing: .02em;
         border: 1px solid #fecaca;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 5px;
     }
 
     .origen-pill {
-        display: inline-block;
-        font-size: 11px;
-        padding: 2px 8px;
+        font-size: 12px;
+        padding: 4px 9px;
         border-radius: 5px;
-        background: #edf0f7;
+        background: #f4f7fc;
         color: #4a5568;
         border: 1px solid #dde3ee;
-        white-space: nowrap;
     }
 
     .monto-ing {
         color: #166534;
         font-weight: 700;
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .monto-eg {
         color: #991b1b;
         font-weight: 700;
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .user-avatar {
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: #fee2e2;
         color: #991b1b;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         display: inline-flex;
         align-items: center;
@@ -236,6 +311,7 @@
         padding: 3.5rem 1rem;
         text-align: center;
         color: #8a94a6;
+        font-size: 14px;
     }
 
         .empty-state i {
@@ -245,226 +321,219 @@
             opacity: .4;
         }
 
-    .chart-bar-lbl {
-        font-size: 9px;
-        color: #8a94a6;
-        white-space: nowrap;
-        overflow: hidden;
-        max-width: 100%;
-        text-overflow: ellipsis;
+    @@media (max-width: 900px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        .analytics-row {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
-@* ── Encabezado ───────────────────────────────────────────────── *@
-<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-    <p class="mb-0" style="font-size:13px;color:rgba(255,255,255,.3)">
-        Consulta movimientos, revisa balances y realiza cierres contables.
-    </p>
-    <div class="d-flex gap-2 flex-wrap">
-        <a asp-controller="Contabilidad" asp-action="HistorialCierres" class="btn-app-ghost">
-            <i class="fas fa-clock-rotate-left"></i> Historial de cierres
+@* ── Encabezado ──────────────────────────────────────────────────── *@
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+    <div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">
+            <i class="fas fa-chart-line me-2" style="color:#c92a2a"></i> Contabilidad
+        </div>
+        <div style="font-size:13px;color:#8a94a6;margin-top:3px">
+            Consulta movimientos, revisa balances y realiza cierres contables
+        </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a asp-controller="Contabilidad" asp-action="HistorialCierres"
+           style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;text-decoration:none"
+           onmouseover="this.style.background='#fff';this.style.borderColor='#b8c4d8'"
+           onmouseout="this.style.background='#f4f7fc';this.style.borderColor='#dde3ee'">
+            <i class="fas fa-clock-rotate-left"></i> Historial
         </a>
-        <a asp-controller="Contabilidad" asp-action="RegistrarMovimiento" class="btn-app-secondary">
+        <button type="button"
+                data-bs-toggle="modal" data-bs-target="#modalRegistrarMovimiento"
+                style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;cursor:pointer"
+                onmouseover="this.style.background='#fff';this.style.borderColor='#b8c4d8'"
+                onmouseout="this.style.background='#f4f7fc';this.style.borderColor='#dde3ee'">
             <i class="fas fa-plus-circle"></i> Registrar movimiento
-        </a>
-        <a asp-controller="Contabilidad" asp-action="RealizarCierre" class="btn-app-primary">
+        </button>
+        <button type="button"
+                data-bs-toggle="modal" data-bs-target="#modalRealizarCierre"
+                style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+                onmouseover="this.style.background='#a61e1e'"
+                onmouseout="this.style.background='#c92a2a'">
             <i class="fas fa-cash-register"></i> Realizar cierre
-        </a>
+        </button>
     </div>
 </div>
 
-@* ── Alertas ──────────────────────────────────────────────────── *@
+@* ── Alertas ──────────────────────────────────────────────────────── *@
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="font-size:14px">
         <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="font-size:14px">
         <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-@* ── KPI Cards ────────────────────────────────────────────────── *@
-<div class="row g-3 mb-3">
-    <div class="col-md-4">
-        <div class="kpi-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <span style="font-size:12px;color:rgba(255,255,255,.35)">Total ingresos</span>
-                <div class="kpi-icon-box" style="background:rgba(74,222,128,.1)">
-                    <i class="fas fa-arrow-up" style="color:#4ade80"></i>
-                </div>
-            </div>
-            <div class="kpi-value" style="color:#4ade80">₡@Model.Resumen.TotalIngresos.ToString("N2")</div>
-            <span class="kpi-trend" style="background:rgba(74,222,128,.1);color:#86efac">
-                <i class="fas fa-arrow-trend-up"></i> Movimientos de ingreso
+@* ── Stats ────────────────────────────────────────────────────────── *@
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">
+            <i class="fas fa-arrow-up" style="color:#166534"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total ingresos</div>
+            <div class="stat-val" style="color:#166534">₡@Model.Resumen.TotalIngresos.ToString("N2")</div>
+            <span class="stat-trend" style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0">
+                <i class="fas fa-arrow-trend-up" style="font-size:9px"></i> Movimientos de ingreso
             </span>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="kpi-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <span style="font-size:12px;color:rgba(255,255,255,.35)">Total egresos</span>
-                <div class="kpi-icon-box" style="background:rgba(248,113,113,.1)">
-                    <i class="fas fa-arrow-down" style="color:#f87171"></i>
-                </div>
-            </div>
-            <div class="kpi-value" style="color:#f87171">₡@Model.Resumen.TotalEgresos.ToString("N2")</div>
-            <span class="kpi-trend" style="background:rgba(248,113,113,.1);color:#fca5a5">
-                <i class="fas fa-arrow-trend-down"></i> Movimientos de egreso
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f1">
+            <i class="fas fa-arrow-down" style="color:#991b1b"></i>
+        </div>
+        <div>
+            <div class="stat-label">Total egresos</div>
+            <div class="stat-val" style="color:#991b1b">₡@Model.Resumen.TotalEgresos.ToString("N2")</div>
+            <span class="stat-trend" style="background:#fff1f1;color:#991b1b;border:1px solid #fecaca">
+                <i class="fas fa-arrow-trend-down" style="font-size:9px"></i> Movimientos de egreso
             </span>
         </div>
     </div>
 
-    <div class="col-md-4">
-        @{
-            var esPositivo = Model.Resumen.BalanceTotal >= 0;
-            var balColor = esPositivo ? "#60a5fa" : "#f87171";
-            var balBg = esPositivo ? "rgba(96,165,250,.1)" : "rgba(248,113,113,.1)";
-            var balTrendBg = esPositivo ? "rgba(96,165,250,.1)" : "rgba(248,113,113,.1)";
-            var balTrendColor = esPositivo ? "#93c5fd" : "#fca5a5";
-            var balIconClass = esPositivo ? "fa-chart-line" : "fa-chart-line-down";
-            var balTexto = esPositivo ? "Balance positivo" : "Balance negativo";
-        }
-        <div class="kpi-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <span style="font-size:12px;color:rgba(255,255,255,.35)">Balance neto</span>
-                <div class="kpi-icon-box" style="background:@balBg">
-                    <i class="fas @balIconClass" style="color:@balColor"></i>
-                </div>
-            </div>
-            <div class="kpi-value" style="color:@balColor">₡@Model.Resumen.BalanceTotal.ToString("N2")</div>
-            <span class="kpi-trend" style="background:@balTrendBg;color:@balTrendColor">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:@balBg">
+            <i class="fas fa-scale-balanced" style="color:@balIconColor"></i>
+        </div>
+        <div>
+            <div class="stat-label">Balance neto</div>
+            <div class="stat-val" style="color:@balColor">₡@Model.Resumen.BalanceTotal.ToString("N2")</div>
+            <span class="stat-trend" style="background:@balBg;color:@balColor;border:1px solid @(esPositivo ? "#bfdbfe" : "#fecaca")">
                 @(esPositivo ? "▲" : "▼") @balTexto
             </span>
         </div>
     </div>
 </div>
 
-@* ── Barra de proporción + mini gráfico ──────────────────────── *@
-@{
-    var totalMov = Model.Resumen.TotalIngresos + Model.Resumen.TotalEgresos;
-    var pctIng = totalMov > 0 ? (double)(Model.Resumen.TotalIngresos / totalMov * 100) : 0;
-    var pctEg = totalMov > 0 ? (double)(Model.Resumen.TotalEgresos / totalMov * 100) : 0;
-    var movs = Model.Movimientos ?? Enumerable.Empty<MovimientoFinancieroDto>();
-    decimal maxMonto = movs.Any() ? movs.Max(m => Math.Abs(m.Monto)) : 1;
-}
-
-<div class="row g-3 mb-3">
-    <div class="col-md-7">
-        <div class="prop-section">
-            <div style="font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">
-                Proporción ingresos / egresos
-            </div>
-            <div class="prop-bar mb-2">
-                <div style="width:@pctIng.ToString("F1")%;background:#4ade80;border-radius:99px 0 0 99px;transition:width .5s"></div>
-                <div style="width:@pctEg.ToString("F1")%;background:#f87171;border-radius:0 99px 99px 0;transition:width .5s"></div>
-            </div>
-            <div class="d-flex justify-content-between mt-1">
-                <span style="font-size:12px;color:#86efac;font-weight:600">
-                    <i class="fas fa-circle me-1" style="font-size:7px"></i>
-                    Ingresos @pctIng.ToString("F1")%
-                </span>
-                <span style="font-size:12px;color:#fca5a5;font-weight:600">
-                    Egresos @pctEg.ToString("F1")%
-                    <i class="fas fa-circle ms-1" style="font-size:7px"></i>
-                </span>
-            </div>
+@* ── Proporción + mini chart ──────────────────────────────────────── *@
+<div class="analytics-row">
+    <div class="analytics-card">
+        <div class="analytics-label">Proporción ingresos / egresos</div>
+        <div class="prop-bar">
+            <div style="width:@pctIng.ToString("F1")%;background:#2f9e44;border-radius:99px 0 0 99px;transition:width .5s"></div>
+            <div style="width:@pctEg.ToString("F1")%;background:#c92a2a;border-radius:0 99px 99px 0;transition:width .5s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:13px;color:#166534;font-weight:600">
+                <i class="fas fa-circle me-1" style="font-size:7px"></i>
+                Ingresos @pctIng.ToString("F1")%
+            </span>
+            <span style="font-size:13px;color:#991b1b;font-weight:600">
+                Egresos @pctEg.ToString("F1")%
+                <i class="fas fa-circle ms-1" style="font-size:7px"></i>
+            </span>
         </div>
     </div>
 
-    <div class="col-md-5">
-        <div class="chart-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <span style="font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em">
-                    Últimos movimientos
+    <div class="analytics-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="analytics-label" style="margin-bottom:0">Últimos movimientos</div>
+            <div style="display:flex;gap:12px">
+                <span style="font-size:12px;color:#166534;display:flex;align-items:center;gap:4px">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#2f9e44;display:inline-block"></span> Ingreso
                 </span>
-                <div class="d-flex gap-3">
-                    <span style="font-size:10px;color:#86efac;display:flex;align-items:center;gap:4px">
-                        <span style="width:8px;height:8px;border-radius:50%;background:#4ade80;display:inline-block"></span> Ingreso
-                    </span>
-                    <span style="font-size:10px;color:#fca5a5;display:flex;align-items:center;gap:4px">
-                        <span style="width:8px;height:8px;border-radius:50%;background:#f87171;display:inline-block"></span> Egreso
-                    </span>
+                <span style="font-size:12px;color:#991b1b;display:flex;align-items:center;gap:4px">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#c92a2a;display:inline-block"></span> Egreso
+                </span>
+            </div>
+        </div>
+        <div class="chart-bars">
+            @foreach (var m in movs.Take(8))
+            {
+                var altura = maxMonto > 0 ? (int)((double)Math.Abs(m.Monto) / (double)maxMonto * 48) : 4;
+                altura = Math.Max(altura, 4);
+                var esIng = m.Tipo == "Ingreso";
+                <div class="chart-bar-wrap">
+                    <div class="chart-bar"
+                         style="height:@(altura)px;background:@(esIng ? "#2f9e44" : "#c92a2a")"
+                         title="@m.Tipo: ₡@m.Monto.ToString("N2")"></div>
                 </div>
-            </div>
-            <div class="chart-bars">
-                @foreach (var m in movs.Take(8))
-                {
-                    var altura = maxMonto > 0 ? (int)((double)Math.Abs(m.Monto) / (double)maxMonto * 52) : 4;
-                    altura = Math.Max(altura, 4);
-                    var esIng = m.Tipo == "Ingreso";
-                    <div class="chart-bar-wrap">
-                        <div class="chart-bar"
-                             style="height:@(altura)px;background:@(esIng ? "#4ade80" : "#f87171");opacity:@(esIng ? "0.85" : "0.9")"
-                             title="@m.Tipo: ₡@m.Monto.ToString("N2")"></div>
-                        <div class="chart-bar-lbl">@m.Fecha.ToString("dd/MM")</div>
-                    </div>
-                }
-            </div>
+            }
+        </div>
+        <div style="display:flex;gap:5px;margin-top:5px">
+            @foreach (var m in movs.Take(8))
+            {
+                <div style="flex:1;font-size:10px;color:#8a94a6;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
+                    @m.Fecha.ToString("dd/MM")
+                </div>
+            }
         </div>
     </div>
 </div>
 
-@* ── Filtros + Tabla ──────────────────────────────────────────── *@
-@*
-    En el controlador agrega:
-        ViewBag.TiposMovimiento    = new SelectList(new[] { "Ingreso", "Egreso" });
-        ViewBag.OrigenesMovimiento = new SelectList(new[] { "Venta", "Compra", "Servicio", "Manual", "Ajuste" });
-*@
-<div class="table-card">
+@* ── Filtros ──────────────────────────────────────────────────────── *@
+<div class="filter-card">
+    <div style="font-size:14px;font-weight:700;color:#1a202c;margin-bottom:14px">
+        <i class="fas fa-filter me-1" style="color:#c92a2a;font-size:11px"></i> Filtros
+    </div>
+    <form asp-action="Index" method="get">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:12px;align-items:end">
+            <div>
+                <span class="f-label">Buscar</span>
+                <input asp-for="TextoBusqueda" class="f-input" placeholder="Categoría, descripción..." />
+            </div>
+            <div>
+                <span class="f-label">Desde</span>
+                <input asp-for="Desde" type="date" class="f-input" />
+            </div>
+            <div>
+                <span class="f-label">Hasta</span>
+                <input asp-for="Hasta" type="date" class="f-input" />
+            </div>
+            <div>
+                <span class="f-label">Tipo</span>
+                <select asp-for="TipoFiltro" asp-items="ViewBag.TiposMovimiento" class="f-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div>
+                <span class="f-label">Origen</span>
+                <select asp-for="OrigenFiltro" asp-items="ViewBag.OrigenesMovimiento" class="f-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit"
+                        style="display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;height:39px">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
 
+@* ── Tabla de movimientos ─────────────────────────────────────────── *@
+<div class="table-card">
     <div class="table-card-header">
         <span style="font-size:14px;font-weight:700;color:#1a202c">
-            <i class="fas fa-list me-2" style="color:rgba(255,255,255,.3)"></i> Movimientos
+            <i class="fas fa-list me-2" style="color:#8a94a6"></i> Movimientos
         </span>
-        <span style="font-size:12px;color:#8a94a6">
+        <span style="font-size:13px;color:#8a94a6">
             @movs.Count() resultado@(movs.Count() != 1 ? "s" : "")
         </span>
     </div>
 
-    <div class="filters-row">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-            <div class="col-md-3">
-                <label asp-for="TextoBusqueda" class="form-label">Buscar</label>
-                <input asp-for="TextoBusqueda" class="form-control" placeholder="Categoría, descripción..." />
-            </div>
-            <div class="col-md-2">
-                <label asp-for="Desde" class="form-label">Desde</label>
-                <input asp-for="Desde" type="date" class="form-control" />
-            </div>
-            <div class="col-md-2">
-                <label asp-for="Hasta" class="form-label">Hasta</label>
-                <input asp-for="Hasta" type="date" class="form-control" />
-            </div>
-            <div class="col-md-2">
-                <label asp-for="TipoFiltro" class="form-label">Tipo</label>
-                <select asp-for="TipoFiltro" asp-items="ViewBag.TiposMovimiento" class="form-select">
-                    <option value="">Todos</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label asp-for="OrigenFiltro" class="form-label">Origen</label>
-                <select asp-for="OrigenFiltro" asp-items="ViewBag.OrigenesMovimiento" class="form-select">
-                    <option value="">Todos</option>
-                </select>
-            </div>
-            <div class="col-md-1 d-grid">
-                <label class="form-label">&nbsp;</label>
-                <button type="submit" class="btn-app-primary" style="justify-content:center;padding:8px">
-                    <i class="fas fa-filter"></i>
-                </button>
-            </div>
-        </form>
-    </div>
-
     <div class="table-responsive">
-        <table class="table-dark-app">
+        <table class="cont-table">
             <thead>
                 <tr>
                     <th>Fecha</th>
@@ -484,15 +553,13 @@
                     {
                         var esIngreso = item.Tipo == "Ingreso";
                         var nombreUsuario = item.UsuarioNombre ?? "";
-                        var iniciales = string.IsNullOrWhiteSpace(nombreUsuario)
-                        ? "U"
+                        var iniciales = string.IsNullOrWhiteSpace(nombreUsuario) ? "U"
                         : string.Concat(nombreUsuario
                         .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                        .Take(2)
-                        .Select(p => p[0].ToString().ToUpper()));
+                        .Take(2).Select(p => p[0].ToString().ToUpper()));
 
                         <tr>
-                            <td style="font-size:11px;color:#8a94a6;white-space:nowrap">
+                            <td style="font-size:13px;color:#8a94a6;white-space:nowrap">
                                 @item.Fecha.ToString("dd/MM/yyyy HH:mm")
                             </td>
                             <td>
@@ -505,8 +572,10 @@
                                     <span class="badge-eg">Egreso</span>
                                 }
                             </td>
-                            <td>@(string.IsNullOrWhiteSpace(item.Categoria) ? "—" : item.Categoria)</td>
-                            <td style="color:#1a202c">@item.Descripcion</td>
+                            <td style="color:#4a5568;font-size:14px">
+                                @(string.IsNullOrWhiteSpace(item.Categoria) ? "—" : item.Categoria)
+                            </td>
+                            <td style="color:#1a202c;font-weight:500;font-size:14px">@item.Descripcion</td>
                             <td>
                                 @if (!string.IsNullOrWhiteSpace(item.Origen))
                                 {
@@ -514,20 +583,19 @@
                                 }
                                 else
                                 {
-                                    <span style="color:#b0b8c8">—</span>
+                                    <span style="color:#b0b8c8;font-size:14px">—</span>
                                 }
                             </td>
-                            <td style="color:#8a94a6">@(item.IdReferencia?.ToString() ?? "—")</td>
+                            <td style="color:#8a94a6;font-size:13px">@(item.IdReferencia?.ToString() ?? "—")</td>
                             <td>
                                 <div style="display:inline-flex;align-items:center;gap:7px">
                                     <div class="user-avatar">@iniciales</div>
-                                    <span>@nombreUsuario</span>
+                                    <span style="font-size:14px">@nombreUsuario</span>
                                 </div>
                             </td>
-                            @* Math.Abs evita "-₡-150.00" si Monto llega negativo *@
                             <td style="text-align:right">
                                 <span class="@(esIngreso ? "monto-ing" : "monto-eg")">
-                                    @(esIngreso ? "₡" : "-₡")@Math.Abs(item.Monto).ToString("N2")
+                                    @(esIngreso ? "+" : "-")₡@Math.Abs(item.Monto).ToString("N2")
                                 </span>
                             </td>
                         </tr>
@@ -548,3 +616,339 @@
         </table>
     </div>
 </div>
+
+@* ══ MODAL: Registrar Movimiento ════════════════════════════════════ *@
+<div class="modal fade" id="modalRegistrarMovimiento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:580px">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;border:1px solid #dde3ee">
+
+            <div class="modal-header" style="background:#1a202c;border:none;padding:16px 22px">
+                <h6 class="modal-title" style="font-weight:700;color:#fff;font-size:16px">
+                    <i class="fas fa-plus-circle me-2" style="color:#fca5a5"></i>
+                    Registrar Movimiento
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-controller="Contabilidad" asp-action="RegistrarMovimiento" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" style="padding:22px">
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Tipo *</label>
+                            <select name="Tipo" id="modalTipo"
+                                    style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px">
+                                <option value="">Seleccione...</option>
+                                <option value="Ingreso">Ingreso</option>
+                                <option value="Egreso">Egreso</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Origen</label>
+                            <select name="Origen"
+                                    style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px">
+                                <option value="Manual">Manual</option>
+                                <option value="Ajuste">Ajuste</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Monto *</label>
+                            <input name="Monto" id="modalMonto" type="number" step="0.01" min="0.01"
+                                   placeholder="₡0.00"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Categoría</label>
+                            <input name="Categoria" type="text"
+                                   placeholder="Ej: Caja chica, Gasto operativo..."
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Fecha y hora *</label>
+                            <input name="Fecha" type="datetime-local"
+                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+                        <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Descripción</label>
+                        <textarea name="Descripcion" rows="3"
+                                  placeholder="Describe el movimiento..."
+                                  style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%;resize:vertical"></textarea>
+                    </div>
+
+                    <div id="modalResumen"
+                         style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafd;border-radius:10px;border:1px solid #edf0f7">
+                        <div id="modalResumenIcono"
+                             style="width:36px;height:36px;border-radius:9px;background:#edf0f7;display:flex;align-items:center;justify-content:center;font-size:16px;color:#8a94a6;flex-shrink:0">
+                            <i class="fas fa-question"></i>
+                        </div>
+                        <div>
+                            <div id="modalResumenLabel" style="font-size:13px;color:#8a94a6;font-weight:600">Sin tipo seleccionado</div>
+                            <div id="modalResumenMonto" style="font-size:20px;font-weight:800;color:#8a94a6">₡0.00</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer" style="padding:14px 22px;border-top:1px solid #edf0f7;display:flex;justify-content:flex-end;gap:8px">
+                    <button type="button" data-bs-dismiss="modal"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;cursor:pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#a61e1e'"
+                            onmouseout="this.style.background='#c92a2a'">
+                        <i class="fas fa-save"></i> Guardar movimiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ══ MODAL: Realizar Cierre ═════════════════════════════════════════ *@
+<div class="modal fade" id="modalRealizarCierre" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:540px">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;border:1px solid #dde3ee">
+
+            <div class="modal-header" style="background:#1a202c;border:none;padding:16px 22px">
+                <h6 class="modal-title" style="font-weight:700;color:#fff;font-size:16px">
+                    <i class="fas fa-cash-register me-2" style="color:#fca5a5"></i>
+                    Realizar Cierre Contable
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-controller="Contabilidad" asp-action="RealizarCierre" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" style="padding:22px">
+
+                    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-bottom:18px">
+                        <i class="fas fa-info-circle" style="color:#d97706;margin-top:2px;flex-shrink:0"></i>
+                        <span style="font-size:14px;color:#92400e;line-height:1.5">
+                            Los totales de ingresos, egresos y balance se calculan automáticamente según las fechas indicadas.
+                        </span>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+                        <div id="campoFechaInicio" style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Fecha inicio *</label>
+                            <input id="inputFechaInicio" name="FechaInicio" type="date"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+
+                        <div id="campoFechaFin" style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Fecha fin *</label>
+                            <input id="inputFechaFin" name="FechaFin" type="date"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+
+                        <div id="campoMes" style="display:none;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Mes *</label>
+                            <input id="inputMes" type="month"
+                                   value="@DateTime.Now.ToString("yyyy-MM")"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+
+                        <div id="campoSemana" style="display:none;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Semana *</label>
+                            <input id="inputSemana" type="week"
+                                   value="@DateTime.Now.ToString("yyyy-") + System.Globalization.ISOWeek.GetWeekOfYear(DateTime.Now).ToString(" 00")"
+                                   style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px;width:100%" />
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Tipo de cierre</label>
+                            <select name="Tipo" id="selectTipoCierre"
+                                    style="background:#f8fafd;border:1px solid #dde3ee;border-radius:9px;color:#1a202c;font-size:14px;padding:9px 12px">
+                                <option value="Diario">Diario</option>
+                                <option value="Semanal">Semanal</option>
+                                <option value="Mensual">Mensual</option>
+                                <option value="Personalizado">Personalizado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Fecha de registro</label>
+                            <input name="FechaRegistro" type="datetime-local"
+                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                                   readonly
+                                   style="background:#f4f7fc;border:1px solid #dde3ee;border-radius:9px;color:#8a94a6;font-size:14px;padding:9px 12px;width:100%;cursor:not-allowed" />
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                            <label style="font-size:12px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Usuario</label>
+                            <input type="text" readonly
+                                   value="Se asigna automáticamente"
+                                   style="background:#f4f7fc;border:1px solid #dde3ee;border-radius:9px;color:#8a94a6;font-size:14px;padding:9px 12px;width:100%;cursor:not-allowed" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer" style="padding:14px 22px;border-top:1px solid #edf0f7;display:flex;justify-content:flex-end;gap:8px">
+                    <button type="button" data-bs-dismiss="modal"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;background:#f4f7fc;border:1px solid #dde3ee;color:#4a5568;font-size:14px;font-weight:500;cursor:pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:9px;background:#c92a2a;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#a61e1e'"
+                            onmouseout="this.style.background='#c92a2a'">
+                        <i class="fas fa-save"></i> Guardar cierre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const modalTipo = document.getElementById('modalTipo');
+        const modalMonto = document.getElementById('modalMonto');
+        const modalIcono = document.getElementById('modalResumenIcono');
+        const modalLabel = document.getElementById('modalResumenLabel');
+        const modalMnt = document.getElementById('modalResumenMonto');
+
+        function actualizarModalResumen() {
+            const tipo = modalTipo.value;
+            const monto = parseFloat(modalMonto.value) || 0;
+            const fmt = '₡' + monto.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            if (tipo === 'Ingreso') {
+                modalIcono.style.background = '#f0fdf4';
+                modalIcono.innerHTML = '<i class="fas fa-arrow-up" style="color:#166534"></i>';
+                modalLabel.style.color = '#166534';
+                modalLabel.textContent = 'Ingreso';
+                modalMnt.style.color = '#166534';
+            } else if (tipo === 'Egreso') {
+                modalIcono.style.background = '#fff1f1';
+                modalIcono.innerHTML = '<i class="fas fa-arrow-down" style="color:#991b1b"></i>';
+                modalLabel.style.color = '#991b1b';
+                modalLabel.textContent = 'Egreso';
+                modalMnt.style.color = '#991b1b';
+            } else {
+                modalIcono.style.background = '#edf0f7';
+                modalIcono.innerHTML = '<i class="fas fa-question" style="color:#8a94a6"></i>';
+                modalLabel.style.color = '#8a94a6';
+                modalLabel.textContent = 'Sin tipo seleccionado';
+                modalMnt.style.color = '#8a94a6';
+            }
+            modalMnt.textContent = fmt;
+        }
+
+        if (modalTipo && modalMonto) {
+            modalTipo.addEventListener('change', actualizarModalResumen);
+            modalMonto.addEventListener('input', actualizarModalResumen);
+            actualizarModalResumen();
+        }
+
+        const selectTipoCierre = document.getElementById('selectTipoCierre');
+        const campoFechaInicio = document.getElementById('campoFechaInicio');
+        const campoFechaFin = document.getElementById('campoFechaFin');
+        const campoMes = document.getElementById('campoMes');
+        const campoSemana = document.getElementById('campoSemana');
+        const inputFechaInicio = document.getElementById('inputFechaInicio');
+        const inputFechaFin = document.getElementById('inputFechaFin');
+        const inputMes = document.getElementById('inputMes');
+        const inputSemana = document.getElementById('inputSemana');
+
+        function actualizarCamposCierre() {
+            const tipo = selectTipoCierre?.value;
+            if (!tipo) return;
+
+            campoFechaInicio.style.display = 'none';
+            campoFechaFin.style.display = 'none';
+            campoMes.style.display = 'none';
+            campoSemana.style.display = 'none';
+
+            inputFechaInicio.removeAttribute('name');
+            inputFechaFin.removeAttribute('name');
+            inputMes.removeAttribute('name');
+            inputSemana.removeAttribute('name');
+
+            if (tipo === 'Mensual') {
+                campoMes.style.display = 'flex';
+                inputMes.setAttribute('name', 'mesCierre');
+                calcularFechasDesdeMes();
+
+            } else if (tipo === 'Semanal') {
+                campoSemana.style.display = 'flex';
+                inputSemana.setAttribute('name', 'semanaCierre');
+                calcularFechasDesdeSemana();
+
+            } else {
+                campoFechaInicio.style.display = 'flex';
+                campoFechaFin.style.display = 'flex';
+                inputFechaInicio.setAttribute('name', 'FechaInicio');
+                inputFechaFin.setAttribute('name', 'FechaFin');
+
+                if (tipo === 'Diario') {
+                    const hoy = new Date().toISOString().split('T')[0];
+                    inputFechaInicio.value = hoy;
+                    inputFechaFin.value = hoy;
+                    inputFechaInicio.readOnly = true;
+                    inputFechaFin.readOnly = true;
+                    inputFechaInicio.style.background = '#f4f7fc';
+                    inputFechaFin.style.background = '#f4f7fc';
+                } else {
+                    inputFechaInicio.readOnly = false;
+                    inputFechaFin.readOnly = false;
+                    inputFechaInicio.style.background = '#f8fafd';
+                    inputFechaFin.style.background = '#f8fafd';
+                }
+            }
+        }
+
+        function calcularFechasDesdeMes() {
+            const val = inputMes.value;
+            if (!val) return;
+            const [y, m] = val.split('-').map(Number);
+            const inicio = new Date(y, m - 1, 1);
+            const fin = new Date(y, m, 0);
+            inputFechaInicio.value = inicio.toISOString().split('T')[0];
+            inputFechaFin.value = fin.toISOString().split('T')[0];
+            inputFechaInicio.setAttribute('name', 'FechaInicio');
+            inputFechaFin.setAttribute('name', 'FechaFin');
+        }
+
+        function calcularFechasDesdeSemana() {
+            const val = inputSemana.value;
+            if (!val) return;
+            const [year, week] = val.split('-W').map(Number);
+            const jan4 = new Date(year, 0, 4);
+            const lunes = new Date(jan4);
+            lunes.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7) + (week - 1) * 7);
+            const domingo = new Date(lunes);
+            domingo.setDate(lunes.getDate() + 6);
+            inputFechaInicio.value = lunes.toISOString().split('T')[0];
+            inputFechaFin.value = domingo.toISOString().split('T')[0];
+            inputFechaInicio.setAttribute('name', 'FechaInicio');
+            inputFechaFin.setAttribute('name', 'FechaFin');
+        }
+
+        if (inputMes) {
+            inputMes.addEventListener('change', calcularFechasDesdeMes);
+        }
+
+        if (inputSemana) {
+            inputSemana.addEventListener('change', calcularFechasDesdeSemana);
+        }
+
+        if (selectTipoCierre) {
+            selectTipoCierre.addEventListener('change', actualizarCamposCierre);
+            actualizarCamposCierre();
+        }
+    </script>
+}

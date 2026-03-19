@@ -127,17 +127,17 @@
         #tablaCitas thead th {
             background: #f8fafd !important;
             color: #8a94a6 !important;
-            font-size: 13px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             text-transform: uppercase;
-            letter-spacing: .05em;
+            letter-spacing: .06em;
             border-bottom: 1px solid #edf0f7 !important;
             padding: 14px 16px !important;
             white-space: nowrap;
         }
 
         #tablaCitas tbody td {
-            padding: 14px 16px !important;
+            padding: 16px 16px !important;
             border-bottom: 1px solid #f0f3f9 !important;
             vertical-align: middle !important;
             color: #4a5568;
@@ -149,7 +149,7 @@
         }
 
         #tablaCitas tbody tr:hover td {
-            background: #fafcff !important;
+            background: #f4f7fc !important;
         }
 
     .ct-id {
@@ -174,7 +174,7 @@
         justify-content: center;
         padding: 5px 11px;
         border-radius: 999px;
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
         border: 1px solid transparent;
@@ -213,48 +213,33 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
         flex-wrap: wrap;
     }
 
     .ct-icon-btn {
-        width: 38px;
-        height: 38px;
+        width: 34px;
+        height: 34px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 10px;
+        font-size: 14px;
+        border-radius: 8px;
         border: 1px solid #dde3ee;
         background: #f8fafd;
+        color: #4a5568;
         text-decoration: none;
-        transition: all .15s ease;
         cursor: pointer;
+        transition: all .15s ease;
     }
 
-        .ct-icon-btn i {
-            font-size: 14px;
-        }
-
-    .ct-icon-edit {
-        color: #92400e;
-        background: #fffbeb;
-        border-color: #fde68a;
-    }
-
-        .ct-icon-edit:hover {
-            background: #fef3c7;
-            color: #78350f;
-        }
-
-    .ct-icon-delete {
-        color: #991b1b;
-        background: #fff1f1;
-        border-color: #fecaca;
-    }
-
-        .ct-icon-delete:hover {
-            background: #fee2e2;
-            color: #7f1d1d;
+        .ct-icon-btn:hover {
+            background: #fff;
+            border-color: #b8c4d8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,.08);
+            color: #1a202c;
+            text-decoration: none;
         }
 
     .ct-modal .modal-dialog {
@@ -414,7 +399,6 @@
             color: #7f1d1d;
         }
 
-    /* DataTables superior: buscar izquierda, mostrar derecha */
     .dataTables_wrapper .row:first-child {
         display: flex !important;
         align-items: center !important;
@@ -425,7 +409,6 @@
         flex-wrap: wrap;
     }
 
-        /* Quitamos el ancho fijo de Bootstrap para que sí se acomoden bien */
         .dataTables_wrapper .row:first-child > div {
             width: auto !important;
             max-width: none !important;
@@ -434,7 +417,6 @@
             padding-right: 0 !important;
         }
 
-            /* Primer bloque = length (Mostrar registros) -> derecha */
             .dataTables_wrapper .row:first-child > div:first-child {
                 order: 2;
                 display: flex !important;
@@ -443,7 +425,6 @@
                 text-align: right !important;
             }
 
-            /* Segundo bloque = filter (Buscar) -> izquierda */
             .dataTables_wrapper .row:first-child > div:last-child {
                 order: 1;
                 display: flex !important;
@@ -643,7 +624,7 @@
                             <td class="text-center">
                                 <div class="ct-actions">
                                     <button type="button"
-                                            class="ct-icon-btn ct-icon-edit"
+                                            class="ct-icon-btn"
                                             title="Editar"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalEditarCita-@cita.IdCita">
@@ -651,7 +632,7 @@
                                     </button>
 
                                     <button type="button"
-                                            class="ct-icon-btn ct-icon-delete"
+                                            class="ct-icon-btn"
                                             title="Eliminar"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalEliminarCita-@cita.IdCita">
